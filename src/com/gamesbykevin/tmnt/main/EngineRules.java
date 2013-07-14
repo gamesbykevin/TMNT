@@ -1,7 +1,5 @@
 package com.gamesbykevin.tmnt.main;
 
-
-
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
