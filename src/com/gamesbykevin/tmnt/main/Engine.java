@@ -208,7 +208,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         //is menu is finished and we dont want to hide mouse cursor then draw it, or if the menu is not finished show mouse
         if (menu.isMenuFinished() && !Main.hideMouse || !menu.isMenuFinished())
         {
-            Point p = mouse.getMouseLocation();
+            Point p = mouse.getLocation();
 
             if (p != null && resources.getMenuImage(ResourceManager.MenuImage.Mouse) != null && resources.getMenuImage(ResourceManager.MenuImage.MouseDrag) != null)
             {
