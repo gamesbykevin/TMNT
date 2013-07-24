@@ -39,12 +39,16 @@ public class Enemy extends Player
         //make sure enemy has hero targeted
         checkAssignment(heroes.size());
         
+        //get the hero the enemy is assigned to attack
         Hero hero = heroes.get(assigned);
         
         //make sure the hero isn't hurt or dead
         if (!hero.isDead() && !hero.isHurt())
         {
-            
+            if (isIdle() && getX() < hero.getX())
+                super.setHorizontalFlip(false);
+            if (isIdle() && getX() > hero.getX())
+                super.setHorizontalFlip(true);
         }
     }
     
