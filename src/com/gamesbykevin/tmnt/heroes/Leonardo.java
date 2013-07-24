@@ -3,8 +3,6 @@ package com.gamesbykevin.tmnt.heroes;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import java.awt.Rectangle;
-
 public final class Leonardo extends Hero implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 94;
@@ -120,7 +118,7 @@ public final class Leonardo extends Hero implements PlayerRules
         
         //jump kick animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(5,4), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(5,4), getNanoSeconds(25));
         animation.add(getSpriteRectangle(6,4), getNanoSeconds(75));
         animation.add(getSpriteRectangle(7,4), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.JUMP_ATTACK);
