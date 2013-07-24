@@ -37,7 +37,7 @@ public class Enemy extends Player
         super.update();
         
         //make sure enemy has hero targeted
-        checkAssignment(heroes.size());
+        checkAssignment(heroes);
         
         //get the hero the enemy is assigned to attack
         Hero hero = heroes.get(assigned);
@@ -50,15 +50,19 @@ public class Enemy extends Player
             if (isIdle() && getX() > hero.getX())
                 super.setHorizontalFlip(true);
         }
+        else
+        {
+            
+        }
     }
     
     /**
      * If the enemy is not assigned a hero to attack do so now
      * @param size Total number of heroes to choose from
      */
-    private void checkAssignment(final int size)
+    private void checkAssignment(final List<Hero> heroes)
     {
-        if (assigned < 0 || assigned >= size)
-            assigned = (int)(Math.random() * size);
+        if (assigned < 0 || assigned >= heroes.size())
+            assigned = (int)(Math.random() * heroes.size());
     }
 }

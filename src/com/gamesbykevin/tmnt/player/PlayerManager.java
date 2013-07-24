@@ -142,7 +142,6 @@ public class PlayerManager
             players.add(enemy);
         }
         
-        //this bubble sort may be optimized
         for (int i=0; i < players.size(); i++)
         {
             for (int x=0; x < players.size(); x++)
@@ -150,7 +149,7 @@ public class PlayerManager
                 if (i == x)
                     continue;
                 
-                if (players.get(i).getY() < players.get(x).getY())
+                if (players.get(i).getY() + players.get(i).getHeight() < players.get(x).getY() + players.get(x).getHeight())
                 {
                     Player temp = players.get(i);
                     
