@@ -134,6 +134,8 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void reset() throws Exception
     {
+        this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
+        
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
         /*

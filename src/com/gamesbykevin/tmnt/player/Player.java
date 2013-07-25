@@ -73,7 +73,7 @@ public class Player extends Sprite
     }
     
     /**
-     * Set the speed for walking
+     * Set the speed itself that the player can move for walking
      * @param x Amount of pixels per step
      */
     protected void setVelocityWalk(final int x)

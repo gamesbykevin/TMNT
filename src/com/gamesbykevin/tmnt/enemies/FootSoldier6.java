@@ -8,7 +8,7 @@ public class FootSoldier6 extends Enemy implements PlayerRules
     private static final int SPRITE_WIDTH  = 65;
     private static final int SPRITE_HEIGHT = 65;
     
-    private static final int VELOCITY_WALK = 4;
+    private static final int VELOCITY_WALK = 1;
     
     /**
      * In this constructor we want to setup all of the animations for this Player

@@ -45,24 +45,47 @@ public class Enemy extends Player
         //make sure the hero isn't hurt or dead
         if (!hero.isDead() && !hero.isHurt())
         {
-            if (isIdle() && getX() < hero.getX())
+            if (canWalk() || isWalking())
+            {
+                //face the direction walking
                 super.setHorizontalFlip(false);
-            if (isIdle() && getX() > hero.getX())
-                super.setHorizontalFlip(true);
+                
+                if (getX() < hero.getX())
+                {
+                    super.setState(State.WALK_HORIZONTAL);
+                    super.setVelocityX(super.getVelocityWalk());
+                }
+                
+                if (getX() > hero.getX())
+                {
+                    super.setHorizontalFlip(true);
+                    super.setState(State.WALK_HORIZONTAL);
+                    super.setVelocityX(-super.getVelocityWalk());
+                }
+            }
         }
         else
         {
-            
+            //if the hero is dead
         }
     }
     
     /**
-     * If the enemy is not assigned a hero to attack do so now
+     * If the enemy is not assigned a hero to attack do so now.
      * @param size Total number of heroes to choose from
      */
     private void checkAssignment(final List<Hero> heroes)
     {
         if (assigned < 0 || assigned >= heroes.size())
+        {
+            //now we have an assigned target
             assigned = (int)(Math.random() * heroes.size());
+            
+            //choose attack pattern
+            //1. attack from front
+            //2. attack from back
+            
+            
+        }
     }
 }
