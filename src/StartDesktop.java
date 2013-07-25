@@ -22,7 +22,7 @@ public class StartDesktop extends JPanel
         
         try
         {
-            main = new Main(Shared.DEFAULT_UPS, false);
+            main = new Main(Shared.DEFAULT_UPS, Shared.DEBUG);
             main.setPanel(this);
             main.createGameEngine();
             main.start();

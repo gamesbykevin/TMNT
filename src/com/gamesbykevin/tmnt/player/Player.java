@@ -153,7 +153,7 @@ public class Player extends Sprite
     }
     
     /**
-     * Set the state of this player
+     * Set the state of this player which also sets the appropriate sprite sheet
      * @param state set what the current Player is doing
      */
     public void setState(final State state)
@@ -161,6 +161,19 @@ public class Player extends Sprite
         this.getSpriteSheet().setCurrent(state);
     }
     
+    /**
+     * Make sure animation exists.
+     * @param state The animation to check
+     * @return boolean
+     */
+    public boolean hasState(final State state)
+    {
+        return getSpriteSheet().hasAnimation(state);
+    }
+    
+    /**
+     * reset sprite sheet animation
+     */
     protected void reset()
     {
         this.getSpriteSheet().reset();
@@ -248,7 +261,7 @@ public class Player extends Sprite
      * Is the player jumping
      * @return boolean
      */
-    protected boolean isJumping()
+    public boolean isJumping()
     {
         switch(getState())
         {
@@ -382,6 +395,15 @@ public class Player extends Sprite
             default:
                 return false;
         }
+    }
+    
+    /**
+     * Checks to see if the player has the ability to throw a projectile
+     * @return boolean
+     */
+    protected boolean canThrowProjectile()
+    {
+        return hasState(State.THROW_PROJECTILE);
     }
     
     /**

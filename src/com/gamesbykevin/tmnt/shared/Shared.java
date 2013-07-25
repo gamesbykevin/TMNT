@@ -16,6 +16,9 @@ public class Shared
     public static final int WINDOW_WIDTH  = 500;
     public static final int WINDOW_HEIGHT = 300;
     
+    //show UPS/FPS counters
+    public static final boolean DEBUG = true;
+    
     //how many updates per second, controls speed of game
     public static final int DEFAULT_UPS = 60;
     

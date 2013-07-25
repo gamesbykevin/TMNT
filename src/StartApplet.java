@@ -40,7 +40,7 @@ public class StartApplet extends JApplet
             e.printStackTrace();
         }
         
-        main = new Main(ups, showCounter);
+        main = new Main(ups, showCounter || Shared.DEBUG);
         main.setApplet(this);
     }
     
