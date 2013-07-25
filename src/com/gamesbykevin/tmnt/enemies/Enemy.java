@@ -1,6 +1,7 @@
 package com.gamesbykevin.tmnt.enemies;
 
 import com.gamesbykevin.framework.base.Sprite;
+import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
@@ -13,24 +14,11 @@ public class Enemy extends Player
     //this is the hero the enemy has targeted
     private int assigned = -1;
     
-    //this is the projectile object
-    private Sprite projectile;
-    
     //the direction the player will attempt to attack from
     private boolean attackEast = false, attackWest = false;
     
     public Enemy()
     {
-    }
-    
-    /**
-     * Get the projectile the enemy has. If the enemy 
-     * does not have a projectile null will be returned.
-     * @return Sprite
-     */
-    protected Sprite getProjectile()
-    {
-        return this.projectile;
     }
     
     /**
@@ -61,64 +49,47 @@ public class Enemy extends Player
                 setVelocityX(VELOCITY_NONE);
                 setVelocityY(VELOCITY_NONE);
                 
-                if (attackEast)
+                //if attacking from the east side and we aren't on the east side yet
+                if (attackEast && getX() < hero.getX() + hero.getWidth())
                 {
-                    if (getX() < hero.getX() + hero.getWidth())
-                    {
-                        setState(State.WALK_HORIZONTAL);
-                        setVelocityX(getVelocityWalk());
-                        setVelocityY(VELOCITY_NONE);
-                    }
-                    else
-                    {
-                        //now that we are on the correct side we can fix the y coordinate
-                        if (getY() < hero.getY() - getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(getVelocityWalk());
-                        }
-                        
-                        if (getY() > hero.getY() + getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(-getVelocityWalk());
-                        }
-                    }
+                    setState(State.WALK_HORIZONTAL);
+                    setVelocityX(getVelocityWalk());
+                    setVelocityY(VELOCITY_NONE);
                 }
                 
-                if (attackWest)
+                //if attacking from the west side and we aren't on the west side yet
+                if (attackWest && getX() > hero.getX() - hero.getWidth())
                 {
-                    if (getX() > hero.getX() - hero.getWidth())
+                    setState(State.WALK_HORIZONTAL);
+                    setVelocityX(-getVelocityWalk());
+                    setVelocityY(VELOCITY_NONE);
+                }
+                
+                //now that we are on the correct side we can fix the y coordinate
+                if (getVelocityX() == VELOCITY_NONE && !hero.isJumping())
+                {
+                    if (getY() < hero.getY() - getVelocityWalk())
                     {
-                        setState(State.WALK_HORIZONTAL);
-                        setVelocityX(-getVelocityWalk());
-                        setVelocityY(VELOCITY_NONE);
+                        setState(State.WALK_VERTICAL);
+                        setVelocityX(VELOCITY_NONE);
+                        setVelocityY(getVelocityWalk());
                     }
-                    else
+
+                    if (getY() > hero.getY() + getVelocityWalk())
                     {
-                        //now that we are on the correct side we can fix the y coordinate
-                        if (!hero.isJumping())
-                        if (getY() < hero.getY() - getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(getVelocityWalk());
-                        }
-                        
-                        if (getY() > hero.getY() + getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(-getVelocityWalk());
-                        }
+                        setState(State.WALK_VERTICAL);
+                        setVelocityX(VELOCITY_NONE);
+                        setVelocityY(-getVelocityWalk());
                     }
                 }
                 
                 //if we have an attack opportunity go for it
                 if (hasAttackOpportunity(hero))
+                {
+                    setVelocityX(VELOCITY_NONE);
+                    setVelocityY(VELOCITY_NONE);
                     performAttack(hero);
+                }
             }
         }
         else
@@ -206,7 +177,14 @@ public class Enemy extends Player
         //if random attack is projectile we need to add projectile
         if (possible.get(rand) == State.THROW_PROJECTILE)
         {
+            Sprite projectile = new Sprite();
+            projectile.setX(getX());
+            projectile.setY(getY());
             
+            SpriteSheetAnimation animation = super.getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
+            projectile.getSpriteSheet().add(animation, null);
+            
+            super.setProjectile(projectile);
         }
     }
 }

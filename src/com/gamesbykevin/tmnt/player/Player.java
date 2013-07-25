@@ -44,15 +44,37 @@ public class Player extends Sprite
     //# of hits player can take before they die
     private int health = 0;
     
+    //this is the projectile object
+    private Sprite projectile;
+    
     public Player()
     {
         setState(State.IDLE);
     }
+    
+    /**
+     * Get the projectile the enemy has. If the enemy 
+     * does not have a projectile null will be returned.
+     * @return Sprite
+     */
+    protected Sprite getProjectile()
+    {
+        return this.projectile;
+    }
+    
+    /**
+     * Sets the projectile
+     * @param projectile 
+     */
+    protected void setProjectile(final Sprite projectile)
+    {
+        this.projectile = projectile;
+    }
 
     /**
-     * For the sprite sheets they are tiled 
-     * perfectly so we can use this formula 
-     * to get the appropriate coordinates.
+     * For the sprite sheets they are tiled perfectly so we 
+     * can use this formula to get the appropriate coordinates.
+     * 
      * @param col Column
      * @param row Row
      * @return Rectangle of coordinates
@@ -390,6 +412,7 @@ public class Player extends Sprite
             case ATTACK4:
             case ATTACK5:
             case JUMP_ATTACK:
+            case THROW_PROJECTILE:
                 return true;
                 
             default:
@@ -471,6 +494,9 @@ public class Player extends Sprite
         offsetCenter();
         
         super.draw(g);
+        
+        if (projectile != null)
+            super.draw(g);
         
         g.setColor(Color.BLUE);
         g.drawRect(getX(), getY(), getWidth(), getHeight());
