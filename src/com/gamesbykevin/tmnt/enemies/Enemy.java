@@ -14,8 +14,11 @@ public class Enemy extends Player
     //this is the hero the enemy has targeted
     private int assigned = -1;
     
-    //the direction the player will attempt to attack from
-    private boolean attackEast = false, attackWest = false;
+    //the direction the player will attempt to attack from if not east then west
+    private boolean attackEast = false;
+    
+    //attackTurn means the cpu was able to attack
+    private boolean attackTurn = false;
     
     public Enemy()
     {
@@ -28,7 +31,7 @@ public class Enemy extends Player
     {
         super.update();
         
-        //make sure enemy has hero targeted
+        //make sure enemy has a hero targeted
         checkAssignment(heroes);
         
         //get the hero the enemy is assigned to attack
@@ -58,38 +61,45 @@ public class Enemy extends Player
                 }
                 
                 //if attacking from the west side and we aren't on the west side yet
-                if (attackWest && getX() > hero.getX() - hero.getWidth())
+                if (!attackEast && getX() > hero.getX() - hero.getWidth())
                 {
                     setState(State.WALK_HORIZONTAL);
                     setVelocityX(-getVelocityWalk());
                     setVelocityY(VELOCITY_NONE);
                 }
                 
-                //now that we are on the correct side we can fix the y coordinate
-                if (getVelocityX() == VELOCITY_NONE && !hero.isJumping())
+                //verify we are on the correct sidenow that we are on the correct side we can fix the y coordinate
+                if (attackTurn)
                 {
-                    if (getY() < hero.getY() - getVelocityWalk())
+                    if (getVelocityX() == VELOCITY_NONE && !hero.isJumping())
                     {
-                        setState(State.WALK_VERTICAL);
-                        setVelocityX(VELOCITY_NONE);
-                        setVelocityY(getVelocityWalk());
-                    }
+                        if (getY() + getHeight() < hero.getY() + hero.getHeight() - getVelocityWalk())
+                        {
+                            setState(State.WALK_VERTICAL);
+                            setVelocityX(VELOCITY_NONE);
+                            setVelocityY(getVelocityWalk());
+                        }
 
-                    if (getY() > hero.getY() + getVelocityWalk())
+                        if (getY() + getHeight() > hero.getY() + hero.getHeight() + getVelocityWalk())
+                        {
+                            setState(State.WALK_VERTICAL);
+                            setVelocityX(VELOCITY_NONE);
+                            setVelocityY(-getVelocityWalk());
+                        }
+                    }
+                    
+                    //if we have an attack opportunity go for it
+                    if (hasAttackOpportunity(hero))
                     {
-                        setState(State.WALK_VERTICAL);
                         setVelocityX(VELOCITY_NONE);
-                        setVelocityY(-getVelocityWalk());
+                        setVelocityY(VELOCITY_NONE);
+                        performAttack(hero);
+                        
+                        //after the player attacks allow another player the opportunity
+                        setAttackTurn(false);
                     }
                 }
                 
-                //if we have an attack opportunity go for it
-                if (hasAttackOpportunity(hero))
-                {
-                    setVelocityX(VELOCITY_NONE);
-                    setVelocityY(VELOCITY_NONE);
-                    performAttack(hero);
-                }
             }
         }
         else
@@ -107,6 +117,34 @@ public class Enemy extends Player
     }
     
     /**
+     * Does this player attack from the east
+     * @param attackEast 
+     */
+    public void setAttackEast(final boolean attackEast)
+    {
+        this.attackEast = attackEast;
+    }
+    
+    public boolean hasAttackEast()
+    {
+        return this.attackEast;
+    }
+    
+    /**
+     * Is it the players turn to attack
+     * @param attackTurn 
+     */
+    public void setAttackTurn(final boolean attackTurn)
+    {
+        this.attackTurn = attackTurn;
+    }
+    
+    public boolean hasAttackTurn()
+    {
+        return this.attackTurn;
+    }
+    
+    /**
      * If the enemy is not assigned a hero to attack do so now.
      * @param size Total number of heroes to choose from
      */
@@ -116,10 +154,6 @@ public class Enemy extends Player
         {
             //now we have an assigned target
             assigned = (int)(Math.random() * heroes.size());
-            
-            //attack pattern is random
-            this.attackEast = (Math.random() < .5);
-            this.attackWest = !this.attackEast;
         }
     }
     
@@ -159,16 +193,21 @@ public class Enemy extends Player
         
         if (hasState(State.THROW_PROJECTILE))
             possible.add(State.THROW_PROJECTILE);
-        if (hasState(State.ATTACK1))
-            possible.add(State.ATTACK1);
-        if (hasState(State.ATTACK2))
-            possible.add(State.ATTACK2);
-        if (hasState(State.ATTACK3))
-            possible.add(State.ATTACK3);
-        if (hasState(State.ATTACK4))
-            possible.add(State.ATTACK4);
-        if (hasState(State.ATTACK5))
-            possible.add(State.ATTACK5);
+        
+        //these attacks are close range and will only be applied if he player is close enough
+        if (getRectangle().contains(hero.getPoint()))
+        {
+            if (hasState(State.ATTACK1))
+                possible.add(State.ATTACK1);
+            if (hasState(State.ATTACK2))
+                possible.add(State.ATTACK2);
+            if (hasState(State.ATTACK3))
+                possible.add(State.ATTACK3);
+            if (hasState(State.ATTACK4))
+                possible.add(State.ATTACK4);
+            if (hasState(State.ATTACK5))
+                possible.add(State.ATTACK5);
+        }
         
         final int rand = (int)(Math.random() * possible.size());
         

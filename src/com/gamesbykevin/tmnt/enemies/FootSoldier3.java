@@ -54,7 +54,7 @@ public class FootSoldier3 extends Enemy implements PlayerRules
         //idle animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,0), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(1,1), getNanoSeconds(250));
+        animation.add(getSpriteRectangle(0,1), getNanoSeconds(250));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.IDLE);
         

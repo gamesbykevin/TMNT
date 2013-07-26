@@ -122,14 +122,78 @@ public class PlayerManager
             hero.update(engine.getKeyboard());
         }
         
+        checkEnemy();
+        
         for (Enemy enemy : enemies)
         {
             enemy.update(heroes);
         }
     }
     
+    /**
+     * This method will make if there are at least 2 enemies that they are set to attack
+     */
+    private void checkEnemy()
+    {
+        int count = 0;
+        
+        boolean attackEast = false;
+        
+        //temp list
+        List<Enemy> tmp = new ArrayList<>();
+        
+        for (Enemy enemy : enemies)
+        {
+            tmp.add(enemy);
+            
+            if (enemy.hasAttackTurn())
+            {
+                if (enemy.hasAttackEast())
+                    attackEast = true;
+                
+                count++;
+            }
+        }
+        
+        //we always need 2 enemies attacking the player
+        if (count < 2)
+        {
+            if (count == 0)
+            {
+                final boolean result = (Math.random() > .5);
+                
+                int rand = (int)(Math.random() * tmp.size());
+                tmp.get(rand).setAttackTurn(true);
+                tmp.get(rand).setAttackEast(result);
+                tmp.remove(rand);
+                
+                rand = (int)(Math.random() * tmp.size());
+                tmp.get(rand).setAttackTurn(true);
+                tmp.get(rand).setAttackEast(!result);
+                tmp.remove(rand);
+            }
+            else
+            {
+                int rand = (int)(Math.random() * tmp.size());
+                tmp.get(rand).setAttackTurn(true);
+                
+                //the other player is attacking from the east so this player needs to attack from the west
+                if (attackEast)
+                    tmp.get(rand).setAttackEast(false);
+                else
+                    tmp.get(rand).setAttackEast(true);
+                
+                tmp.remove(rand);
+            }
+            
+            tmp.clear();
+            tmp = null;
+        }
+    }
+    
     public Graphics render(Graphics g)
     {
+        //all players will be contained here and sorted so they are drawn in the correct order
         List<Player> players = new ArrayList<>();
         
         for (Hero hero : heroes)
