@@ -87,17 +87,17 @@ public class Enemy extends Player
                             setVelocityY(-getVelocityWalk());
                         }
                     }
-                    
-                    //if we have an attack opportunity go for it
-                    if (hasAttackOpportunity(hero))
-                    {
-                        setVelocityX(VELOCITY_NONE);
-                        setVelocityY(VELOCITY_NONE);
-                        performAttack(hero);
-                        
-                        //after the player attacks allow another player the opportunity
-                        setAttackTurn(false);
-                    }
+                }
+
+                //if we have an attack opportunity go for it
+                if (hasAttackOpportunity(hero))
+                {
+                    setVelocityX(VELOCITY_NONE);
+                    setVelocityY(VELOCITY_NONE);
+                    performAttack(hero);
+
+                    //after the player attacks it is no longer their turn so another player can have the chance
+                    setAttackTurn(false);
                 }
                 
             }
@@ -146,7 +146,9 @@ public class Enemy extends Player
     
     /**
      * If the enemy is not assigned a hero to attack do so now.
-     * @param size Total number of heroes to choose from
+     * NOTE: WILL NEED TO ADD LOGIC HERE SO IF THERE ARE MORE THAN 1 HERO
+     * THE ENEMIES ASSIGNED TO EACH HERO IS EQUALLY SPREAD OUT
+     * @param heroes Heroes to choose from
      */
     private void checkAssignment(final List<Hero> heroes)
     {

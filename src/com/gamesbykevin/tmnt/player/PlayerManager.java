@@ -170,7 +170,6 @@ public class PlayerManager
                 rand = (int)(Math.random() * tmp.size());
                 tmp.get(rand).setAttackTurn(true);
                 tmp.get(rand).setAttackEast(!result);
-                tmp.remove(rand);
             }
             else
             {
@@ -182,8 +181,6 @@ public class PlayerManager
                     tmp.get(rand).setAttackEast(false);
                 else
                     tmp.get(rand).setAttackEast(true);
-                
-                tmp.remove(rand);
             }
             
             tmp.clear();
@@ -193,7 +190,7 @@ public class PlayerManager
     
     public Graphics render(Graphics g)
     {
-        //all players will be contained here and sorted so they are drawn in the correct order
+        //all players will be contained in this list and sorted so the lowest y value is drawn first
         List<Player> players = new ArrayList<>();
         
         for (Hero hero : heroes)
