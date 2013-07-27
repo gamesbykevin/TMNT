@@ -1,7 +1,5 @@
 package com.gamesbykevin.tmnt.player;
 
-import com.gamesbykevin.framework.base.Sprite;
-
 import com.gamesbykevin.tmnt.enemies.Enemy;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.*;
@@ -29,80 +27,81 @@ public class PlayerManager
         //addTurtle(resources, delay, 200, 200);
         
         addEnemy(resources, delay, 250, 100);
+        addEnemy(resources, delay, 150, 300);
     }
     
     private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
     {
-        com.gamesbykevin.tmnt.enemies.Enemy d = null;
+        Enemy enemy = null;
         
         int rand = (int)(Math.random() * ResourceManager.GameEnemies.values().length);
         
         switch (rand)
         {
             case 0:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier1();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier1();
                 break;
                 
             case 1:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier2();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier2();
                 break;
                 
             case 2:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier3();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier3();
                 break;
                 
             case 3:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier4();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier4();
                 break;
                 
             case 4:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier5();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier5();
                 break;
                 
             case 5:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier6();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier6();
                 break;
                 
             case 6:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier7();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier7();
                 break;
                 
             case 7:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier8();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier8();
                 break;
                 
             default:
-                d = new com.gamesbykevin.tmnt.enemies.FootSoldier9();
+                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier9();
                 break;
         }
         
-        d.setImage(resources.getGameEnemy(ResourceManager.GameEnemies.values()[rand]));
-        d.setDelay(delay);
-        d.setLocation(x, y);
+        enemy.setImage(resources.getGameEnemy(ResourceManager.GameEnemies.values()[rand]));
+        enemy.setDelay(delay);
+        enemy.setLocation(x, y);
         
-        enemies.add(d);
+        enemies.add(enemy);
     }
     
     private void addTurtle(final ResourceManager resources, final long delay, final int x, final int y)
     {
-        com.gamesbykevin.tmnt.heroes.Hero d = null;
+        Hero hero = null;
         
         int rand = (int)(Math.random() * ResourceManager.GameHeroes.values().length);
         
         if (rand == 0)
-            d = new com.gamesbykevin.tmnt.heroes.Donatello();
+            hero = new com.gamesbykevin.tmnt.heroes.Donatello();
         if (rand == 1)
-            d = new com.gamesbykevin.tmnt.heroes.Raphael();
+            hero = new com.gamesbykevin.tmnt.heroes.Raphael();
         if (rand == 2)
-            d = new com.gamesbykevin.tmnt.heroes.Leonardo();
+            hero = new com.gamesbykevin.tmnt.heroes.Leonardo();
         if (rand == 3)
-            d = new com.gamesbykevin.tmnt.heroes.Michelangelo();
+            hero = new com.gamesbykevin.tmnt.heroes.Michelangelo();
         
-        d.setImage(resources.getGameHero(ResourceManager.GameHeroes.values()[rand]));
-        d.setDelay(delay);
-        d.setLocation(x, y);
+        hero.setImage(resources.getGameHero(ResourceManager.GameHeroes.values()[rand]));
+        hero.setDelay(delay);
+        hero.setLocation(x, y);
         
-        heroes.add(d);
+        heroes.add(hero);
     }
     
     /**
@@ -171,7 +170,8 @@ public class PlayerManager
                 tmp.get(rand).setAttackTurn(true);
                 tmp.get(rand).setAttackEast(!result);
             }
-            else
+            
+            if (count == 1 && enemies.size() > count)
             {
                 int rand = (int)(Math.random() * tmp.size());
                 tmp.get(rand).setAttackTurn(true);

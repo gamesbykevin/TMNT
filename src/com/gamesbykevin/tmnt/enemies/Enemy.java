@@ -15,7 +15,7 @@ public class Enemy extends Player
     private int assigned = -1;
     
     //the direction the player will attempt to attack from if not east then west
-    private boolean attackEast = false;
+    private boolean attackEast = (Math.random() > .5);
     
     //attackTurn means the cpu was able to attack
     private boolean attackTurn = false;
@@ -37,82 +37,151 @@ public class Enemy extends Player
         //get the hero the enemy is assigned to attack
         Hero hero = heroes.get(assigned);
         
+        //face the direction hero is
+        if (getX() < hero.getX())
+            setHorizontalFlip(false);
+        else
+            setHorizontalFlip(true);
+        
         //make sure the hero isn't hurt or dead
         if (!hero.isDead() && !hero.isHurt())
         {
+            //make sure enemy can walk or if they are walking to follow the logic below
             if (canWalk() || isWalking())
             {
-                //face the direction walking
-                if (getX() < hero.getX())
-                    setHorizontalFlip(false);
-                else
-                    setHorizontalFlip(true);
-                
+                //reset state and velocity
                 setState(State.IDLE);
-                setVelocityX(VELOCITY_NONE);
-                setVelocityY(VELOCITY_NONE);
+                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
                 
-                //if attacking from the east side and we aren't on the east side yet
-                if (attackEast && getX() < hero.getX() + hero.getWidth())
-                {
-                    setState(State.WALK_HORIZONTAL);
-                    setVelocityX(getVelocityWalk());
-                    setVelocityY(VELOCITY_NONE);
-                }
+                //surround the enemy first
+                surroundEnemy(hero);
                 
-                //if attacking from the west side and we aren't on the west side yet
-                if (!attackEast && getX() > hero.getX() - hero.getWidth())
-                {
-                    setState(State.WALK_HORIZONTAL);
-                    setVelocityX(-getVelocityWalk());
-                    setVelocityY(VELOCITY_NONE);
-                }
+                //line up the y-cooridnate to get ready to attack
+                lineupAttack(hero);
                 
-                //verify we are on the correct sidenow that we are on the correct side we can fix the y coordinate
-                if (attackTurn)
-                {
-                    if (getVelocityX() == VELOCITY_NONE && !hero.isJumping())
-                    {
-                        if (getY() + getHeight() < hero.getY() + hero.getHeight() - getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(getVelocityWalk());
-                        }
-
-                        if (getY() + getHeight() > hero.getY() + hero.getHeight() + getVelocityWalk())
-                        {
-                            setState(State.WALK_VERTICAL);
-                            setVelocityX(VELOCITY_NONE);
-                            setVelocityY(-getVelocityWalk());
-                        }
-                    }
-                }
-
-                //if we have an attack opportunity go for it
-                if (hasAttackOpportunity(hero))
-                {
-                    setVelocityX(VELOCITY_NONE);
-                    setVelocityY(VELOCITY_NONE);
-                    performAttack(hero);
-
-                    //after the player attacks it is no longer their turn so another player can have the chance
-                    setAttackTurn(false);
-                }
+                //then we close the gap and get close
+                closeGap(hero);
                 
+                //here we check for the opportunity to attack and take it if available
+                checkAttackOpportunity(hero);
             }
         }
         else
         {
-            if (hero.isDead())
+            //if the hero is dead and the enemy is not jumping set them to idle state
+            if (hero.isDead() && !isJumping())
             {
-                //if the hero is dead and the enemy is not jumping set them to idle state
-                if (!isJumping())
-                {
-                    setState(State.IDLE);
-                    setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
-                }
+                setState(State.IDLE);
+                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
+        }
+    }
+    
+    /**
+     * If we have a chance to harm hero take it
+     * @param hero The hero we want to harm.
+     */
+    private void checkAttackOpportunity(final Hero hero)
+    {
+        //if we have an attack opportunity go for it
+        if (hasAttackOpportunity(hero))
+        {
+            //while attacking the enemy isn't moving
+            setVelocityX(VELOCITY_NONE);
+            setVelocityY(VELOCITY_NONE);
+            
+            //perform a random attack
+            performAttack(hero);
+
+            //after the player attacks it is no longer their turn so another player can have the chance
+            setAttackTurn(false);
+        }
+    }
+    
+    /**
+     * Here depending on whether or not the enemy can throw a projectile 
+     * the enemy could move further back or close in to be able to attack
+     * @param hero 
+     */
+    private void closeGap(final Hero hero)
+    {
+        if (!attackTurn)
+            return;
+        
+        //if the enemy can throw a projectile we will handle this differently
+        if (super.hasState(State.THROW_PROJECTILE))
+        {
+            
+        }
+        else
+        {
+            if (getX() < hero.getX())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
+            
+            if (getX() > hero.getX())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(-getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
+        }
+    }
+    
+    /**
+     * Here the enemy will correct the y coordinate to 
+     * lineup with the hero, basically ready to attack.
+     * @param hero The hero we are targeting.
+     */
+    private void lineupAttack(final Hero hero)
+    {
+        if (!this.attackTurn)
+            return;
+        
+        //if the x velocity is still active or the hero is jumping we will not move into attack position
+        if (getVelocityX() != VELOCITY_NONE || hero.isJumping())
+            return;
+        
+        //now that we are on the correct side we can fix the y coordinate
+        if (getY() + getHeight() < hero.getY() + hero.getHeight() - getVelocityWalk())
+        {
+            setState(State.WALK_VERTICAL);
+            setVelocityX(VELOCITY_NONE);
+            setVelocityY(getVelocityWalk());
+        }
+
+        if (getY() + getHeight() > hero.getY() + hero.getHeight() + getVelocityWalk())
+        {
+            setState(State.WALK_VERTICAL);
+            setVelocityX(VELOCITY_NONE);
+            setVelocityY(-getVelocityWalk());
+        }
+    }
+    
+    /**
+     * This is the initial state when an enemy starts. 
+     * They will position themselves on the appropriate side
+     * @param hero The hero to surround.
+     */
+    private void surroundEnemy(final Hero hero)
+    {
+        //if attacking from the east side and we aren't on the east side yet
+        if (attackEast && getX() < hero.getX() + hero.getWidth())
+        {
+            setState(State.WALK_HORIZONTAL);
+            setVelocityX(getVelocityWalk());
+            setVelocityY(VELOCITY_NONE);
+        }
+
+        //if attacking from the west side and we aren't on the west side yet
+        if (!attackEast && getX() > hero.getX() - hero.getWidth())
+        {
+            setState(State.WALK_HORIZONTAL);
+            setVelocityX(-getVelocityWalk());
+            setVelocityY(VELOCITY_NONE);
         }
     }
     
@@ -160,9 +229,12 @@ public class Enemy extends Player
     }
     
     /**
-     * Checks if the enemy can attack the hero
-     * @param hero
-     * @return 
+     * Checks if the enemy can attack the hero. 
+     * If the enemy is within the center point of the hero,
+     * or the enemy can throw projectiles and is within the 
+     * same y coordinate.
+     * @param hero Hero to attack
+     * @return boolean
      */
     private boolean hasAttackOpportunity(final Hero hero)
     {
@@ -211,8 +283,10 @@ public class Enemy extends Player
                 possible.add(State.ATTACK5);
         }
         
+        //get random index
         final int rand = (int)(Math.random() * possible.size());
         
+        //set the enemy state
         setState(possible.get(rand));
         
         //if random attack is projectile we need to add projectile
@@ -222,6 +296,7 @@ public class Enemy extends Player
             projectile.setX(getX());
             projectile.setY(getY());
             
+            //all enemies not including bosses have 1 projectile
             SpriteSheetAnimation animation = super.getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
             projectile.getSpriteSheet().add(animation, null);
             

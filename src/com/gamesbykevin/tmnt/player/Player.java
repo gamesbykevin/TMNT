@@ -194,7 +194,7 @@ public class Player extends Sprite
     }
     
     /**
-     * reset sprite sheet animation
+     * Only reset sprite sheet animation
      */
     protected void reset()
     {
@@ -220,6 +220,10 @@ public class Player extends Sprite
         return TimerCollection.toNanoSeconds(milliseconds);
     }
     
+    /**
+     * Sets the delay per each update
+     * @param delay In nanoseconds
+     */
     public void setDelay(final long delay)
     {
         this.getSpriteSheet().setDelay(delay);

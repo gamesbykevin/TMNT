@@ -23,9 +23,6 @@ public class Main extends Thread
     //do we hide mouse when the menu is not visible and actual gameplay started
     public static boolean hideMouse = true;//(DEBUG_MODE);//true;
     
-    //do we want to display our fps/ups counter, true by default
-    private final boolean showCounter;
-    
     //how many nanoseconds bewteen each engine update
     private double nanoSecondsPerUpdate;
     
@@ -50,10 +47,8 @@ public class Main extends Thread
     //reference to our panel
     private JPanel panel;
     
-    public Main(final int ups, final boolean showCounter)
-    {
-        this.showCounter = showCounter;
-        
+    public Main(final int ups)
+    {        
         //the dimensions used for original and full screen
         originalSizeWindow = new Rectangle(0, 0, Shared.WINDOW_WIDTH, Shared.WINDOW_HEIGHT);
         fullSizeWindow     = new Rectangle(originalSizeWindow);
@@ -232,7 +227,7 @@ public class Main extends Thread
 
             engine.render(g);
 
-            if (showCounter)
+            if (Shared.DEBUG)
                 renderCounter(g);
         }
     }

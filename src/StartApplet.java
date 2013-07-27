@@ -27,20 +27,18 @@ public class StartApplet extends JApplet
         setCursor(Shared.CURSOR);
             
         int ups = Shared.DEFAULT_UPS;
-        boolean showCounter = true;
 
         try
         {
             //parameters here
-            ups         = Integer.parseInt(getParameter("ups"));
-            showCounter = Boolean.parseBoolean(getParameter("showCounter"));
+            ups = Integer.parseInt(getParameter("ups"));
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
         
-        main = new Main(ups, showCounter || Shared.DEBUG);
+        main = new Main(ups);
         main.setApplet(this);
     }
     
