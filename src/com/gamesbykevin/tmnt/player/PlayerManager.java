@@ -86,18 +86,28 @@ public class PlayerManager
     
     private void addTurtle(final ResourceManager resources, final long delay, final int x, final int y)
     {
-        Hero hero = null;
+        Hero hero;
         
         int rand = (int)(Math.random() * ResourceManager.GameHeroes.values().length);
         
-        if (rand == 0)
-            hero = new Donatello();
-        if (rand == 1)
-            hero = new Raphael();
-        if (rand == 2)
-            hero = new Leonardo();
-        if (rand == 3)
-            hero = new Michelangelo();
+        switch(rand)
+        {
+            case 0:
+                hero = new Donatello();
+                break;
+                
+            case 1:
+                hero = new Raphael();
+                break;
+                
+            case 2:
+                hero = new Leonardo();
+                break;
+                
+            default:
+                hero = new Michelangelo();
+                break;
+        }
         
         hero.setImage(resources.getGameHero(ResourceManager.GameHeroes.values()[rand]));
         hero.setDelay(delay);
@@ -127,7 +137,7 @@ public class PlayerManager
         
         for (Enemy enemy : enemies)
         {
-            enemy.update(heroes);
+            enemy.update(engine.getMain().getScreen(), heroes);
         }
     }
     

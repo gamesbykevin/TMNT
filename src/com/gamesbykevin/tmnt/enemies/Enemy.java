@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.enemies;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 
@@ -21,6 +22,8 @@ public class Enemy extends Player
     //attackTurn means the cpu was able to attack
     private boolean attackTurn = false;
     
+    private static final double PROJECTILE_SPEED_RATIO = 3;
+    
     public Enemy()
     {
     }
@@ -28,9 +31,22 @@ public class Enemy extends Player
     /**
      * Run the AI here for the enemy
      */
-    public void update(List<Hero> heroes)
+    public void update(final Rectangle screen, final List<Hero> heroes)
     {
         super.update();
+        
+        if (getProjectile() != null)
+        {
+            for (Hero hero : heroes)
+            {
+                if (hero.getRectangle().intersects(getProjectile().getRectangle()))
+                    setProjectile(null);
+            }
+            
+            //projectile is no longer within game window
+            if (getProjectile() != null && !screen.contains(getProjectile().getPoint()))
+                setProjectile(null);
+        }
         
         //make sure enemy has a hero targeted
         checkAssignment(heroes);
@@ -66,6 +82,36 @@ public class Enemy extends Player
                 //here we check for the opportunity to attack and take it if available
                 checkAttackOpportunity(hero);
             }
+            
+            if (isAttacking())
+            {
+                //if attack is projectile we need to add projectile
+                if (getState() == State.THROW_PROJECTILE)
+                {
+                    Sprite projectile = new Sprite();
+                    projectile.setLocation(getX(), getY() - (getHeight() / 2));
+                    projectile.setDimensions(getWidth(), getHeight());
+                    projectile.setImage(getImage());
+
+                    if (hasHorizontalFlip())
+                    {
+                        projectile.setHorizontalFlip(true);
+                        projectile.setVelocity(-super.getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+                    }
+                    else
+                    {
+                        projectile.setHorizontalFlip(false);
+                        projectile.setVelocity(super.getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+                    }
+
+                    //NOTE: all enemies not including bosses have 1 projectile
+                    SpriteSheetAnimation animation = getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
+                    projectile.getSpriteSheet().add(animation, null);
+
+                    setProjectile(projectile);
+                }
+                
+            }
         }
         else
         {
@@ -97,20 +143,6 @@ public class Enemy extends Player
             
             //start attack here
             setState(attackState);
-        
-            //if attack is projectile we need to add projectile
-            if (attackState == State.THROW_PROJECTILE)
-            {
-                Sprite projectile = new Sprite();
-                projectile.setX(getX());
-                projectile.setY(getY());
-
-                //all enemies not including bosses have 1 projectile
-                SpriteSheetAnimation animation = super.getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
-                projectile.getSpriteSheet().add(animation, null);
-
-                setProjectile(projectile);
-            }
         }
     }
     
@@ -280,8 +312,12 @@ public class Enemy extends Player
         if (canAttack)
         {
             List<State> possible = getPossibleAttacks();
-            final int rand = (int)(Math.random() * possible.size());
-            return possible.get(rand);
+            
+            if (possible.size() > 0)
+            {
+                final int rand = (int)(Math.random() * possible.size());
+                return possible.get(rand);
+            }
         }
             
         
@@ -296,7 +332,8 @@ public class Enemy extends Player
     {
         List<State> possible = new ArrayList<>();
         
-        if (hasState(State.THROW_PROJECTILE))
+        //can only throw 1 projectile at a time
+        if (hasState(State.THROW_PROJECTILE) && getProjectile() == null)
             possible.add(State.THROW_PROJECTILE);
         
         if (hasState(State.ATTACK1))
@@ -311,13 +348,5 @@ public class Enemy extends Player
             possible.add(State.ATTACK5);
         
         return possible;
-    }
-    
-    /**
-     * Choose the appropriate attack at random
-     * @param hero Hero we need
-     */
-    private void performAttack(final State state)
-    {
     }
 }

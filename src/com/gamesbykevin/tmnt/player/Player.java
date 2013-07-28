@@ -240,6 +240,12 @@ public class Player extends Sprite
         getSpriteSheet().update();
         super.update();
         
+        if (projectile != null)
+        {
+            projectile.getSpriteSheet().update();
+            projectile.update();
+        }
+        
         //manage miscallaneous stuff here
         manageState();
     }
@@ -474,6 +480,15 @@ public class Player extends Sprite
         
         super.setX(super.getX() - halfWidth);
         super.setY(super.getY() - halfHeight);
+        
+        if (projectile != null)
+        {
+            halfWidth = (projectile.getWidth()  / 2);
+            halfHeight =(projectile.getHeight() / 2);
+            
+            projectile.setX(projectile.getX() - halfWidth);
+            projectile.setY(projectile.getY() - halfHeight);
+        }
     }
     
     /**
@@ -486,6 +501,15 @@ public class Player extends Sprite
         
         super.setX(super.getX() + halfWidth);
         super.setY(super.getY() + halfHeight);
+        
+        if (projectile != null)
+        {
+            halfWidth = (projectile.getWidth()  / 2);
+            halfHeight =(projectile.getHeight() / 2);
+            
+            projectile.setX(projectile.getX() + halfWidth);
+            projectile.setY(projectile.getY() + halfHeight);
+        }
     }
     
     /**
@@ -500,7 +524,7 @@ public class Player extends Sprite
         super.draw(g);
         
         if (projectile != null)
-            super.draw(g);
+            projectile.draw(g);
         
         g.setColor(Color.BLUE);
         g.drawRect(getX(), getY(), getWidth(), getHeight());
