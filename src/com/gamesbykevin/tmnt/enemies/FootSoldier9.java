@@ -52,11 +52,11 @@ public class FootSoldier9 extends Enemy implements PlayerRules
         
         //throwing projectile animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(1,2), getNanoSeconds(200));
-        animation.add(getSpriteRectangle(0,2), getNanoSeconds(100));
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(100));
-        animation.add(getSpriteRectangle(2,2), getNanoSeconds(100));
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(1,2), getNanoSeconds(600));
+        animation.add(getSpriteRectangle(0,2), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(2,2), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(3,2), getNanoSeconds(75));
         getSpriteSheet().add(animation, Player.State.THROW_PROJECTILE);
 
         //projectile animation

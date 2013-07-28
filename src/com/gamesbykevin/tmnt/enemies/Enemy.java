@@ -3,7 +3,6 @@ package com.gamesbykevin.tmnt.enemies;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 
@@ -19,13 +18,13 @@ public class Enemy extends Player
     //the direction the player will attempt to attack from if not east then west
     private boolean attackEast = (Math.random() > .5);
     
-    //attackTurn means the cpu was able to attack
-    private boolean attackTurn = false;
+    private static final double PROJECTILE_SPEED_RATIO = 5;
     
-    private static final double PROJECTILE_SPEED_RATIO = 3;
+    private boolean step1 = true, step2 = false, step3 = false;
     
     public Enemy()
     {
+        resetSteps();
     }
     
     /**
@@ -71,13 +70,16 @@ public class Enemy extends Player
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
                 
                 //surround the enemy first
-                surroundEnemy(hero);
+                if (step1)
+                    surroundEnemy(hero);
                 
-                //line up the y-cooridnate to get ready to attack
-                lineupAttack(hero);
+                //next, line up the y-cooridnate to get ready to attack
+                if (!step1 && step2)
+                    lineupAttack(hero);
                 
-                //then we close the gap
-                closeGap(hero);
+                //then, close/spread the gap
+                if (!step1 && !step2 && step3)
+                    closeGap(hero);
                 
                 //here we check for the opportunity to attack and take it if available
                 checkAttackOpportunity(hero);
@@ -86,7 +88,7 @@ public class Enemy extends Player
             if (isAttacking())
             {
                 //if attack is projectile we need to add projectile
-                if (getState() == State.THROW_PROJECTILE)
+                if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasStarted())
                 {
                     Sprite projectile = new Sprite();
                     projectile.setLocation(getX(), getY() - (getHeight() / 2));
@@ -110,7 +112,6 @@ public class Enemy extends Player
 
                     setProjectile(projectile);
                 }
-                
             }
         }
         else
@@ -139,11 +140,64 @@ public class Enemy extends Player
             setVelocityY(VELOCITY_NONE);
             
             //when the player attacks it is no longer their turn
-            setAttackTurn(false);
+            resetSteps();
             
             //start attack here
             setState(attackState);
         }
+    }
+    
+    /**
+     * Start back at step 1
+     */
+    public void resetSteps()
+    {
+        setStep1(true);
+        setStep2(false);
+        setStep3(false);
+    }
+    
+    /**
+     * This step is where the enemy surrounds the hero
+     * @return boolean
+     */
+    public boolean hasStep1()
+    {
+        return step1;
+    }
+    
+    public void setStep1(final boolean step1)
+    {
+        this.step1 = step1;
+        
+    }
+    
+    /**
+     * This step is when the enemy lines up to attack
+     * @return boolean
+     */
+    public boolean hasStep2()
+    {
+        return step2;
+    }
+    
+    public void setStep2(final boolean step2)
+    {
+        this.step2 = step2;
+    }
+    
+    /**
+     * This step is where the enemy closes the gap to attack the hero
+     * @return boolean
+     */
+    public boolean hasStep3()
+    {
+        return step3;
+    }
+    
+    public void setStep3(final boolean step3)
+    {
+        this.step3 = step3;
     }
     
     /**
@@ -153,17 +207,28 @@ public class Enemy extends Player
      */
     private void closeGap(final Hero hero)
     {
-        if (!attackTurn)
-            return;
-        
         //if the enemy can throw a projectile we will handle this differently
-        if (super.hasState(State.THROW_PROJECTILE))
+        if (hasState(State.THROW_PROJECTILE))
         {
+            //move away from hero since we are preparing to throw a projectile
+            if (getX() <= hero.getX())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(-getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
             
+            //move away from hero since we are preparing to throw a projectile
+            if (getX() > hero.getX())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
         }
         else
         {
-            if (getX() < hero.getX())
+            if (getX() <= hero.getX())
             {
                 setState(State.WALK_HORIZONTAL);
                 setVelocityX(getVelocityWalk());
@@ -186,12 +251,19 @@ public class Enemy extends Player
      */
     private void lineupAttack(final Hero hero)
     {
-        if (!this.attackTurn)
+        //if the x velocity is still active or the hero is jumping we will not move into attack position
+        if (hero.isJumping())
             return;
         
-        //if the x velocity is still active or the hero is jumping we will not move into attack position
-        if (getVelocityX() != VELOCITY_NONE || hero.isJumping())
+        Rectangle anchor = getAnchorLocation();
+        Rectangle anchorHero = hero.getAnchorLocation();
+        
+        if (anchor.getY() >= anchorHero.getY() && anchor.getY() <= anchorHero.getY() + anchorHero.getHeight())
+        {
+            setStep2(false);
+            setStep3(true);
             return;
+        }
         
         //now that we are on the correct side we can fix the y coordinate
         if (getY() + getHeight() < hero.getY() + hero.getHeight() - getVelocityWalk())
@@ -216,20 +288,36 @@ public class Enemy extends Player
      */
     private void surroundEnemy(final Hero hero)
     {
-        //if attacking from the east side and we aren't on the east side yet
-        if (attackEast && getX() < hero.getX() + hero.getWidth())
+        if (attackEast)
         {
-            setState(State.WALK_HORIZONTAL);
-            setVelocityX(getVelocityWalk());
-            setVelocityY(VELOCITY_NONE);
+            //if attacking from the east side and we aren't on the east side yet
+            if (getX() < hero.getX() + hero.getWidth())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
+            else
+            {
+                //we are done with the current step
+                setStep1(false);
+            }
         }
-
-        //if attacking from the west side and we aren't on the west side yet
-        if (!attackEast && getX() > hero.getX() - hero.getWidth())
+        
+        if (!attackEast)
         {
-            setState(State.WALK_HORIZONTAL);
-            setVelocityX(-getVelocityWalk());
-            setVelocityY(VELOCITY_NONE);
+            //if attacking from the west side and we aren't on the west side yet
+            if (getX() > hero.getX() - hero.getWidth())
+            {
+                setState(State.WALK_HORIZONTAL);
+                setVelocityX(-getVelocityWalk());
+                setVelocityY(VELOCITY_NONE);
+            }
+            else
+            {
+                //we are done with the current step
+                setStep1(false);
+            }
         }
     }
     
@@ -245,20 +333,6 @@ public class Enemy extends Player
     public boolean hasAttackEast()
     {
         return this.attackEast;
-    }
-    
-    /**
-     * Is it the players turn to attack
-     * @param attackTurn 
-     */
-    public void setAttackTurn(final boolean attackTurn)
-    {
-        this.attackTurn = attackTurn;
-    }
-    
-    public boolean hasAttackTurn()
-    {
-        return this.attackTurn;
     }
     
     /**
@@ -285,26 +359,26 @@ public class Enemy extends Player
      */
     private State getAttackOpportunity(final Hero hero)
     {
-        //if the enemy can't attack return false
-        if (!canAttack())
+        //if the enemy can't attack return false, or if the hero is jumping
+        if (!canAttack() || hero.isJumping())
             return null;
         
         //enemy anchor
-        Rectangle anchor1 = getAnchorLocation();
+        Rectangle anchor = getAnchorLocation();
         
         //hero anchor
-        Rectangle anchor2 = hero.getAnchorLocation();
+        Rectangle anchorHero = hero.getAnchorLocation();
         
         boolean canAttack = false;
         
         //if the enemy bounds contains the center of the hero we can attack
-        if (getRectangle().contains(hero.getPoint()) && anchor1.intersects(anchor2))
+        if (getRectangle().contains(hero.getPoint()) && anchor.intersects(anchorHero))
         {
             canAttack = true;
         }
         
         //if enemy has ability to throw a projectile and if the enemy y is within the hero y the hero can be attacked
-        if (canThrowProjectile() && anchor1.getY() >= anchor2.getY() && anchor1.getY() <= anchor2.getY() + anchor2.getHeight())
+        if (canThrowProjectile() && anchor.getY() >= anchorHero.getY() && anchor.getY() <= anchorHero.getY() + anchorHero.getHeight())
         {
             canAttack = true;
         }

@@ -52,8 +52,8 @@ public class FootSoldier2 extends Enemy implements PlayerRules
         
         //throw projectile animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(350));
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(350));
+        animation.add(getSpriteRectangle(3,2), getNanoSeconds(700));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.THROW_PROJECTILE);
         
         //projectile animation

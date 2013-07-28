@@ -27,9 +27,9 @@ public class PlayerManager
         //addTurtle(resources, delay, 200, 200);
         
         addEnemy(resources, delay, 250, 100);
-        addEnemy(resources, delay, 250, 200);
-        addEnemy(resources, delay, 50, 200);
-        addEnemy(resources, delay, 50, 100);
+        //addEnemy(resources, delay, 250, 200);
+        //addEnemy(resources, delay, 50, 200);
+        //addEnemy(resources, delay, 50, 100);
     }
     
     private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
@@ -148,6 +148,7 @@ public class PlayerManager
     {
         int count = 0;
         
+        //is there an enemy attacking from the east
         boolean attackEast = false;
         
         //temp list
@@ -155,49 +156,58 @@ public class PlayerManager
         
         for (Enemy enemy : enemies)
         {
-            tmp.add(enemy);
-            
-            if (enemy.hasAttackTurn())
+            //if there is an existing enemy already in the process of attacking
+            if (enemy.hasStep2() || enemy.hasStep3())
             {
                 if (enemy.hasAttackEast())
                     attackEast = true;
                 
                 count++;
             }
+            else
+            {
+                //if enemy is not attacking add them to possible list
+                tmp.add(enemy);
+            }
         }
         
-        //we always need 2 enemies attacking the player
-        if (count < 2)
+        while (count < 2)
         {
-            if (count == 0)
+            if (tmp.size() > 0)
             {
-                final boolean result = (Math.random() > .5);
+                final int rand = (int)(Math.random() * tmp.size());
+                tmp.get(rand).setStep2(true);
                 
-                int rand = (int)(Math.random() * tmp.size());
-                tmp.get(rand).setAttackTurn(true);
-                tmp.get(rand).setAttackEast(result);
+                
+                if (attackEast)
+                {
+                    //if there is an enemy already attacking the east we must attack west
+                    tmp.get(rand).setAttackEast(false);
+                }
+                else
+                {
+                    //pick a random attack direction
+                    final boolean result = (Math.random()> .5);
+                    
+                    //if result is true set east attack
+                    if (result)
+                        attackEast = true;
+                    
+                    tmp.get(rand).setAttackEast(result);
+                }
+                
                 tmp.remove(rand);
                 
-                rand = (int)(Math.random() * tmp.size());
-                tmp.get(rand).setAttackTurn(true);
-                tmp.get(rand).setAttackEast(!result);
+                count++;
             }
-            
-            if (count == 1 && enemies.size() > count)
+            else
             {
-                int rand = (int)(Math.random() * tmp.size());
-                tmp.get(rand).setAttackTurn(true);
-                
-                //the other player is attacking from the east so this player needs to attack from the west
-                if (attackEast)
-                    tmp.get(rand).setAttackEast(false);
-                else
-                    tmp.get(rand).setAttackEast(true);
+                break;
             }
-            
-            tmp.clear();
-            tmp = null;
         }
+        
+        tmp.clear();
+        tmp = null;
     }
     
     public Graphics render(Graphics g)

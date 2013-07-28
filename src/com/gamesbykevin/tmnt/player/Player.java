@@ -529,6 +529,12 @@ public class Player extends Sprite
         g.setColor(Color.BLUE);
         g.drawRect(getX(), getY(), getWidth(), getHeight());
         
+        if (projectile != null)
+        {
+            g.setColor(Color.BLUE);
+            g.drawRect(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
+        }
+    
         resetCenter();
         
         g.setColor(Color.RED);
