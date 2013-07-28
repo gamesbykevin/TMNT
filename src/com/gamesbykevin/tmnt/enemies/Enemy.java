@@ -6,6 +6,7 @@ import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class Enemy extends Player
                 //line up the y-cooridnate to get ready to attack
                 lineupAttack(hero);
                 
-                //then we close the gap and get close
+                //then we close the gap
                 closeGap(hero);
                 
                 //here we check for the opportunity to attack and take it if available
@@ -83,18 +84,33 @@ public class Enemy extends Player
      */
     private void checkAttackOpportunity(final Hero hero)
     {
-        //if we have an attack opportunity go for it
-        if (hasAttackOpportunity(hero))
+        final State attackState = getAttackOpportunity(hero);
+        
+        if (attackState != null)
         {
             //while attacking the enemy isn't moving
             setVelocityX(VELOCITY_NONE);
             setVelocityY(VELOCITY_NONE);
             
-            //perform a random attack
-            performAttack(hero);
-
-            //after the player attacks it is no longer their turn so another player can have the chance
+            //when the player attacks it is no longer their turn
             setAttackTurn(false);
+            
+            //start attack here
+            setState(attackState);
+        
+            //if attack is projectile we need to add projectile
+            if (attackState == State.THROW_PROJECTILE)
+            {
+                Sprite projectile = new Sprite();
+                projectile.setX(getX());
+                projectile.setY(getY());
+
+                //all enemies not including bosses have 1 projectile
+                SpriteSheetAnimation animation = super.getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
+                projectile.getSpriteSheet().add(animation, null);
+
+                setProjectile(projectile);
+            }
         }
     }
     
@@ -229,78 +245,79 @@ public class Enemy extends Player
     }
     
     /**
-     * Checks if the enemy can attack the hero. 
-     * If the enemy is within the center point of the hero,
-     * or the enemy can throw projectiles and is within the 
-     * same y coordinate.
-     * @param hero Hero to attack
-     * @return boolean
+     * If any enemy is within striking distance of the hero
+     * they will take advantage of it. If there is no 
+     * attack opportunity null will be returned.
+     * @param hero The hero we are attacking
+     * @return State, the action that will take place
      */
-    private boolean hasAttackOpportunity(final Hero hero)
+    private State getAttackOpportunity(final Hero hero)
     {
-        //if the enemy is currently attacking then there is no new opportunity to attack
-        if (isAttacking())
-            return false;
+        //if the enemy can't attack return false
+        if (!canAttack())
+            return null;
+        
+        //enemy anchor
+        Rectangle anchor1 = getAnchorLocation();
+        
+        //hero anchor
+        Rectangle anchor2 = hero.getAnchorLocation();
+        
+        boolean canAttack = false;
         
         //if the enemy bounds contains the center of the hero we can attack
-        if (getRectangle().contains(hero.getPoint()))
-            return true;
-        
-        //if the enemy y coordinate is within the hero y coordinate
-        if (getY() > hero.getY() - getVelocityWalk() && getY() < hero.getY() + getVelocityWalk())
+        if (getRectangle().contains(hero.getPoint()) && anchor1.intersects(anchor2))
         {
-            //check if player has ability to throw a projectile
-            if (super.canThrowProjectile())
-                return true;
+            canAttack = true;
         }
         
-        return false;
+        //if enemy has ability to throw a projectile and if the enemy y is within the hero y the hero can be attacked
+        if (canThrowProjectile() && anchor1.getY() >= anchor2.getY() && anchor1.getY() <= anchor2.getY() + anchor2.getHeight())
+        {
+            canAttack = true;
+        }
+        
+        if (canAttack)
+        {
+            List<State> possible = getPossibleAttacks();
+            final int rand = (int)(Math.random() * possible.size());
+            return possible.get(rand);
+        }
+            
+        
+        return null;
     }
     
     /**
-     * Choose the appropriate attack at random
-     * @param hero Hero we need
+     * We want a list of all the possible attacks for this enemy
+     * @return ArrayList of possible states
      */
-    private void performAttack(final Hero hero)
+    private List<State> getPossibleAttacks()
     {
         List<State> possible = new ArrayList<>();
         
         if (hasState(State.THROW_PROJECTILE))
             possible.add(State.THROW_PROJECTILE);
         
-        //these attacks are close range and will only be applied if he player is close enough
-        if (getRectangle().contains(hero.getPoint()))
-        {
-            if (hasState(State.ATTACK1))
-                possible.add(State.ATTACK1);
-            if (hasState(State.ATTACK2))
-                possible.add(State.ATTACK2);
-            if (hasState(State.ATTACK3))
-                possible.add(State.ATTACK3);
-            if (hasState(State.ATTACK4))
-                possible.add(State.ATTACK4);
-            if (hasState(State.ATTACK5))
-                possible.add(State.ATTACK5);
-        }
+        if (hasState(State.ATTACK1))
+            possible.add(State.ATTACK1);
+        if (hasState(State.ATTACK2))
+            possible.add(State.ATTACK2);
+        if (hasState(State.ATTACK3))
+            possible.add(State.ATTACK3);
+        if (hasState(State.ATTACK4))
+            possible.add(State.ATTACK4);
+        if (hasState(State.ATTACK5))
+            possible.add(State.ATTACK5);
         
-        //get random index
-        final int rand = (int)(Math.random() * possible.size());
-        
-        //set the enemy state
-        setState(possible.get(rand));
-        
-        //if random attack is projectile we need to add projectile
-        if (possible.get(rand) == State.THROW_PROJECTILE)
-        {
-            Sprite projectile = new Sprite();
-            projectile.setX(getX());
-            projectile.setY(getY());
-            
-            //all enemies not including bosses have 1 projectile
-            SpriteSheetAnimation animation = super.getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
-            projectile.getSpriteSheet().add(animation, null);
-            
-            super.setProjectile(projectile);
-        }
+        return possible;
+    }
+    
+    /**
+     * Choose the appropriate attack at random
+     * @param hero Hero we need
+     */
+    private void performAttack(final State state)
+    {
     }
 }

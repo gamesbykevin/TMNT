@@ -508,7 +508,7 @@ public class Player extends Sprite
         resetCenter();
         
         g.setColor(Color.RED);
-        Rectangle r = this.getAnchorLocation();
+        Rectangle r = getAnchorLocation();
         g.drawRect(r.x, r.y, r.width, r.height);
         
         return g;

@@ -1,7 +1,7 @@
 package com.gamesbykevin.tmnt.player;
 
-import com.gamesbykevin.tmnt.enemies.Enemy;
-import com.gamesbykevin.tmnt.heroes.Hero;
+import com.gamesbykevin.tmnt.enemies.*;
+import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 
 import java.awt.Graphics;
@@ -22,12 +22,14 @@ public class PlayerManager
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
         
-        addTurtle(resources, delay, 100, 100);
+        addTurtle(resources, delay, 150, 100);
         //addTurtle(resources, delay, 200, 100);
         //addTurtle(resources, delay, 200, 200);
         
         addEnemy(resources, delay, 250, 100);
-        addEnemy(resources, delay, 150, 300);
+        addEnemy(resources, delay, 250, 200);
+        addEnemy(resources, delay, 50, 200);
+        addEnemy(resources, delay, 50, 100);
     }
     
     private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
@@ -39,39 +41,39 @@ public class PlayerManager
         switch (rand)
         {
             case 0:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier1();
+                enemy = new FootSoldier1();
                 break;
                 
             case 1:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier2();
+                enemy = new FootSoldier2();
                 break;
                 
             case 2:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier3();
+                enemy = new FootSoldier3();
                 break;
                 
             case 3:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier4();
+                enemy = new FootSoldier4();
                 break;
                 
             case 4:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier5();
+                enemy = new FootSoldier5();
                 break;
                 
             case 5:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier6();
+                enemy = new FootSoldier6();
                 break;
                 
             case 6:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier7();
+                enemy = new FootSoldier7();
                 break;
                 
             case 7:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier8();
+                enemy = new FootSoldier8();
                 break;
                 
             default:
-                enemy = new com.gamesbykevin.tmnt.enemies.FootSoldier9();
+                enemy = new FootSoldier9();
                 break;
         }
         
@@ -89,13 +91,13 @@ public class PlayerManager
         int rand = (int)(Math.random() * ResourceManager.GameHeroes.values().length);
         
         if (rand == 0)
-            hero = new com.gamesbykevin.tmnt.heroes.Donatello();
+            hero = new Donatello();
         if (rand == 1)
-            hero = new com.gamesbykevin.tmnt.heroes.Raphael();
+            hero = new Raphael();
         if (rand == 2)
-            hero = new com.gamesbykevin.tmnt.heroes.Leonardo();
+            hero = new Leonardo();
         if (rand == 3)
-            hero = new com.gamesbykevin.tmnt.heroes.Michelangelo();
+            hero = new Michelangelo();
         
         hero.setImage(resources.getGameHero(ResourceManager.GameHeroes.values()[rand]));
         hero.setDelay(delay);
