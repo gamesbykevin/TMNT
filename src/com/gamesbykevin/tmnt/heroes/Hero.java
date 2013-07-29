@@ -18,7 +18,8 @@ public class Hero extends Player
     
     private void checkAttack(List<Enemy> enemies)
     {
-        if (getSpriteSheet().hasFinished())
+        //if the attacking animation is finished check for collision and reset animation
+        if (getSpriteSheet().hasFinished() && !hasState(State.THROW_PROJECTILE))
         {
             for (Enemy enemy : enemies)
             {

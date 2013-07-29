@@ -105,7 +105,7 @@ public class Enemy extends Player
     private void checkAttack(List<Hero> heroes)
     {
         //if the attacking animation is finished check for collision and reset animation
-        if (getSpriteSheet().hasFinished())
+        if (getSpriteSheet().hasFinished() && !hasState(State.THROW_PROJECTILE))
         {
             for (Hero hero : heroes)
             {
