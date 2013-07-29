@@ -59,6 +59,7 @@ public class FootSoldier7 extends Enemy implements PlayerRules
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(0,3), getNanoSeconds(75));
+        animation.setLoop(true);
         getSpriteSheet().add(animation, State.PROJECTILE1);
         
         //projectile finish animation

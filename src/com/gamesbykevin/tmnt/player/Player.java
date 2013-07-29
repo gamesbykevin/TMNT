@@ -1,6 +1,7 @@
 package com.gamesbykevin.tmnt.player;
 
 import com.gamesbykevin.framework.base.Sprite;
+import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.framework.util.TimerCollection;
 import java.awt.Color;
 
@@ -46,6 +47,9 @@ public class Player extends Sprite
     
     //this is the projectile object
     private Sprite projectile;
+    
+    //the projectile speed will be a factor of the player walk speed
+    private static final double PROJECTILE_SPEED_RATIO = 5;
     
     public Player()
     {
@@ -274,6 +278,30 @@ public class Player extends Sprite
         
         if (isAttacking() && !isJumping())
         {
+            //if attack is projectile we need to add projectile
+            if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
+            {
+                projectile = new Sprite();
+                projectile.setLocation(getX(), getY() - (getHeight() / 2));
+                projectile.setDimensions(getWidth(), getHeight());
+                projectile.setImage(getImage());
+
+                if (hasHorizontalFlip())
+                {
+                    projectile.setHorizontalFlip(true);
+                    projectile.setVelocity(-getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+                }
+                else
+                {
+                    projectile.setHorizontalFlip(false);
+                    projectile.setVelocity(getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+                }
+
+                //NOTE: all enemies not including bosses have 1 projectile
+                SpriteSheetAnimation animation = getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
+                projectile.getSpriteSheet().add(animation, null);
+            }
+            
             //if the attacking animation is finished
             if (getSpriteSheet().hasFinished())
             {

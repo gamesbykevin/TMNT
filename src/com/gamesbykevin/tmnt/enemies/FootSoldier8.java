@@ -67,6 +67,7 @@ public class FootSoldier8 extends Enemy implements PlayerRules
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(1,0), getNanoSeconds(75));
         animation.add(getSpriteRectangle(3,0), getNanoSeconds(75));
+        animation.setLoop(true);
         getSpriteSheet().add(animation, Player.State.PROJECTILE1);
         
         //walk horizontal animation

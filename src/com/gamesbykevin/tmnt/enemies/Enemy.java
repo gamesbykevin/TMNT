@@ -1,8 +1,5 @@
 package com.gamesbykevin.tmnt.enemies;
 
-import com.gamesbykevin.framework.base.Sprite;
-import com.gamesbykevin.framework.base.SpriteSheetAnimation;
-
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 
@@ -18,8 +15,6 @@ public class Enemy extends Player
     
     //the direction the player will attempt to attack from if not east then west
     private boolean attackEast = (Math.random() > .5);
-    
-    private static final double PROJECTILE_SPEED_RATIO = 5;
     
     private boolean step1 = true, step2 = false, step3 = false;
     
@@ -86,7 +81,7 @@ public class Enemy extends Player
                     closeGap(anchor, anchorHero, hero.getX());
                 
                 //here we check for the opportunity to attack and take it if available
-                final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getPoint(), hero.isJumping());
+                final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
                 if (attackState != null)
                 {
@@ -99,35 +94,6 @@ public class Enemy extends Player
 
                     //start attack here
                     setState(attackState);
-                }
-            }
-            
-            if (isAttacking())
-            {
-                //if attack is projectile we need to add projectile
-                if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasStarted())
-                {
-                    Sprite projectile = new Sprite();
-                    projectile.setLocation(getX(), getY() - (getHeight() / 2));
-                    projectile.setDimensions(getWidth(), getHeight());
-                    projectile.setImage(getImage());
-
-                    if (hasHorizontalFlip())
-                    {
-                        projectile.setHorizontalFlip(true);
-                        projectile.setVelocity(-super.getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-                    }
-                    else
-                    {
-                        projectile.setHorizontalFlip(false);
-                        projectile.setVelocity(super.getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-                    }
-
-                    //NOTE: all enemies not including bosses have 1 projectile
-                    SpriteSheetAnimation animation = getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
-                    projectile.getSpriteSheet().add(animation, null);
-
-                    setProjectile(projectile);
                 }
             }
         }
@@ -367,7 +333,7 @@ public class Enemy extends Player
      * @param hero The hero we are attacking
      * @return State, the action that will take place
      */
-    private State getAttackOpportunity(final Rectangle anchor, final Rectangle anchorHero, final Point heroPoint, final boolean isJumping)
+    private State getAttackOpportunity(final Rectangle anchor, final Rectangle anchorHero, final Point heroCenter, final boolean isJumping)
     {
         //if the enemy can't attack return false, or if the hero is jumping
         if (!canAttack() || isJumping)
@@ -375,8 +341,10 @@ public class Enemy extends Player
         
         boolean canAttack = false;
         
+        Rectangle r = this.getRectangle();
+        
         //if the enemy bounds contains the center of the hero we can attack
-        if (getRectangle().contains(heroPoint) && anchor.intersects(anchorHero))
+        if (r.contains(heroCenter) && anchor.intersects(anchorHero))
         {
             canAttack = true;
         }

@@ -22,14 +22,14 @@ public class PlayerManager
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
         
-        addTurtle(resources, delay, 150, 100);
+        addTurtle(resources, delay, 200, 100);
         //addTurtle(resources, delay, 200, 100);
         //addTurtle(resources, delay, 200, 200);
         
-        addEnemy(resources, delay, 250, 100);
-        //addEnemy(resources, delay, 250, 200);
-        //addEnemy(resources, delay, 50, 200);
-        //addEnemy(resources, delay, 50, 100);
+        addEnemy(resources, delay, 350, 100);
+        addEnemy(resources, delay, 350, 200);
+        addEnemy(resources, delay, 50, 200);
+        addEnemy(resources, delay, 50, 100);
     }
     
     private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
