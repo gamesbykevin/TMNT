@@ -105,7 +105,7 @@ public class Enemy extends Player
     private void checkAttack(List<Hero> heroes)
     {
         //if the attacking animation is finished check for collision and reset animation
-        if (getSpriteSheet().hasFinished() && !hasState(State.THROW_PROJECTILE))
+        if (getSpriteSheet().hasFinished())
         {
             for (Hero hero : heroes)
             {
@@ -116,8 +116,9 @@ public class Enemy extends Player
                 Rectangle anchorHero = hero.getAnchorLocation();
 
                 //we have hit the enemy so lets exit the loop as the cpu can only hurt one enemy at a time
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()))
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()) && !hasState(State.THROW_PROJECTILE))
                 {
+                    hero.setHorizontalFlip(!hasHorizontalFlip());
                     hero.setState(State.HURT);
                     hero.getSpriteSheet().reset();
                     hero.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
