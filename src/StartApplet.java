@@ -1,7 +1,7 @@
+import com.gamesbykevin.tmnt.shared.Shared;
 import javax.swing.JApplet;
 
 import com.gamesbykevin.tmnt.main.Main;
-import com.gamesbykevin.tmnt.shared.Shared;
 
 /**
  * WE NEED THIS CLASS HERE FOR JAVA APPLETS OUTSIDE A PACKAGE SO IT CAN FIND THE STARTING POINT
@@ -23,7 +23,7 @@ public class StartApplet extends JApplet
         //request the focus so input will be detected withoug having to click the applet window
         requestFocusInWindow();
         
-        //we are going to use our own custom cursor so create transparent 1 x 1 pixel to hide default cursor
+        //use cursor from Shared class
         setCursor(Shared.CURSOR);
             
         int ups = Shared.DEFAULT_UPS;

@@ -39,6 +39,7 @@ public class StartDesktop extends JPanel
         {
             JFrame window = new JFrame(Shared.GAME_NAME);
 
+            //use cursor from Shared class
             window.setCursor(Shared.CURSOR);
             window.add(new StartDesktop());
             window.setResizable(false);
