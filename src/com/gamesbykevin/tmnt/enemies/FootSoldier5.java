@@ -52,8 +52,8 @@ public class FootSoldier5 extends Enemy implements PlayerRules
         
         //attack1 animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(350));
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(350));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(550));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK1);
         
         //attack2 animation
