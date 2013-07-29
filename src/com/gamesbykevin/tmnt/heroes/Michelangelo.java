@@ -61,7 +61,7 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(7,1), getNanoSeconds(50));
         animation.add(getSpriteRectangle(8,1), getNanoSeconds(50));
         animation.add(getSpriteRectangle(9,1), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(0,2), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(0,2), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK1);
         
         //attack2 animation
@@ -71,7 +71,7 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(3,2), getNanoSeconds(50));
         animation.add(getSpriteRectangle(4,2), getNanoSeconds(50));
         animation.add(getSpriteRectangle(5,2), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,2), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(6,2), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK2);
         
         //attack3 animation
@@ -82,7 +82,7 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(0,3), getNanoSeconds(50));
         animation.add(getSpriteRectangle(1,3), getNanoSeconds(50));
         animation.add(getSpriteRectangle(2,3), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,3), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(3,3), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK3);
         
         //attack4 animation
@@ -93,7 +93,7 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(0,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(1,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,5), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(3,5), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK4);
 
         /*

@@ -90,8 +90,8 @@ public class FootSoldier7 extends Enemy implements PlayerRules
         
         //hurt animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(200));
-        animation.add(getSpriteRectangle(3,0), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(3,0), getNanoSeconds(275));
         getSpriteSheet().add(animation, State.HURT);
         
         //dead animation

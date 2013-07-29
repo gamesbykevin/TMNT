@@ -33,6 +33,7 @@ public class Hero extends Player
                 {
                     enemy.setState(State.HURT);
                     enemy.getSpriteSheet().reset();
+                    enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 }
             }
 

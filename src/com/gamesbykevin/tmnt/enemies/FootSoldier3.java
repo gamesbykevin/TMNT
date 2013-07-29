@@ -84,8 +84,8 @@ public class FootSoldier3 extends Enemy implements PlayerRules
         
         //hurt animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(1,0), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(1,0), getNanoSeconds(275));
         getSpriteSheet().add(animation, State.HURT);
         
         //dead animation
