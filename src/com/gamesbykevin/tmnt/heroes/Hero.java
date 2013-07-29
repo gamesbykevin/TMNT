@@ -1,12 +1,13 @@
 package com.gamesbykevin.tmnt.heroes;
 
 import com.gamesbykevin.framework.input.Keyboard;
+
+import com.gamesbykevin.tmnt.enemies.Enemy;
 import com.gamesbykevin.tmnt.player.Player;
-import static com.gamesbykevin.tmnt.player.Player.State.ATTACK1;
-import static com.gamesbykevin.tmnt.player.Player.State.ATTACK2;
-import static com.gamesbykevin.tmnt.player.Player.State.ATTACK3;
-import static com.gamesbykevin.tmnt.player.Player.State.ATTACK4;
+
 import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
+import java.util.List;
 
 public class Hero extends Player
 {
@@ -15,16 +16,45 @@ public class Hero extends Player
         
     }
     
+    private void checkAttack(List<Enemy> enemies)
+    {
+        if (getSpriteSheet().hasFinished())
+        {
+            for (Enemy enemy : enemies)
+            {
+                if (!enemy.canHurt())
+                    continue;
+
+                Rectangle anchorHero = getAnchorLocation();
+                Rectangle anchorEnemy = enemy.getAnchorLocation();
+
+                //we have hit the enemy, NOTE: we don't want to exit loop
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(enemy.getCenter()))
+                {
+                    enemy.setState(State.HURT);
+                    enemy.getSpriteSheet().reset();
+                }
+            }
+
+            //reset the animation since attacking is finished
+            reset();
+            setState(State.IDLE);
+
+            if (getNextState() != null)
+                applyNextState();
+        }
+    }
+    
     /**
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final Keyboard keyboard)
+    public void update(final Keyboard keyboard, List<Enemy> enemies)
     {
         super.update();
         
-        if (isDead())
-            return;
+        if (isAttacking())
+            checkAttack(enemies);
         
         if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
         {

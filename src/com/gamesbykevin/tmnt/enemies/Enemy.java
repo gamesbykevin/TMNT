@@ -39,15 +39,19 @@ public class Enemy extends Player
         //get the hero the enemy is assigned to attack
         Hero hero = heroes.get(assigned);
         
-        //face the direction hero is
-        if (getX() < hero.getX())
-            setHorizontalFlip(false);
-        else
-            setHorizontalFlip(true);
-        
         //make sure the hero isn't hurt or dead
-        if (!hero.isDead() && !hero.isHurt())
+        if (!hero.isDead() && !hero.isHurt() && !isDead() && !isHurt())
         {
+            //face the direction hero is
+            if (getX() < hero.getX())
+                setHorizontalFlip(false);
+            else
+                setHorizontalFlip(true);
+            
+            //if we are attacking check for collision as well as reset animation
+            if (isAttacking())
+                checkAttack(heroes);
+            
             //make sure enemy can walk or if they are walking to follow the logic below
             if (canWalk() || isWalking())
             {
@@ -95,6 +99,36 @@ public class Enemy extends Player
                 setState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
+        }
+    }
+    
+    private void checkAttack(List<Hero> heroes)
+    {
+        //if the attacking animation is finished check for collision and reset animation
+        if (getSpriteSheet().hasFinished())
+        {
+            for (Hero hero : heroes)
+            {
+                if (!hero.canHurt())
+                    continue;
+
+                Rectangle anchorEnemy = getAnchorLocation();
+                Rectangle anchorHero = hero.getAnchorLocation();
+
+                //we have hit the enemy so lets exit the loop as the cpu can only hurt one enemy at a time
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()))
+                {
+                    hero.setState(State.HURT);
+                    hero.getSpriteSheet().reset();
+                    break;
+                }
+            }
+
+            reset();
+            setState(State.IDLE);
+
+            if (getNextState() != null)
+                applyNextState();
         }
     }
     

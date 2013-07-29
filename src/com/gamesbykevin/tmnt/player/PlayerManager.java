@@ -130,7 +130,7 @@ public class PlayerManager
         //all heroes are human
         for (Hero hero : heroes)
         {
-            hero.update(engine.getKeyboard());
+            hero.update(engine.getKeyboard(), enemies);
         }
         
         checkEnemy();

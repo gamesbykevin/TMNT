@@ -168,14 +168,24 @@ public class Player extends Sprite
      * the next attack here.
      * @param state set what the current Player is doing
      */
-    protected void setNextState(final State state)
+    public void setNextState(final State state)
     {
         this.nextState = state;
     }
     
-    protected State getNextState()
+    public State getNextState()
     {
         return this.nextState;
+    }
+    
+    /**
+     * Assigns the next state to the current state
+     * and then sets the next state to null
+     */
+    public void applyNextState()
+    {
+        setState(getNextState());
+        setNextState(null);
     }
     
     /**
@@ -301,28 +311,12 @@ public class Player extends Sprite
                 SpriteSheetAnimation animation = getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
                 projectile.getSpriteSheet().add(animation, null);
             }
-            
-            //if the attacking animation is finished
-            if (getSpriteSheet().hasFinished())
-            {
-                reset();
-                setState(State.IDLE);
-                
-                if (nextState != null)
-                {
-                    setState(nextState);
-                    nextState = null;
-                }
-            }
         }
         
-        if (isHurt())
+        if (isHurt() && getSpriteSheet().hasFinished())
         {
-            if (getSpriteSheet().hasFinished())
-            {
-                reset();
-                setState(State.IDLE);
-            }
+            reset();
+            setState(State.IDLE);
         }
     }
     
