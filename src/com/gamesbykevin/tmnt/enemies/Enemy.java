@@ -30,18 +30,8 @@ public class Enemy extends Player
     {
         super.update();
         
-        if (getProjectile() != null)
-        {
-            for (Hero hero : heroes)
-            {
-                if (hero.getRectangle().intersects(getProjectile().getRectangle()))
-                    setProjectile(null);
-            }
-            
-            //projectile is no longer within game window
-            if (getProjectile() != null && !screen.contains(getProjectile().getPoint()))
-                setProjectile(null);
-        }
+        //check if projectile has hit hero or off the screen
+        checkProjectile(heroes, screen);
         
         //make sure enemy has a hero targeted
         checkAssignment(heroes);
@@ -105,6 +95,37 @@ public class Enemy extends Player
                 setState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
+        }
+    }
+    
+    /**
+     * Check if hero has been hit with projectile or if projectile is still on the main screen.
+     * If projectile is no longer on the main screen it will be removed
+     * @param heroes Heroes to check if they have been hit
+     * @param screen Inbounds area for projectile
+     */
+    private void checkProjectile(List<Hero> heroes, final Rectangle screen)
+    {
+        if (getProjectile() != null)
+        {
+            for (Hero hero : heroes)
+            {
+                if (hero.isHurt() || hero.isDead())
+                    continue;
+                
+                Rectangle anchor = getAnchorLocation();
+                Rectangle anchorHero = hero.getAnchorLocation();
+                
+                //projectile has hit hero
+                if (anchor.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
+                {
+                    setProjectile(null);
+                }
+            }
+            
+            //projectile is no longer within game window so remove it
+            if (getProjectile() != null && !screen.intersects(getProjectile().getRectangle()))
+                setProjectile(null);
         }
     }
     

@@ -282,7 +282,7 @@ public class Player extends Sprite
             if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
             {
                 projectile = new Sprite();
-                projectile.setLocation(getX(), getY() - (getHeight() / 2));
+                projectile.setLocation(getX(), getY());
                 projectile.setDimensions(getWidth(), getHeight());
                 projectile.setImage(getImage());
 
