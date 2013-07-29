@@ -6,6 +6,7 @@ import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,20 +70,36 @@ public class Enemy extends Player
                 setState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
                 
+                Rectangle anchor = getAnchorLocation();
+                Rectangle anchorHero = hero.getAnchorLocation();
+                
                 //surround the enemy first
                 if (step1)
                     surroundEnemy(hero);
                 
                 //next, line up the y-cooridnate to get ready to attack
                 if (!step1 && step2)
-                    lineupAttack(hero);
+                    lineupAttack(anchor, anchorHero, hero.isJumping());
                 
                 //then, close/spread the gap
                 if (!step1 && !step2 && step3)
-                    closeGap(hero);
+                    closeGap(anchor, anchorHero, hero.getX());
                 
                 //here we check for the opportunity to attack and take it if available
-                checkAttackOpportunity(hero);
+                final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getPoint(), hero.isJumping());
+
+                if (attackState != null)
+                {
+                    //while attacking the enemy isn't moving
+                    setVelocityX(VELOCITY_NONE);
+                    setVelocityY(VELOCITY_NONE);
+
+                    //when the player attacks it is no longer their turn
+                    resetSteps();
+
+                    //start attack here
+                    setState(attackState);
+                }
             }
             
             if (isAttacking())
@@ -122,28 +139,6 @@ public class Enemy extends Player
                 setState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
-        }
-    }
-    
-    /**
-     * If we have a chance to harm hero take it
-     * @param hero The hero we want to harm.
-     */
-    private void checkAttackOpportunity(final Hero hero)
-    {
-        final State attackState = getAttackOpportunity(hero);
-        
-        if (attackState != null)
-        {
-            //while attacking the enemy isn't moving
-            setVelocityX(VELOCITY_NONE);
-            setVelocityY(VELOCITY_NONE);
-            
-            //when the player attacks it is no longer their turn
-            resetSteps();
-            
-            //start attack here
-            setState(attackState);
         }
     }
     
@@ -205,13 +200,31 @@ public class Enemy extends Player
      * the enemy could move further back or close in to be able to attack
      * @param hero 
      */
-    private void closeGap(final Hero hero)
+    private void closeGap(final Rectangle anchor, final Rectangle anchorHero, final int heroX)
     {
+        //if the hero is once again out of range we need to go back a step or two
+        if (anchor.getY() <= anchorHero.getY() || anchor.getY() >= anchorHero.getY() + anchorHero.getHeight())
+        {
+            if (Math.random() > .5)
+            {
+                //restart from step one
+                resetSteps();
+            }
+            else
+            {
+                //correct y coordinate again
+                setStep2(true);
+                setStep3(false);
+            }
+            
+            return;
+        }
+        
         //if the enemy can throw a projectile we will handle this differently
         if (hasState(State.THROW_PROJECTILE))
         {
             //move away from hero since we are preparing to throw a projectile
-            if (getX() <= hero.getX())
+            if (getX() <= heroX)
             {
                 setState(State.WALK_HORIZONTAL);
                 setVelocityX(-getVelocityWalk());
@@ -219,7 +232,7 @@ public class Enemy extends Player
             }
             
             //move away from hero since we are preparing to throw a projectile
-            if (getX() > hero.getX())
+            if (getX() > heroX)
             {
                 setState(State.WALK_HORIZONTAL);
                 setVelocityX(getVelocityWalk());
@@ -228,14 +241,14 @@ public class Enemy extends Player
         }
         else
         {
-            if (getX() <= hero.getX())
+            if (getX() <= heroX)
             {
                 setState(State.WALK_HORIZONTAL);
                 setVelocityX(getVelocityWalk());
                 setVelocityY(VELOCITY_NONE);
             }
             
-            if (getX() > hero.getX())
+            if (getX() > heroX)
             {
                 setState(State.WALK_HORIZONTAL);
                 setVelocityX(-getVelocityWalk());
@@ -249,16 +262,13 @@ public class Enemy extends Player
      * lineup with the hero, basically ready to attack.
      * @param hero The hero we are targeting.
      */
-    private void lineupAttack(final Hero hero)
+    private void lineupAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean isJumping)
     {
         //if the x velocity is still active or the hero is jumping we will not move into attack position
-        if (hero.isJumping())
+        if (isJumping)
             return;
         
-        Rectangle anchor = getAnchorLocation();
-        Rectangle anchorHero = hero.getAnchorLocation();
-        
-        if (anchor.getY() >= anchorHero.getY() && anchor.getY() <= anchorHero.getY() + anchorHero.getHeight())
+        if (anchor.getY() > anchorHero.getY() && anchor.getY() < anchorHero.getY() + anchorHero.getHeight())
         {
             setStep2(false);
             setStep3(true);
@@ -266,14 +276,14 @@ public class Enemy extends Player
         }
         
         //now that we are on the correct side we can fix the y coordinate
-        if (getY() + getHeight() < hero.getY() + hero.getHeight() - getVelocityWalk())
+        if (anchor.getY() <= anchorHero.getY())
         {
             setState(State.WALK_VERTICAL);
             setVelocityX(VELOCITY_NONE);
             setVelocityY(getVelocityWalk());
         }
 
-        if (getY() + getHeight() > hero.getY() + hero.getHeight() + getVelocityWalk())
+        if (anchor.getY() >= anchorHero.getY() + anchorHero.getHeight())
         {
             setState(State.WALK_VERTICAL);
             setVelocityX(VELOCITY_NONE);
@@ -357,28 +367,22 @@ public class Enemy extends Player
      * @param hero The hero we are attacking
      * @return State, the action that will take place
      */
-    private State getAttackOpportunity(final Hero hero)
+    private State getAttackOpportunity(final Rectangle anchor, final Rectangle anchorHero, final Point heroPoint, final boolean isJumping)
     {
         //if the enemy can't attack return false, or if the hero is jumping
-        if (!canAttack() || hero.isJumping())
+        if (!canAttack() || isJumping)
             return null;
-        
-        //enemy anchor
-        Rectangle anchor = getAnchorLocation();
-        
-        //hero anchor
-        Rectangle anchorHero = hero.getAnchorLocation();
         
         boolean canAttack = false;
         
         //if the enemy bounds contains the center of the hero we can attack
-        if (getRectangle().contains(hero.getPoint()) && anchor.intersects(anchorHero))
+        if (getRectangle().contains(heroPoint) && anchor.intersects(anchorHero))
         {
             canAttack = true;
         }
         
         //if enemy has ability to throw a projectile and if the enemy y is within the hero y the hero can be attacked
-        if (canThrowProjectile() && anchor.getY() >= anchorHero.getY() && anchor.getY() <= anchorHero.getY() + anchorHero.getHeight())
+        if (canThrowProjectile() && anchor.getY() > anchorHero.getY() && anchor.getY() < anchorHero.getY() + anchorHero.getHeight())
         {
             canAttack = true;
         }
@@ -394,7 +398,6 @@ public class Enemy extends Player
             }
         }
             
-        
         return null;
     }
     
