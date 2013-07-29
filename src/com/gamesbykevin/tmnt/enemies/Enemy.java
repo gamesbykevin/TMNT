@@ -110,15 +110,16 @@ public class Enemy extends Player
         {
             for (Hero hero : heroes)
             {
-                if (hero.isHurt() || hero.isDead())
+                if (!hero.canHurt())
                     continue;
                 
-                Rectangle anchor = getAnchorLocation();
+                Rectangle anchorProjectile = Player.getAnchorLocation(getProjectile());
                 Rectangle anchorHero = hero.getAnchorLocation();
                 
                 //projectile has hit hero
-                if (anchor.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
+                if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
                 {
+                    hero.setState(State.HURT);
                     setProjectile(null);
                 }
             }

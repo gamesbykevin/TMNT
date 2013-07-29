@@ -315,6 +315,15 @@ public class Player extends Sprite
                 }
             }
         }
+        
+        if (isHurt())
+        {
+            if (getSpriteSheet().hasFinished())
+            {
+                reset();
+                setState(State.IDLE);
+            }
+        }
     }
     
     /**
@@ -437,6 +446,28 @@ public class Player extends Sprite
     }
     
     /**
+     * Determine if the player is vulnerable to attack/projectile
+     * @return boolean
+     */
+    public boolean canHurt()
+    {
+        switch(getState())
+        {
+            //any of these can't hurt the player
+            case HURT:
+            case DEAD:
+            case DEFENSE:
+            case JUMP:
+            case JUMP_ATTACK:
+                return false;
+            
+            //every thing else can
+            default:
+                return true;
+        }
+    }
+    
+    /**
      * Is the player currently attacking
      * @return boolean
      */
@@ -485,7 +516,7 @@ public class Player extends Sprite
     
     /**
      * Gets a Rectangle of the players feet with a height of 10% of the total height
-     * @return 
+     * @return Rectangle
      */
     public Rectangle getAnchorLocation()
     {
@@ -499,24 +530,42 @@ public class Player extends Sprite
     }
     
     /**
+     * Gets a Rectangle of the parameter sprite feet with a height of 10% of the total height
+     * @param sprite
+     * @return Rectangle
+     */
+    public static Rectangle getAnchorLocation(Sprite sprite)
+    {
+        offsetCenter(sprite);
+        
+        Rectangle anchor = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * .1), sprite.getWidth(), (int)(sprite.getHeight() * .1));
+        
+        resetCenter(sprite);
+        
+        return anchor;
+    }
+    
+    /**
      * Offsets the x,y coordinates by half the width/height
      */
     private void offsetCenter()
     {
-        int halfWidth = (getWidth() / 2);
-        int halfHeight = (getHeight() / 2);
+        offsetCenter(this);
         
-        super.setX(super.getX() - halfWidth);
-        super.setY(super.getY() - halfHeight);
-        
+        //also include projectile
         if (projectile != null)
         {
-            halfWidth = (projectile.getWidth()  / 2);
-            halfHeight =(projectile.getHeight() / 2);
-            
-            projectile.setX(projectile.getX() - halfWidth);
-            projectile.setY(projectile.getY() - halfHeight);
+            offsetCenter(projectile);
         }
+    }
+    
+    private static void offsetCenter(Sprite sprite)
+    {
+        int halfWidth = (sprite.getWidth() / 2);
+        int halfHeight = (sprite.getHeight() / 2);
+        
+        sprite.setX(sprite.getX() - halfWidth);
+        sprite.setY(sprite.getY() - halfHeight);
     }
     
     /**
@@ -524,20 +573,22 @@ public class Player extends Sprite
      */
     private void resetCenter()
     {
-        int halfWidth = (getWidth() / 2);
-        int halfHeight = (getHeight() / 2);
+        resetCenter(this);
         
-        super.setX(super.getX() + halfWidth);
-        super.setY(super.getY() + halfHeight);
-        
+        //also include projectile
         if (projectile != null)
         {
-            halfWidth = (projectile.getWidth()  / 2);
-            halfHeight =(projectile.getHeight() / 2);
-            
-            projectile.setX(projectile.getX() + halfWidth);
-            projectile.setY(projectile.getY() + halfHeight);
+            resetCenter(projectile);
         }
+    }
+    
+    private static void resetCenter(Sprite sprite)
+    {
+        int halfWidth = (sprite.getWidth() / 2);
+        int halfHeight = (sprite.getHeight() / 2);
+        
+        sprite.setX(sprite.getX() + halfWidth);
+        sprite.setY(sprite.getY() + halfHeight);
     }
     
     /**
