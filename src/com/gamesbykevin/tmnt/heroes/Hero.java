@@ -16,38 +16,6 @@ public class Hero extends Player
         
     }
     
-    private void checkAttack(List<Enemy> enemies)
-    {
-        //if the attacking animation is finished check for collision and reset animation
-        if (getSpriteSheet().hasFinished())
-        {
-            for (Enemy enemy : enemies)
-            {
-                if (!enemy.canHurt())
-                    continue;
-
-                Rectangle anchorHero = getAnchorLocation();
-                Rectangle anchorEnemy = enemy.getAnchorLocation();
-
-                //we have hit the enemy, NOTE: we don't want to exit loop
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(enemy.getCenter()) && !hasState(State.THROW_PROJECTILE))
-                {
-                    enemy.setHorizontalFlip(!hasHorizontalFlip());
-                    enemy.setState(State.HURT);
-                    enemy.getSpriteSheet().reset();
-                    enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                }
-            }
-
-            //reset the animation since attacking is finished
-            reset();
-            setState(State.IDLE);
-
-            if (getNextState() != null)
-                applyNextState();
-        }
-    }
-    
     /**
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
@@ -190,6 +158,38 @@ public class Hero extends Player
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 keyboard.resetAllKeyEvents();
             }
+        }
+    }
+    
+    private void checkAttack(List<Enemy> enemies)
+    {
+        //if the attacking animation is finished check for collision and reset animation
+        if (getSpriteSheet().hasFinished())
+        {
+            for (Enemy enemy : enemies)
+            {
+                if (!enemy.canHurt())
+                    continue;
+
+                Rectangle anchorHero = getAnchorLocation();
+                Rectangle anchorEnemy = enemy.getAnchorLocation();
+
+                //we have hit the enemy, NOTE: we don't want to exit loop
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(enemy.getCenter()) && !hasState(State.THROW_PROJECTILE))
+                {
+                    enemy.setHorizontalFlip(!hasHorizontalFlip());
+                    enemy.setState(State.HURT);
+                    enemy.getSpriteSheet().reset();
+                    enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                }
+            }
+
+            //reset the animation since attacking is finished
+            reset();
+            setState(State.IDLE);
+
+            if (getNextState() != null)
+                applyNextState();
         }
     }
 }
