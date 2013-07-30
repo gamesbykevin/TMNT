@@ -26,7 +26,7 @@ public class Enemy extends Player
     /**
      * Run the AI here for the enemy
      */
-    public void update(final Rectangle screen, final List<Hero> heroes)
+    public void update(final Rectangle screen, final List<Hero> heroes) throws Exception
     {
         super.update();
         
@@ -93,7 +93,7 @@ public class Enemy extends Player
         }
         else
         {
-            //if the hero is dead and the enemy is not jumping set them to idle state
+            //if the hero is dead and the enemy is not jumping set them to an idle state
             if (hero.isDead() && !isJumping())
             {
                 setState(State.IDLE);
@@ -102,6 +102,10 @@ public class Enemy extends Player
         }
     }
     
+    /**
+     * Here we will check if the enemy has hurt any of the heroes
+     * @param heroes List of heroes
+     */
     private void checkAttack(List<Hero> heroes)
     {
         //if the attacking animation is finished check for collision and reset animation
@@ -109,14 +113,15 @@ public class Enemy extends Player
         {
             for (Hero hero : heroes)
             {
-                if (!hero.canHurt())
+                //if we can't hurt the enemy or if we are throwing a projectile, its the projectile that can hurt
+                if (!hero.canHurt() || hasState(State.THROW_PROJECTILE))
                     continue;
 
                 Rectangle anchorEnemy = getAnchorLocation();
                 Rectangle anchorHero = hero.getAnchorLocation();
 
                 //we have hit the enemy so lets exit the loop as the cpu can only hurt one enemy at a time
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()) && !hasState(State.THROW_PROJECTILE))
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()))
                 {
                     hero.setHorizontalFlip(!hasHorizontalFlip());
                     hero.setState(State.HURT);
@@ -126,9 +131,11 @@ public class Enemy extends Player
                 }
             }
 
+            //now that attack animation is complete reset
             reset();
             setState(State.IDLE);
 
+            //if another attack is available start it now
             if (getNextState() != null)
                 applyNextState();
         }
@@ -142,27 +149,58 @@ public class Enemy extends Player
      */
     private void checkProjectile(List<Hero> heroes, final Rectangle screen)
     {
+        //if the projectile exists and is the correct animation
         if (getProjectile() != null)
         {
-            for (Hero hero : heroes)
+            if (getProjectile().getSpriteSheet().getCurrent() == State.PROJECTILE1)
             {
-                if (!hero.canHurt())
-                    continue;
-                
-                Rectangle anchorProjectile = Player.getAnchorLocation(getProjectile());
-                Rectangle anchorHero = hero.getAnchorLocation();
-                
-                //projectile has hit hero
-                if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
+                for (Hero hero : heroes)
                 {
-                    hero.setState(State.HURT);
-                    setProjectile(null);
+                    if (!hero.canHurt())
+                        continue;
+
+                    Rectangle anchorProjectile = Player.getAnchorLocation(getProjectile());
+                    Rectangle anchorHero = hero.getAnchorLocation();
+
+                    //projectile has hit hero
+                    if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
+                    {
+                        hero.setState(State.HURT);
+
+                        //check if there is an additional animation now that the projectile has hit
+                        if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
+                        {
+                            getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                            getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
+                            getProjectile().getSpriteSheet().reset();
+                            break;
+                        }
+                        else
+                        {
+                            //if another animation does not exist then remove the projectile
+                            removeProjectile();
+                            return;
+                        }
+                    }
                 }
             }
             
-            //projectile is no longer within game window so remove it
-            if (getProjectile() != null && !screen.intersects(getProjectile().getRectangle()))
-                setProjectile(null);
+            if (getProjectile().getSpriteSheet().getCurrent() == State.PROJECTILE1_FINISH)
+            {
+                //if the animation has finished remove projectile
+                if (getProjectile().getSpriteSheet().hasFinished())
+                {
+                    removeProjectile();
+                    return;
+                }
+            }
+                
+            //if the projectile is no longer in the current game window remove it
+            if (!screen.intersects(getProjectile().getRectangle()))
+            {
+                removeProjectile();
+                return;
+            }
         }
     }
     
@@ -283,7 +321,7 @@ public class Enemy extends Player
     
     /**
      * Here the enemy will correct the y coordinate to 
-     * lineup with the hero, basically ready to attack.
+     * lineup with the hero, basically getting ready to attack.
      * @param hero The hero we are targeting.
      */
     private void lineupAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean isJumping)
@@ -397,25 +435,20 @@ public class Enemy extends Player
         if (!canAttack() || isJumping)
             return null;
         
-        boolean canAttack = false;
-        
-        Rectangle r = this.getRectangle();
+        //can the enemy attack close and far
+        boolean canAttackClose = false, canAttackFar = false;
         
         //if the enemy bounds contains the center of the hero we can attack
-        if (r.contains(heroCenter) && anchor.intersects(anchorHero))
-        {
-            canAttack = true;
-        }
+        if (getRectangle().contains(heroCenter) && anchor.intersects(anchorHero))
+            canAttackClose = true;
         
-        //if enemy has ability to throw a projectile and if the enemy y is within the hero y the hero can be attacked
+        //if enemy has ability to throw a projectile and if the enemy y is within the hero y
         if (canThrowProjectile() && anchor.getY() > anchorHero.getY() && anchor.getY() < anchorHero.getY() + anchorHero.getHeight())
-        {
-            canAttack = true;
-        }
+            canAttackFar = true;
         
-        if (canAttack)
+        if (canAttackClose || canAttackFar)
         {
-            List<State> possible = getPossibleAttacks();
+            List<State> possible = getPossibleAttacks(canAttackClose);
             
             if (possible.size() > 0)
             {
@@ -431,24 +464,28 @@ public class Enemy extends Player
      * We want a list of all the possible attacks for this enemy
      * @return ArrayList of possible states
      */
-    private List<State> getPossibleAttacks()
+    private List<State> getPossibleAttacks(final boolean canAttackClose)
     {
         List<State> possible = new ArrayList<>();
         
-        //can only throw 1 projectile at a time
+        //if the player can attack close then check if we have these attacks
+        if (canAttackClose)
+        {
+            if (hasState(State.ATTACK1))
+                possible.add(State.ATTACK1);
+            if (hasState(State.ATTACK2))
+                possible.add(State.ATTACK2);
+            if (hasState(State.ATTACK3))
+                possible.add(State.ATTACK3);
+            if (hasState(State.ATTACK4))
+                possible.add(State.ATTACK4);
+            if (hasState(State.ATTACK5))
+                possible.add(State.ATTACK5);
+        }
+        
+        //currently can only throw 1 projectile at a time
         if (hasState(State.THROW_PROJECTILE) && getProjectile() == null)
             possible.add(State.THROW_PROJECTILE);
-        
-        if (hasState(State.ATTACK1))
-            possible.add(State.ATTACK1);
-        if (hasState(State.ATTACK2))
-            possible.add(State.ATTACK2);
-        if (hasState(State.ATTACK3))
-            possible.add(State.ATTACK3);
-        if (hasState(State.ATTACK4))
-            possible.add(State.ATTACK4);
-        if (hasState(State.ATTACK5))
-            possible.add(State.ATTACK5);
         
         return possible;
     }

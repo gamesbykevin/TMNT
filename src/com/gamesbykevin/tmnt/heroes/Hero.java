@@ -20,7 +20,7 @@ public class Hero extends Player
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final Keyboard keyboard, List<Enemy> enemies)
+    public void update(final Keyboard keyboard, List<Enemy> enemies) throws Exception
     {
         super.update();
         
@@ -184,12 +184,17 @@ public class Hero extends Player
                 }
             }
 
-            //reset the animation since attacking is finished
-            reset();
-            setState(State.IDLE);
-
-            if (getNextState() != null)
-                applyNextState();
+            //since the attack animation is finished reset it, but not if the hero is jumping
+            if (!isJumping())
+            {
+                //reset the animation
+                reset();
+                setState(State.IDLE);
+                
+                //if there is another state
+                if (getNextState() != null)
+                    applyNextState();
+            }
         }
     }
 }

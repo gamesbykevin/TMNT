@@ -1,7 +1,6 @@
 package com.gamesbykevin.tmnt.player;
 
 import com.gamesbykevin.framework.base.Sprite;
-import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.framework.util.TimerCollection;
 import java.awt.Color;
 
@@ -51,6 +50,9 @@ public class Player extends Sprite
     //the projectile speed will be a factor of the player walk speed
     private static final double PROJECTILE_SPEED_RATIO = 5;
     
+    //how many times can this player get hurt before they fly backwards
+    private static final int CONSECUTIVE_HIT_LIMIT = 3;
+    
     public Player()
     {
         setState(State.IDLE);
@@ -67,12 +69,12 @@ public class Player extends Sprite
     }
     
     /**
-     * Sets the projectile
+     * Removes the projectile
      * @param projectile 
      */
-    protected void setProjectile(final Sprite projectile)
+    protected void removeProjectile()
     {
-        this.projectile = projectile;
+        this.projectile = null;
     }
 
     /**
@@ -249,7 +251,7 @@ public class Player extends Sprite
      * velocity set. Also updates the timers
      */
     @Override
-    public void update()
+    public void update() throws Exception
     {
         getSpriteSheet().update();
         super.update();
@@ -288,29 +290,9 @@ public class Player extends Sprite
         
         if (isAttacking() && !isJumping())
         {
-            //if attack is projectile we need to add projectile
+            //if the attack is projectile add the projectile
             if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
-            {
-                projectile = new Sprite();
-                projectile.setLocation(getX(), getY());
-                projectile.setDimensions(getWidth(), getHeight());
-                projectile.setImage(getImage());
-
-                if (hasHorizontalFlip())
-                {
-                    projectile.setHorizontalFlip(true);
-                    projectile.setVelocity(-getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-                }
-                else
-                {
-                    projectile.setHorizontalFlip(false);
-                    projectile.setVelocity(getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-                }
-
-                //NOTE: all enemies not including bosses have 1 projectile
-                SpriteSheetAnimation animation = getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1);
-                projectile.getSpriteSheet().add(animation, null);
-            }
+                addProjectile();
         }
         
         if (isHurt() && getSpriteSheet().hasFinished())
@@ -318,6 +300,38 @@ public class Player extends Sprite
             reset();
             setState(State.IDLE);
         }
+    }
+    
+    private void addProjectile()
+    {
+        projectile = new Sprite();
+        projectile.setLocation(getX(), getY());
+        projectile.setDimensions(getWidth(), getHeight());
+        projectile.setImage(getImage());
+
+        if (hasHorizontalFlip())
+        {
+            projectile.setHorizontalFlip(true);
+            projectile.setVelocity(-getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+        }
+        else
+        {
+            projectile.setHorizontalFlip(false);
+            projectile.setVelocity(getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
+        }
+
+        //we need the delay or else the animation won't update
+        projectile.getSpriteSheet().setDelay(getSpriteSheet().getDelay());
+        
+        //NOTE: all enemies not including bosses have 1 projectile
+        projectile.getSpriteSheet().add(getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1), State.PROJECTILE1);
+        
+        if (getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
+        {
+            projectile.getSpriteSheet().add(getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1_FINISH), State.PROJECTILE1_FINISH);
+        }
+        
+        projectile.getSpriteSheet().setCurrent(State.PROJECTILE1);
     }
     
     /**
