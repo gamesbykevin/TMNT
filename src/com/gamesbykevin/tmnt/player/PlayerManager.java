@@ -125,7 +125,7 @@ public class PlayerManager
         heroes.add(hero);
     }
     
-    public void update(final Engine engine)
+    public void update(final Engine engine) throws Exception
     {
         //all heroes are human
         for (Hero hero : heroes)
