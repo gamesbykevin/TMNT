@@ -77,7 +77,8 @@ public class Enemy extends Player
                 //here we check for the opportunity to attack and take it if available
                 final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
-                if (attackState != null)
+                //if there is an attack opportunity and the hero isn't hurt, take it
+                if (attackState != null && !hero.isHurt())
                 {
                     //while attacking the enemy isn't moving
                     setVelocityX(VELOCITY_NONE);
@@ -125,7 +126,7 @@ public class Enemy extends Player
                 {
                     hero.setHorizontalFlip(!hasHorizontalFlip());
                     hero.setState(State.HURT);
-                    hero.getSpriteSheet().reset();
+                    hero.reset();
                     hero.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     break;
                 }
@@ -165,21 +166,29 @@ public class Enemy extends Player
                     //projectile has hit hero
                     if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
                     {
-                        hero.setState(State.HURT);
+                        //all projectiles will be moving when they cause damage to hero
+                        if (getProjectile().hasVelocity())
+                        {
+                            hero.setState(State.HURT);
+                            hero.reset();
 
-                        //check if there is an additional animation now that the projectile has hit
-                        if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
-                        {
-                            getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                            getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
-                            getProjectile().getSpriteSheet().reset();
-                            break;
-                        }
-                        else
-                        {
-                            //if another animation does not exist then remove the projectile
-                            removeProjectile();
-                            return;
+                            //check if there is an additional animation now that the projectile has hit
+                            if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
+                            {
+                                if (getProjectile().getSpriteSheet().getCurrent() != State.PROJECTILE1_FINISH)
+                                {
+                                    getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                                    getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
+                                    getProjectile().getSpriteSheet().reset();
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                //if another animation does not exist then remove the projectile
+                                removeProjectile();
+                                return;
+                            }
                         }
                     }
                 }

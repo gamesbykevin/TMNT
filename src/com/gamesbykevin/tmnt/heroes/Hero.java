@@ -174,13 +174,18 @@ public class Hero extends Player
                 Rectangle anchorHero = getAnchorLocation();
                 Rectangle anchorEnemy = enemy.getAnchorLocation();
 
-                //we have hit the enemy, NOTE: we don't want to exit loop
+                //we have made collision with the enemy
                 if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(enemy.getCenter()) && !hasState(State.THROW_PROJECTILE))
                 {
-                    enemy.setHorizontalFlip(!hasHorizontalFlip());
-                    enemy.setState(State.HURT);
-                    enemy.getSpriteSheet().reset();
-                    enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                    //make sure hero is facing the enemy, NOTE: even though we hit the enemy do not exit loop because we may damage multiple
+                    if (enemy.getCenter().x >= getCenter().x && !hasHorizontalFlip() ||
+                        enemy.getCenter().x <= getCenter().x && hasHorizontalFlip())
+                    {
+                        enemy.setHorizontalFlip(!hasHorizontalFlip());
+                        enemy.setState(State.HURT);
+                        enemy.getSpriteSheet().reset();
+                        enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                    }
                 }
             }
 

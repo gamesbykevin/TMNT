@@ -50,9 +50,6 @@ public class Player extends Sprite
     //the projectile speed will be a factor of the player walk speed
     private static final double PROJECTILE_SPEED_RATIO = 5;
     
-    //how many times can this player get hurt before they fly backwards
-    private static final int CONSECUTIVE_HIT_LIMIT = 3;
-    
     public Player()
     {
         setState(State.IDLE);
@@ -212,7 +209,7 @@ public class Player extends Sprite
     /**
      * Only reset sprite sheet animation
      */
-    protected void reset()
+    public void reset()
     {
         this.getSpriteSheet().reset();
     }
@@ -295,10 +292,13 @@ public class Player extends Sprite
                 addProjectile();
         }
         
-        if (isHurt() && getSpriteSheet().hasFinished())
+        if (isHurt())
         {
-            reset();
-            setState(State.IDLE);
+            if (getSpriteSheet().hasFinished())
+            {
+                setState(State.IDLE);
+                reset();
+            }
         }
     }
     

@@ -1,5 +1,6 @@
 package com.gamesbykevin.tmnt.player;
 
+import com.gamesbykevin.framework.util.TimerCollection;
 import com.gamesbykevin.tmnt.enemies.*;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
@@ -22,9 +23,9 @@ public class PlayerManager
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
         
-        addTurtle(resources, delay, 200, 100);
-        //addTurtle(resources, delay, 200, 100);
-        //addTurtle(resources, delay, 200, 200);
+        addHero(resources, delay, 200, 100);
+        //addHero(resources, delay, 200, 100);
+        //addHero(resources, delay, 200, 200);
         
         addEnemy(resources, delay, 350, 100);
         addEnemy(resources, delay, 350, 200);
@@ -84,7 +85,7 @@ public class PlayerManager
         enemies.add(enemy);
     }
     
-    private void addTurtle(final ResourceManager resources, final long delay, final int x, final int y)
+    private void addHero(final ResourceManager resources, final long delay, final int x, final int y)
     {
         Hero hero;
         
@@ -127,13 +128,14 @@ public class PlayerManager
     
     public void update(final Engine engine) throws Exception
     {
-        //all heroes are human
+        //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
             hero.update(engine.getKeyboard(), enemies);
         }
         
-        checkEnemy();
+        //make sure we have enemies attacking the heroes
+        updateStrategy();
         
         for (Enemy enemy : enemies)
         {
@@ -144,7 +146,7 @@ public class PlayerManager
     /**
      * This method will make if there are at least 2 enemies that they are set to attack
      */
-    private void checkEnemy()
+    private void updateStrategy()
     {
         int count = 0;
         
