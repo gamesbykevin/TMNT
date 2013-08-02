@@ -142,7 +142,7 @@ public class PlayerManager
         //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
-            hero.update(engine.getKeyboard(), enemies);
+            hero.update(engine, enemies);
         }
         
         //make sure we have enemies attacking the heroes

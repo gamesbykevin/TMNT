@@ -3,7 +3,7 @@ package com.gamesbykevin.tmnt.enemies;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-public class FootSoldier1 extends Enemy implements PlayerRules
+public final class FootSoldier1 extends Enemy implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 80;
     private static final int SPRITE_HEIGHT = 80;
@@ -53,7 +53,7 @@ public class FootSoldier1 extends Enemy implements PlayerRules
         //attack1 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(0,0), getNanoSeconds(350));
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(350));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK1);
 
         //attack2 animation

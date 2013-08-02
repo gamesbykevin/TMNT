@@ -115,6 +115,9 @@ public class Enemy extends Player
      */
     private void avoidAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean jumping)
     {
+        if (1==1)
+            return;
+        
         if (jumping)
             return;
         
@@ -191,7 +194,8 @@ public class Enemy extends Player
             {
                 for (Hero hero : heroes)
                 {
-                    if (!hero.canHurt())
+                    //all projectiles will be moving when they cause damage to hero
+                    if (!hero.canHurt() || !getProjectile().hasVelocity())
                         continue;
 
                     Rectangle anchorProjectile = Player.getAnchorLocation(getProjectile());
@@ -200,29 +204,25 @@ public class Enemy extends Player
                     //projectile has hit hero
                     if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
                     {
-                        //all projectiles will be moving when they cause damage to hero
-                        if (getProjectile().hasVelocity())
-                        {
-                            hero.setState(State.HURT);
-                            hero.reset();
+                        hero.setState(State.HURT);
+                        hero.reset();
 
-                            //check if there is an additional animation now that the projectile has hit
-                            if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
+                        //check if there is an additional animation now that the projectile has hit
+                        if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
+                        {
+                            if (getProjectile().getSpriteSheet().getCurrent() != State.PROJECTILE1_FINISH)
                             {
-                                if (getProjectile().getSpriteSheet().getCurrent() != State.PROJECTILE1_FINISH)
-                                {
-                                    getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                                    getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
-                                    getProjectile().getSpriteSheet().reset();
-                                    break;
-                                }
+                                getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                                getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
+                                getProjectile().getSpriteSheet().reset();
+                                break;
                             }
-                            else
-                            {
-                                //if another animation does not exist then remove the projectile
-                                removeProjectile();
-                                return;
-                            }
+                        }
+                        else
+                        {
+                            //if another animation does not exist then remove the projectile
+                            removeProjectile();
+                            return;
                         }
                     }
                 }

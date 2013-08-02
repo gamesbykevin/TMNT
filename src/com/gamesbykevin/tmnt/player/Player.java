@@ -7,7 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-public class Player extends Sprite
+public abstract class Player extends Sprite
 {
     /**
      * The state will define what the Player is doing
@@ -52,6 +52,7 @@ public class Player extends Sprite
     
     public Player()
     {
+        super.createSpriteSheet();
         setState(State.IDLE);
     }
     
@@ -305,6 +306,7 @@ public class Player extends Sprite
     private void addProjectile()
     {
         projectile = new Sprite();
+        projectile.createSpriteSheet();
         projectile.setLocation(getX(), getY());
         projectile.setDimensions(getWidth(), getHeight());
         projectile.setImage(getImage());

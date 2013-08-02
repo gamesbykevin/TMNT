@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.main;
 import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.input.Keyboard;
 
+import com.gamesbykevin.tmnt.levels.*;
 import com.gamesbykevin.tmnt.menu.GameMenu;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 
@@ -33,6 +34,8 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Keyboard keyboard;
     
     private PlayerManager playerManager;
+    
+    private LevelManager levelManager;
     
     /**
      * The Engine that contains the game/menu objects
@@ -105,6 +108,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     if (playerManager == null)
                     {
                         this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
+                        this.levelManager = new LevelManager(resources);
                     }
                     else
                     {
@@ -122,6 +126,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         }
     }
     
+    public LevelManager getLevelManager()
+    {
+        return this.levelManager;
+    }
+    
     public Main getMain()
     {
         return main;
@@ -135,6 +144,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     public void reset() throws Exception
     {
         this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
+        this.levelManager = new LevelManager(resources);
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
@@ -182,13 +192,15 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         Font f = g2d.getFont();
         g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 16));
         
+        if (this.levelManager != null)
+        {
+            this.levelManager.render(g2d);
+        }
         
         if (this.playerManager != null)
         {
             this.playerManager.render(g2d);
         }
-        
-        
         
         g2d.setFont(f);
         return g2d;

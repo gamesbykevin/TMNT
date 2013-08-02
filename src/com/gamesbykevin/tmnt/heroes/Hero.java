@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.heroes;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.enemies.Enemy;
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.player.Player;
 
 import java.awt.event.KeyEvent;
@@ -20,14 +21,14 @@ public class Hero extends Player
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final Keyboard keyboard, List<Enemy> enemies) throws Exception
+    public void update(final Engine engine, List<Enemy> enemies) throws Exception
     {
         super.update();
         
         if (isAttacking())
             checkAttack(enemies);
         
-        if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_RIGHT))
         {
             if (canWalk())
             {
@@ -37,7 +38,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_LEFT))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_LEFT))
         {
             if (canWalk())
             {
@@ -47,7 +48,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_UP))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_UP))
         {
             if (canWalk())
             {
@@ -62,7 +63,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_DOWN))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_DOWN))
         {
             if (canWalk())
             {
@@ -77,7 +78,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_A))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_A))
         {
             if (canJump())
             {
@@ -89,7 +90,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_S))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_S))
         {
             if (canAttack())
             {
@@ -104,7 +105,7 @@ public class Hero extends Player
                 {
                     setState(State.ATTACK1);
                     setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                    keyboard.removeKeyPressed(KeyEvent.VK_S);
+                    engine.getKeyboard().removeKeyPressed(KeyEvent.VK_S);
                 }
             }
             else
@@ -135,30 +136,33 @@ public class Hero extends Player
                             break;
                     }
                     
-                    keyboard.removeKeyPressed(KeyEvent.VK_S);
+                    engine.getKeyboard().removeKeyPressed(KeyEvent.VK_S);
                 }
             }
         }
 
-        if (keyboard.hasKeyReleased(KeyEvent.VK_LEFT) || keyboard.hasKeyReleased(KeyEvent.VK_RIGHT))
+        if (engine.getKeyboard().hasKeyReleased(KeyEvent.VK_LEFT) || engine.getKeyboard().hasKeyReleased(KeyEvent.VK_RIGHT))
         {
             if (isWalking() || isIdle())
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.resetAllKeyEvents();
+                engine.getKeyboard().resetAllKeyEvents();
             }
         }
 
-        if (keyboard.hasKeyReleased(KeyEvent.VK_UP) || keyboard.hasKeyReleased(KeyEvent.VK_DOWN))
+        if (engine.getKeyboard().hasKeyReleased(KeyEvent.VK_UP) || engine.getKeyboard().hasKeyReleased(KeyEvent.VK_DOWN))
         {
             if (isWalking() || isIdle())
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.resetAllKeyEvents();
+                engine.getKeyboard().resetAllKeyEvents();
             }
         }
+        
+        if (engine.getLevelManager() != null && engine.getLevelManager().getLevel() != null)
+            engine.getLevelManager().getLevel().update(this.getVelocityX());
     }
     
     private void checkAttack(List<Enemy> enemies)

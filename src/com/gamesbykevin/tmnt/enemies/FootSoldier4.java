@@ -3,7 +3,7 @@ package com.gamesbykevin.tmnt.enemies;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-public class FootSoldier4 extends Enemy implements PlayerRules
+public final class FootSoldier4 extends Enemy implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 80;
     private static final int SPRITE_HEIGHT = 80;

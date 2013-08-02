@@ -21,7 +21,7 @@ public class ResourceManager
     //collections of resources
     private enum Type
     {
-        MenuImage, MenuAudio, GameFont, GameAudioEffects, GameAudioMusic, GameHeroes, GameEnemies, GameBosses
+        MenuImage, MenuAudio, GameFont, GameAudioEffects, GameAudioMusic, GameHeroes, GameEnemies, GameBosses, LevelObjects
     }
     
     //root directory of all resources
@@ -42,6 +42,17 @@ public class ResourceManager
     public enum GameBosses
     {
         Boss1, Boss2, Boss3, Boss4, Boss5, Boss6
+    }
+    
+    public enum LevelObjects
+    {
+        Level1, Level1Background, 
+        Level2, 
+        Level3, Level3Background, 
+        Level4, Level4Background, 
+        Level5, Level5Background, 
+        Level6, Level6Background, 
+        Pizza
     }
     
     public enum MenuAudio
@@ -85,6 +96,9 @@ public class ResourceManager
         
         //load all heores
         add(Type.GameHeroes, (Object[])GameHeroes.values(), RESOURCE_DIR + "images/game/turtles/{0}.gif", "Loading Game Hero Image Resources", Resources.Type.Image);
+        
+        //load all levels
+        add(Type.LevelObjects, (Object[])LevelObjects.values(), RESOURCE_DIR + "", "images/game/level/{0}.gif", Resources.Type.Image);
         
         //game images
         //add(Type.GameImage, (Object[])GameImage.values(), RESOURCE_DIR + "images/game/{0}.jpg", "Loading Game Image Resources", Resources.Type.Image);
@@ -145,6 +159,11 @@ public class ResourceManager
     public Image getGameEnemy(final Object key)
     {
         return getResources(Type.GameEnemies).getImage(key);
+    }
+    
+    public Image getLevelObject(final Object key)
+    {
+        return getResources(Type.LevelObjects).getImage(key);
     }
     
     /*

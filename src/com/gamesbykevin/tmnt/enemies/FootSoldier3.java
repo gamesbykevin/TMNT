@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gamesbykevin.tmnt.enemies;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
@@ -11,7 +7,7 @@ import com.gamesbykevin.tmnt.player.PlayerRules;
  *
  * @author GOD
  */
-public class FootSoldier3 extends Enemy implements PlayerRules
+public final class FootSoldier3 extends Enemy implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 60;
     private static final int SPRITE_HEIGHT = 60;
