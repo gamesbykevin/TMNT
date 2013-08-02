@@ -29,17 +29,17 @@ public class LevelManager
      * Set the level number which will create a new instance of level
      * @param num 
      */
-    public void setLevel(final int num, final ResourceManager res)
+    public void setLevel(final int num, ResourceManager resources)
     {
         switch(num)
         {
             case 0:
-                Image image = res.getLevelObject(ResourceManager.LevelObjects.Level1);
+                Image image = resources.getLevelObject(ResourceManager.LevelObjects.Level1);
                 
                 level = new Level1();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(res.getLevelObject(ResourceManager.LevelObjects.Level1Background));
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level1Background));
                 break;
                 
             default:
