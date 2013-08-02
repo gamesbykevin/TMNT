@@ -74,6 +74,10 @@ public class Enemy extends Player
                 if (!step1 && !step2 && step3)
                     closeGap(anchor, anchorHero, hero.getX());
                 
+                //if we aren't getting ready to attack we should be avoiding our targeted hero
+                if (!step2 && !step3)
+                    avoidAttack(anchor, anchorHero, hero.isJumping());
+                
                 //here we check for the opportunity to attack and take it if available
                 final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
@@ -99,6 +103,36 @@ public class Enemy extends Player
             {
                 setState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+            }
+        }
+    }
+    
+    /**
+     * If the enemy is not attacking the assigned hero they should be avoiding attack
+     * @param anchor The Rectangle representing the foot area of this enemy
+     * @param anchorHero The Rectangle representing the foot area of the hero
+     * @param jumping Is the hero jumping
+     */
+    private void avoidAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean jumping)
+    {
+        if (jumping)
+            return;
+        
+        //if the hero is not jumping and we are lined up
+        if (isLinedUp(anchor, anchorHero))
+        {
+            if (anchor.getY() < anchorHero.getY())
+            {
+                setState(State.WALK_VERTICAL);
+                setVelocityX(VELOCITY_NONE);
+                setVelocityY(-getVelocityWalk());
+            }
+            
+            if (anchor.getY() > anchorHero.getY())
+            {
+                setState(State.WALK_VERTICAL);
+                setVelocityX(VELOCITY_NONE);
+                setVelocityY(getVelocityWalk());
             }
         }
     }
@@ -339,7 +373,7 @@ public class Enemy extends Player
         if (isJumping)
             return;
         
-        if (anchor.getY() > anchorHero.getY() && anchor.getY() < anchorHero.getY() + anchorHero.getHeight())
+        if (isLinedUp(anchor, anchorHero))
         {
             setStep2(false);
             setStep3(true);
@@ -360,6 +394,11 @@ public class Enemy extends Player
             setVelocityX(VELOCITY_NONE);
             setVelocityY(-getVelocityWalk());
         }
+    }
+    
+    private boolean isLinedUp(final Rectangle anchor, final Rectangle anchorHero)
+    {
+        return (anchor.getY() > anchorHero.getY() && anchor.getY() < anchorHero.getY() + anchorHero.getHeight());
     }
     
     /**

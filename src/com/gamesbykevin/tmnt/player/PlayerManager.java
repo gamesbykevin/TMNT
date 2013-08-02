@@ -1,9 +1,12 @@
 package com.gamesbykevin.tmnt.player;
 
 import com.gamesbykevin.framework.util.TimerCollection;
+
 import com.gamesbykevin.tmnt.enemies.*;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
+import com.gamesbykevin.tmnt.main.ResourceManager.GameHeroes;
+import com.gamesbykevin.tmnt.main.ResourceManager.GameEnemies;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -37,40 +40,44 @@ public class PlayerManager
     {
         Enemy enemy = null;
         
-        int rand = (int)(Math.random() * ResourceManager.GameEnemies.values().length);
+        int rand = (int)(Math.random() * GameEnemies.values().length);
         
-        switch (rand)
+        switch (GameEnemies.values()[rand])
         {
-            case 0:
+            case FootSoldier1:
                 enemy = new FootSoldier1();
                 break;
                 
-            case 1:
+            case FootSoldier2:
                 enemy = new FootSoldier2();
                 break;
                 
-            case 2:
+            case FootSoldier3:
                 enemy = new FootSoldier3();
                 break;
                 
-            case 3:
+            case FootSoldier4:
                 enemy = new FootSoldier4();
                 break;
                 
-            case 4:
+            case FootSoldier5:
                 enemy = new FootSoldier5();
                 break;
                 
-            case 5:
+            case FootSoldier6:
                 enemy = new FootSoldier6();
                 break;
                 
-            case 6:
+            case FootSoldier7:
                 enemy = new FootSoldier7();
                 break;
                 
-            case 7:
+            case FootSoldier8:
                 enemy = new FootSoldier8();
+                break;
+                
+            case FootSoldier9:
+                enemy = new FootSoldier9();
                 break;
                 
             default:
@@ -78,7 +85,7 @@ public class PlayerManager
                 break;
         }
         
-        enemy.setImage(resources.getGameEnemy(ResourceManager.GameEnemies.values()[rand]));
+        enemy.setImage(resources.getGameEnemy(GameEnemies.values()[rand]));
         enemy.setDelay(delay);
         enemy.setLocation(x, y);
         
@@ -89,20 +96,24 @@ public class PlayerManager
     {
         Hero hero;
         
-        int rand = (int)(Math.random() * ResourceManager.GameHeroes.values().length);
+        int heroIndex = (int)(Math.random() * GameHeroes.values().length);
         
-        switch(rand)
+        switch(GameHeroes.values()[heroIndex])
         {
-            case 0:
+            case Donatello:
                 hero = new Donatello();
                 break;
                 
-            case 1:
+            case Raphael:
                 hero = new Raphael();
                 break;
                 
-            case 2:
+            case Leonardo:
                 hero = new Leonardo();
+                break;
+                
+            case Michelangelo:
+                hero = new Michelangelo();
                 break;
                 
             default:
@@ -110,7 +121,7 @@ public class PlayerManager
                 break;
         }
         
-        hero.setImage(resources.getGameHero(ResourceManager.GameHeroes.values()[rand]));
+        hero.setImage(resources.getGameHero(GameHeroes.values()[heroIndex]));
         hero.setDelay(delay);
         hero.setLocation(x, y);
         
@@ -179,7 +190,6 @@ public class PlayerManager
             {
                 final int rand = (int)(Math.random() * tmp.size());
                 tmp.get(rand).setStep2(true);
-                
                 
                 if (attackEast)
                 {
