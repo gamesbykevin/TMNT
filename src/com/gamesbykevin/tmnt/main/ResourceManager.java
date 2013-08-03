@@ -98,7 +98,7 @@ public class ResourceManager
         add(Type.GameHeroes, (Object[])GameHeroes.values(), RESOURCE_DIR + "images/game/turtles/{0}.gif", "Loading Game Hero Image Resources", Resources.Type.Image);
         
         //load all levels
-        add(Type.LevelObjects, (Object[])LevelObjects.values(), RESOURCE_DIR + "", "images/game/level/{0}.gif", Resources.Type.Image);
+        add(Type.LevelObjects, (Object[])LevelObjects.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", Resources.Type.Image);
         
         //game images
         //add(Type.GameImage, (Object[])GameImage.values(), RESOURCE_DIR + "images/game/{0}.jpg", "Loading Game Image Resources", Resources.Type.Image);
