@@ -12,9 +12,8 @@ import java.awt.Polygon;
  */
 public final class Level1 extends Level implements LevelRules
 {
-    public void Level1()
+    public Level1()
     {
-        super();
         setupDefaults();
     }
     
