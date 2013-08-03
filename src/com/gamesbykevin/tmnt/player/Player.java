@@ -39,7 +39,7 @@ public abstract class Player extends Sprite
     private State nextState;
     
     //no velocity
-    protected final static int VELOCITY_NONE = 0;
+    public final static int VELOCITY_NONE = 0;
     
     //# of hits player can take before they die
     private int health = 0;

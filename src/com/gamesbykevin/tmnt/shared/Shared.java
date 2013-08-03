@@ -15,8 +15,8 @@ import java.awt.image.BufferedImage;
 public class Shared 
 {
     //dimensions for the original window
-    public static final int WINDOW_WIDTH  = 500;
-    public static final int WINDOW_HEIGHT = 300;
+    public static final int WINDOW_WIDTH  = 400;
+    public static final int WINDOW_HEIGHT = 224;
     
     //show UPS/FPS counters
     public static final boolean DEBUG = true;

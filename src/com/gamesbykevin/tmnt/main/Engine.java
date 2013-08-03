@@ -108,11 +108,13 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     if (playerManager == null)
                     {
                         this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
-                        this.levelManager = new LevelManager(resources);
+                        this.levelManager = new LevelManager();
+                        this.levelManager.setLevel(0, resources);
                     }
                     else
                     {
                         this.playerManager.update(this);
+                        this.levelManager.update(playerManager.getEnemies(), playerManager.getHeroes(), main.getScreen());
                     }
                 }
                 
@@ -144,7 +146,8 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     public void reset() throws Exception
     {
         this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
-        this.levelManager = new LevelManager(resources);
+        this.levelManager = new LevelManager();
+        this.levelManager.setLevel(0, resources);
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         

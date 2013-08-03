@@ -14,9 +14,11 @@ public final class Level1 extends Level implements LevelRules
 {
     public void Level1()
     {
+        super();
         setupDefaults();
     }
     
+    @Override
     public void setupDefaults()
     {
         int x[] = {0,   2299, 2299, 0  };

@@ -137,12 +137,30 @@ public class PlayerManager
         heroes.add(hero);
     }
     
+    /**
+     * Get a list of all our enemies
+     * @return List<Enemy>
+     */
+    public List<Enemy> getEnemies()
+    {
+        return this.enemies;
+    }
+    
+    /**
+     * Get a list of all our heroes
+     * @return List<Hero>
+     */
+    public List<Hero> getHeroes()
+    {
+        return this.heroes;
+    }
+    
     public void update(final Engine engine) throws Exception
     {
         //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
-            hero.update(engine, enemies);
+            hero.update(engine.getKeyboard(), enemies);
         }
         
         //make sure we have enemies attacking the heroes
