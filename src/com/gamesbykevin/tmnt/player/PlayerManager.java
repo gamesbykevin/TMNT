@@ -26,14 +26,14 @@ public class PlayerManager
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
         
-        addHero(resources, delay, 200, 100);
+        addHero(resources, delay, 200, 150);
         //addHero(resources, delay, 200, 100);
         //addHero(resources, delay, 200, 200);
         
         addEnemy(resources, delay, 350, 100);
-        addEnemy(resources, delay, 350, 200);
-        addEnemy(resources, delay, 50, 200);
-        addEnemy(resources, delay, 50, 100);
+        //addEnemy(resources, delay, 350, 200);
+        //addEnemy(resources, delay, 50, 200);
+        //addEnemy(resources, delay, 50, 100);
     }
     
     private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
@@ -160,7 +160,7 @@ public class PlayerManager
         //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
-            hero.update(engine.getKeyboard(), enemies);
+            hero.update(engine.getKeyboard(), enemies, engine.getLevelManager().getLevel());
         }
         
         //make sure we have enemies attacking the heroes

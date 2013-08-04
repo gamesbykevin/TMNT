@@ -3,10 +3,11 @@ package com.gamesbykevin.tmnt.heroes;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.enemies.Enemy;
-import com.gamesbykevin.tmnt.main.Engine;
+import com.gamesbykevin.tmnt.levels.Level;
 import com.gamesbykevin.tmnt.player.Player;
 
 import java.awt.event.KeyEvent;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
 
@@ -21,9 +22,14 @@ public class Hero extends Player
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final Keyboard keyboard, List<Enemy> enemies) throws Exception
+    public void update(final Keyboard keyboard, List<Enemy> enemies, final Level level) throws Exception
     {
+        Point origin = super.getPoint();
+        
         super.update();
+        
+        if (!level.getBounds().contains(super.getAnchorLocation()))
+            super.setLocation(origin);
         
         if (isAttacking())
             checkAttack(enemies);
