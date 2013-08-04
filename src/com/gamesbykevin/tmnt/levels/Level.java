@@ -29,6 +29,15 @@ public abstract class Level extends Sprite
     {
     }
     
+    /**
+     * Gets the east most x-coordinate of the polygon
+     * @return int x-coordinate
+     */
+    public int getEastBoundsX()
+    {
+        return (bounds.getBounds().x + bounds.getBounds().width);
+    }
+    
     public void setBackgroundImage(final Image background)
     {
         this.backgrounds = new ArrayList<>();

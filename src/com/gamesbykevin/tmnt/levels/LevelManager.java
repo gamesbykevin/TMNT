@@ -89,6 +89,11 @@ public class LevelManager
                     if (hero.getVelocityX() > 0 && hero.getX() >= rightSide)
                     {
                         getLevel().setScrollSpeed(hero.getVelocityX());
+                        
+                        //stop level scroll if at end of level
+                        if (getLevel().getEastBoundsX() <= screen.x + screen.width)
+                            getLevel().setScrollSpeed(Player.VELOCITY_NONE);
+                        
                         hero.setX(rightSide);
                     }
                     

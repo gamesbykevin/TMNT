@@ -1,9 +1,5 @@
 package com.gamesbykevin.tmnt.levels;
 
-import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.LevelObjects;
-
-import java.awt.Image;
 import java.awt.Polygon;
 
 /**
@@ -20,7 +16,7 @@ public final class Level1 extends Level implements LevelRules
     @Override
     public void setupDefaults()
     {
-        int x[] = {0,   2299, 2299, 0  };
+        int x[] = {0,   2310, 2310, 0  };
         int y[] = {162, 162,  224,  224};
         
         //set the area that is in bounds
