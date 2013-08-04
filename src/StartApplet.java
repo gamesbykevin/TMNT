@@ -15,7 +15,7 @@ public class StartApplet extends JApplet
     public void init()
     {
         //the size of our game window
-        setSize(Shared.WINDOW_WIDTH, Shared.WINDOW_HEIGHT);
+        setSize(Shared.INITIAL_WIDTH, Shared.INITIAL_HEIGHT);
 
         //allow focus on our applet
         setFocusable(true);

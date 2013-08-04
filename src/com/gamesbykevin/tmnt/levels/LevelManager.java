@@ -71,40 +71,38 @@ public class LevelManager
             {
                 if (!enemy.isDead())
                 {
-                    //hasEnemies = true;
+                    hasEnemies = true;
                     break;
                 }
             }
             
-            if (!hasEnemies)
+            for (Hero hero : heroes)
             {
-                for (Hero hero : heroes)
+                getLevel().setScrollSpeed(Player.VELOCITY_NONE);
+
+                //right edge where hero can't go past
+                final int rightSide = screen.x + (int)(screen.width * .9);
+
+                //if the hero is moving east make sure they still stay on screen
+                if (hero.getVelocityX() > 0 && hero.getX() >= rightSide)
                 {
-                    getLevel().setScrollSpeed(Player.VELOCITY_NONE);
-                    
-                    //right edge where hero can't go past
-                    final int rightSide = screen.x + (int)(screen.width * .9);
-                    
-                    //if the hero is moving east make sure they still stay on screen
-                    if (hero.getVelocityX() > 0 && hero.getX() >= rightSide)
-                    {
+                    if (!hasEnemies)
                         getLevel().setScrollSpeed(hero.getVelocityX());
-                        
-                        //stop level scroll if at end of level
-                        if (getLevel().getEastBoundsX() <= screen.x + screen.width)
-                            getLevel().setScrollSpeed(Player.VELOCITY_NONE);
-                        
-                        hero.setX(rightSide);
-                    }
-                    
-                    //left edge where hero can't go past
-                    final int leftSide = screen.x + (int)(screen.width * .1);
-                    
-                    //if the hero is moving west make sure they still stay on screen
-                    if (hero.getVelocityX() < 0 && hero.getX() <= leftSide)
-                    {
-                        hero.setX(leftSide);
-                    }
+
+                    //stop level scroll if at end of level
+                    if (getLevel().getEastBoundsX() <= screen.x + screen.width)
+                        getLevel().setScrollSpeed(Player.VELOCITY_NONE);
+
+                    hero.setX(rightSide);
+                }
+
+                //left edge where hero can't go past
+                final int leftSide = screen.x + (int)(screen.width * .1);
+
+                //if the hero is moving west make sure they still stay on screen
+                if (hero.getVelocityX() < 0 && hero.getX() <= leftSide)
+                {
+                    hero.setX(leftSide);
                 }
             }
         }

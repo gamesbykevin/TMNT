@@ -16,7 +16,7 @@ public class StartDesktop extends JPanel
     public StartDesktop()
     {
         setCursor(Shared.CURSOR);
-        setPreferredSize(new Dimension(Shared.WINDOW_WIDTH, Shared.WINDOW_HEIGHT));
+        setPreferredSize(new Dimension(Shared.INITIAL_WIDTH, Shared.INITIAL_HEIGHT));
         setFocusable(true);
         requestFocus();
         

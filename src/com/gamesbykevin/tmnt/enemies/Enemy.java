@@ -50,49 +50,56 @@ public class Enemy extends Player
             
             //if we are attacking check for collision as well as reset animation
             if (isAttacking())
-                checkAttack(heroes);
-            
-            //make sure enemy can walk or if they are walking to follow the logic below
-            if (canWalk() || isWalking())
             {
-                //reset state and velocity
-                setState(State.IDLE);
-                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
-                
-                Rectangle anchor = getAnchorLocation();
-                Rectangle anchorHero = hero.getAnchorLocation();
-                
-                //surround the enemy first
-                if (step1)
-                    surroundEnemy(hero);
-                
-                //next, line up the y-cooridnate to get ready to attack
-                if (!step1 && step2)
-                    lineupAttack(anchor, anchorHero, hero.isJumping());
-                
-                //then, close/spread the gap
-                if (!step1 && !step2 && step3)
-                    closeGap(anchor, anchorHero, hero.getX());
-                
-                //if we aren't getting ready to attack we should be avoiding our targeted hero
-                if (!step2 && !step3)
-                    avoidAttack(anchor, anchorHero, hero.isJumping());
-                
-                //here we check for the opportunity to attack and take it if available
-                final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
-
-                //if there is an attack opportunity and the hero isn't hurt, take it
-                if (attackState != null && !hero.isHurt())
+                checkAttack(heroes);
+            }
+            else
+            {
+                //make sure enemy can walk or if they are walking to follow the logic below
+                if (canWalk() || isWalking())
                 {
-                    //while attacking the enemy isn't moving
-                    setVelocityX(VELOCITY_NONE);
-                    setVelocityY(VELOCITY_NONE);
+                    //reset state and velocity
+                    setState(State.IDLE);
+                    setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
 
-                    //when the player attacks it is no longer their turn
-                    resetSteps();
+                    Rectangle anchor = getAnchorLocation();
+                    Rectangle anchorHero = hero.getAnchorLocation();
 
-                    //start attack here
-                    setState(attackState);
+                    //surround the enemy first
+                    if (step1)
+                        surroundEnemy(hero);
+
+                    //next, line up the y-cooridnate to get ready to attack
+                    if (!step1 && step2)
+                        lineupAttack(anchor, anchorHero, hero.isJumping());
+
+                    //then, close/spread the gap
+                    if (!step1 && !step2 && step3)
+                        closeGap(anchor, anchorHero, hero.getX());
+
+                    //if we aren't getting ready to attack we should be avoiding our targeted hero
+                    if (!step2 && !step3)
+                        avoidAttack(anchor, anchorHero, hero.isJumping());
+
+                    //here we check for the opportunity to attack and take it if available
+                    final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
+
+                    //if there is an attack opportunity and the hero isn't hurt, take it
+                    if (attackState != null && !hero.isHurt())
+                    {
+                        //while attacking the enemy isn't moving
+                        setVelocityX(VELOCITY_NONE);
+                        setVelocityY(VELOCITY_NONE);
+
+                        //when the player attacks it is no longer their turn
+                        resetSteps();
+
+                        //start attack here
+                        setState(attackState);
+                        
+                        //now that new state is set reset animation
+                        reset();
+                    }
                 }
             }
         }
@@ -102,6 +109,13 @@ public class Enemy extends Player
             if (hero.isDead() && !isJumping())
             {
                 setState(State.IDLE);
+                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+            }
+            
+            if (isAttacking() && getSpriteSheet().hasFinished())
+            {
+                setState(State.IDLE);
+                reset();
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
         }
@@ -170,8 +184,8 @@ public class Enemy extends Player
             }
 
             //now that attack animation is complete reset
-            reset();
             setState(State.IDLE);
+            reset();
 
             //if another attack is available start it now
             if (getNextState() != null)

@@ -57,7 +57,7 @@ public final class Raphael extends Hero implements PlayerRules
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(6,1), getNanoSeconds(75));
         animation.add(getSpriteRectangle(7,1), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(8,1), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(8,1), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK1);
         
         //attack2 animation
@@ -67,14 +67,14 @@ public final class Raphael extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(8,1), getNanoSeconds(75));
         animation.add(getSpriteRectangle(9,1), getNanoSeconds(75));
         animation.add(getSpriteRectangle(0,2), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(1,2), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(1,2), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK2);
         
         //attack3 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(2,2), getNanoSeconds(100));
         animation.add(getSpriteRectangle(3,2), getNanoSeconds(100));
-        animation.add(getSpriteRectangle(4,2), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(4,2), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK3);
         
         //attack4 animation
@@ -86,7 +86,7 @@ public final class Raphael extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(9,2), getNanoSeconds(30));
         animation.add(getSpriteRectangle(0,3), getNanoSeconds(30));
         animation.add(getSpriteRectangle(1,3), getNanoSeconds(30));
-        animation.add(getSpriteRectangle(2,3), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(2,3), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK4);
 
         //attack5 animation
@@ -97,7 +97,7 @@ public final class Raphael extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(3,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(4,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(5,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,5), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(6,5), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK5);
         
         //jump animation

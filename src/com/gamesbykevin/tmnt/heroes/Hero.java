@@ -28,7 +28,7 @@ public class Hero extends Player
         
         super.update();
         
-        if (!level.getBounds().contains(super.getAnchorLocation()))
+        if (!super.isJumping() && !level.getBounds().contains(super.getAnchorLocation()))
             super.setLocation(origin);
         
         if (isAttacking())
@@ -65,7 +65,10 @@ public class Hero extends Player
             //if moving up while still jumping up we will need to adjust the stop y
             if (isJumping() && getVelocityY() < 0)
             {
-                setJumpPhase2(getJumpPhase2() - getVelocityWalk());
+                if (level.getBounds().contains(getX(), getJumpPhase2() - getVelocityWalk()))
+                {
+                    setJumpPhase2(getJumpPhase2() - getVelocityWalk());
+                }
             }
         }
 
@@ -80,7 +83,10 @@ public class Hero extends Player
             //if moving down while still jumping up we will need to adjust the stop y
             if (isJumping() && getVelocityY() < 0)
             {
-                setJumpPhase2(getJumpPhase2() + getVelocityWalk());
+                if (level.getBounds().contains(getX(), getJumpPhase2() + getVelocityWalk() + (getHeight()/2)))
+                {
+                    setJumpPhase2(getJumpPhase2() + getVelocityWalk());
+                }
             }
         }
 

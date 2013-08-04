@@ -271,14 +271,16 @@ public abstract class Player extends Sprite
     {
         if (isJumping())
         {
-            if (getY() <= this.jumpPhase1)
+            //have we reached the peak of our jump
+            if (getY() <= getJumpPhase1())
             {
                 setVelocityY(-getVelocityY());
             }
             
-            if (getY() >= this.jumpPhase2)
+            //have we reached the landing spot of our jump
+            if (getY() >= getJumpPhase2())
             {
-                setY(this.jumpPhase2);
+                setY(getJumpPhase2());
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 reset();
                 setState(State.IDLE);
@@ -290,7 +292,9 @@ public abstract class Player extends Sprite
         {
             //if the attack is projectile add the projectile
             if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
+            {
                 addProjectile();
+            }
         }
         
         if (isHurt())
@@ -303,6 +307,9 @@ public abstract class Player extends Sprite
         }
     }
     
+    /**
+     * Add projectile to throw at player
+     */
     private void addProjectile()
     {
         projectile = new Sprite();

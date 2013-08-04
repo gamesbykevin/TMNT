@@ -48,10 +48,10 @@ public class Main extends Thread
     private JPanel panel;
     
     public Main(final int ups)
-    {        
+    {
         //the dimensions used for original and full screen
-        originalSizeWindow = new Rectangle(0, 0, Shared.WINDOW_WIDTH, Shared.WINDOW_HEIGHT);
-        fullSizeWindow     = new Rectangle(originalSizeWindow);
+        originalSizeWindow = new Rectangle(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
+        fullSizeWindow     = new Rectangle(this.originalSizeWindow);
 
         //duration of nanoSeconds per update
         nanoSecondsPerUpdate = NANO_SECONDS_PER_SECOND / ups;
@@ -223,7 +223,7 @@ public class Main extends Thread
             Graphics g = tmp.getGraphics();
 
             g.setColor(Color.BLACK);
-            g.fillRect(originalSizeWindow.x, originalSizeWindow.y, originalSizeWindow.width, originalSizeWindow.height);
+            g.fillRect(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
 
             engine.render(g);
 
@@ -232,6 +232,10 @@ public class Main extends Thread
         }
     }
     
+    /**
+     * Does the applet have focus, if this is a JPanel it will always return true
+     * @return boolean
+     */
     public boolean hasFocus()
     {
         if (applet != null)
@@ -245,6 +249,11 @@ public class Main extends Thread
         }
     }
     
+    /**
+     * Draw frame counter onto Image
+     * @param g Graphics
+     * @return Graphics
+     */
     private Graphics renderCounter(Graphics g)
     {
         final String result = updatesDisplay + " UPS, " + framesDisplay + " FPS";
@@ -269,6 +278,9 @@ public class Main extends Thread
         return g;
     }
     
+    /**
+     * Draw Image onto screen
+     */
     private void drawScreen()
     {
         if (bufferedImage == null)
