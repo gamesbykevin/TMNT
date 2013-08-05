@@ -13,9 +13,11 @@ import java.util.List;
 
 public class Hero extends Player
 {
+    private Point validLocation;
+    
     public Hero()
     {
-        
+        validLocation = new Point();
     }
     
     /**
@@ -24,12 +26,31 @@ public class Hero extends Player
      */
     public void update(final Keyboard keyboard, List<Enemy> enemies, final Level level) throws Exception
     {
-        Point origin = super.getPoint();
+        //record our location before update is called
+        if (!isJumping())
+        {
+            //make note of last valid location in case player is out of bounds
+            if (level.getBounds().contains(getAnchorLocation()))
+                validLocation = super.getPoint();
+        }
+        else
+        {
+            
+        }
         
         super.update();
         
-        if (!super.isJumping() && !level.getBounds().contains(super.getAnchorLocation()))
-            super.setLocation(origin);
+        //now that update has been called make sure we are still within the boundary
+        if (!isJumping())
+        {
+            //if the player is not jumping their anchor location needs to be inside the level boundary
+            if (!level.getBounds().contains(getAnchorLocation()))
+                super.setLocation(validLocation);
+        }
+        else
+        {
+            
+        }
         
         if (isAttacking())
             checkAttack(enemies);
@@ -61,15 +82,6 @@ public class Hero extends Player
                 setVelocity(VELOCITY_NONE, -getVelocityWalk());
                 getSpriteSheet().setCurrent(State.WALK_VERTICAL);
             }
-            
-            //if moving up while still jumping up we will need to adjust the stop y
-            if (isJumping() && getVelocityY() < 0)
-            {
-                if (level.getBounds().contains(getX(), getJumpPhase2() - getVelocityWalk()))
-                {
-                    setJumpPhase2(getJumpPhase2() - getVelocityWalk());
-                }
-            }
         }
 
         if (keyboard.hasKeyPressed(KeyEvent.VK_DOWN))
@@ -79,15 +91,6 @@ public class Hero extends Player
                 setVelocity(VELOCITY_NONE, getVelocityWalk());
                 getSpriteSheet().setCurrent(State.WALK_VERTICAL);
             }
-            
-            //if moving down while still jumping up we will need to adjust the stop y
-            if (isJumping() && getVelocityY() < 0)
-            {
-                if (level.getBounds().contains(getX(), getJumpPhase2() + getVelocityWalk() + (getHeight()/2)))
-                {
-                    setJumpPhase2(getJumpPhase2() + getVelocityWalk());
-                }
-            }
         }
 
         if (keyboard.hasKeyPressed(KeyEvent.VK_A))
@@ -96,8 +99,8 @@ public class Hero extends Player
             {
                 setVelocity(getVelocityX(), -getVelocityJump());
                 setState(State.JUMP);
-                setJumpPhase1(getY() - (getVelocityJump() * 30));
-                setJumpPhase2(getY());
+                setJumpPhase1(getX(), getY() - (getVelocityJump() * Player.NUM_FRAMES_JUMP));
+                setJumpPhase2(getX(), getY());
                 reset();
             }
         }

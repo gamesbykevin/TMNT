@@ -71,7 +71,7 @@ public class LevelManager
             {
                 if (!enemy.isDead())
                 {
-                    hasEnemies = true;
+                    //hasEnemies = true;
                     break;
                 }
             }

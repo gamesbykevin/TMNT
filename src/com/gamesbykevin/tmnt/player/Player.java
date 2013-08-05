@@ -5,6 +5,7 @@ import com.gamesbykevin.framework.util.TimerCollection;
 import java.awt.Color;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 public abstract class Player extends Sprite
@@ -32,8 +33,8 @@ public abstract class Player extends Sprite
     
     //jump phase 1, y coordinate where jump needs to peak
     //jump phase 2, y coordinate where jump needs to stop
-    private int jumpPhase1 = 0;
-    private int jumpPhase2 = 0;
+    private Point jumpPhase1;
+    private Point jumpPhase2;
     
     //this is to check if we are to chain attack states together
     private State nextState;
@@ -49,6 +50,9 @@ public abstract class Player extends Sprite
     
     //the projectile speed will be a factor of the player walk speed
     private static final double PROJECTILE_SPEED_RATIO = 5;
+    
+    //number of frames to execute jump
+    public static final int NUM_FRAMES_JUMP = 30;
     
     public Player()
     {
@@ -130,16 +134,16 @@ public abstract class Player extends Sprite
      * Set the jump phase 1 so we know when the peak of the jump is
      * @param jumpPhase1 This is the jump peak
      */
-    protected void setJumpPhase1(final int jumpPhase1)
+    protected void setJumpPhase1(final int x, final int y)
     {
-        this.jumpPhase1 = jumpPhase1;
+        this.jumpPhase1 = new Point(x, y);
     }
     
     /**
-     * Get the Y peak coordinate
-     * @return int The Y coordinate where we the jump has peaked and we need to start declining
+     * This will contain the Y peak coordinate
+     * @return Point with the Y coordinate where we the jump has peaked and we need to start declining
      */
-    protected int getJumpPhase1()
+    protected Point getJumpPhase1()
     {
         return this.jumpPhase1;
     }
@@ -148,16 +152,16 @@ public abstract class Player extends Sprite
      * Set the jump phase 2 so we know when the jump finish is
      * @param jumpPhase2 This is the jump finish
      */
-    protected void setJumpPhase2(final int jumpPhase2)
+    protected void setJumpPhase2(final int x, final int y)
     {
-        this.jumpPhase2 = jumpPhase2;
+        this.jumpPhase2 = new Point(x, y);
     }
     
     /**
-     * Get the Y finish coordinate
-     * @return int The Y coordinate where we need to stop the jumping at
+     * This will contain the Y finish coordinate
+     * @return Point with the Y coordinate where we need to stop the jumping at
      */
-    protected int getJumpPhase2()
+    protected Point getJumpPhase2()
     {
         return this.jumpPhase2;
     }
@@ -272,18 +276,18 @@ public abstract class Player extends Sprite
         if (isJumping())
         {
             //have we reached the peak of our jump
-            if (getY() <= getJumpPhase1())
+            if (getY() <= getJumpPhase1().getY())
             {
                 setVelocityY(-getVelocityY());
             }
             
             //have we reached the landing spot of our jump
-            if (getY() >= getJumpPhase2())
+            if (getY() >= getJumpPhase2().getY())
             {
-                setY(getJumpPhase2());
+                setY(getJumpPhase2().getY());
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                reset();
                 setState(State.IDLE);
+                reset();
                 nextState = null;
             }
         }
@@ -341,6 +345,7 @@ public abstract class Player extends Sprite
         }
         
         projectile.getSpriteSheet().setCurrent(State.PROJECTILE1);
+        projectile.getSpriteSheet().reset();
     }
     
     /**

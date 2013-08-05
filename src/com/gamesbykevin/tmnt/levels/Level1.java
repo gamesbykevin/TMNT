@@ -16,8 +16,9 @@ public final class Level1 extends Level implements LevelRules
     @Override
     public void setupDefaults()
     {
-        int x[] = {0,   2310, 2310, 0  };
-        int y[] = {162, 162,  224,  224};
+        int x[] = {0,   866, 879, 1160, 1191, 2304, 2392, 0};
+        int y[] = {137, 137, 160,  160, 137, 137, 224, 224};
+        
         
         //set the area that is in bounds
         super.setBounds(new Polygon(x, y, x.length));
