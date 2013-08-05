@@ -97,11 +97,23 @@ public abstract class Level extends Sprite
         return (this.bounds.contains(rectangle));
     }
     
+    /**
+     * Set the autoscroll speed of the background
+     * @param autoScrollSpeed Pixels per frame to scroll
+     */
+    public void setAutoScrollSpeed(final int autoScrollSpeed)
+    {
+        for (Sprite background : backgrounds)
+        {
+            background.setVelocityX(-autoScrollSpeed);
+        }
+    }
+    
     public void setScrollSpeed(final int scrollSpeed)
     {
         if (backgrounds != null)
         {
-            //make sure auto scroll is not enabled
+            //make sure auto scroll is not enabled so we can sroll the background accordingly
             if (!hasAutoScrollBackground())
             {
                 for (Sprite background : backgrounds)

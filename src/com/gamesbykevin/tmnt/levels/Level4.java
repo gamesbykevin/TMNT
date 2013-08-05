@@ -6,9 +6,9 @@ import java.awt.Polygon;
  * Specifications for Level1
  * @author GOD
  */
-public final class Level1 extends Level implements LevelRules
+public final class Level4 extends Level implements LevelRules
 {
-    public Level1()
+    public Level4()
     {
         setupDefaults();
     }
@@ -16,8 +16,8 @@ public final class Level1 extends Level implements LevelRules
     @Override
     public void setupDefaults()
     {
-        int x[] = {0,   866, 879, 1160, 1191, 2304, 2392, 0};
-        int y[] = {137, 137, 160,  160, 137, 137, 224, 224};
+        int x[] = {0,   3847, 3867, 4223, 4223, 0};
+        int y[] = {133, 133,  111,  111,  221,  221};
         
         //set the area that is in bounds
         super.setBounds(new Polygon(x, y, x.length));

@@ -16,6 +16,9 @@ public class LevelManager
 {
     private Level level;
     
+    //scroll speed when auto scroll is enabled
+    private static final int SCROLL_SPEED = 10;
+    
     public LevelManager()
     {
         
@@ -34,12 +37,14 @@ public class LevelManager
      * Set the level number which will create a new instance of level
      * @param num 
      */
-    public void setLevel(final int num, ResourceManager resources)
+    public void setLevel(ResourceManager.LevelObjects chosenLevel, ResourceManager resources) throws Exception
     {
-        switch(num)
+        Image image;
+        
+        switch(chosenLevel)
         {
-            case 0:
-                Image image = resources.getLevelObject(ResourceManager.LevelObjects.Level1);
+            case Level1:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level1);
                 
                 level = new Level1();
                 level.setImage(image);
@@ -47,8 +52,53 @@ public class LevelManager
                 level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level1Background));
                 break;
                 
-            default:
+            case Level2:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level2);
+                
+                level = new Level2();
+                level.setImage(image);
+                level.setDimensions(image.getWidth(null), image.getHeight(null));
                 break;
+                
+            case Level3:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level3);
+                
+                level = new Level3();
+                level.setImage(image);
+                level.setDimensions(image.getWidth(null), image.getHeight(null));
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level3Background));
+                level.setAutoScrollSpeed(SCROLL_SPEED);
+                break;
+                
+            case Level4:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level4);
+                
+                level = new Level4();
+                level.setImage(image);
+                level.setDimensions(image.getWidth(null), image.getHeight(null));
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level4Background));
+                break;
+                
+            case Level5:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level5);
+                
+                level = new Level5();
+                level.setImage(image);
+                level.setDimensions(image.getWidth(null), image.getHeight(null));
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level5Background));
+                break;
+                
+            case Level6:
+                image = resources.getLevelObject(ResourceManager.LevelObjects.Level6);
+                
+                level = new Level6();
+                level.setImage(image);
+                level.setDimensions(image.getWidth(null), image.getHeight(null));
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level6Background));
+                break;
+                
+            default:
+                throw new Exception("Level not found");
         }
     }
     

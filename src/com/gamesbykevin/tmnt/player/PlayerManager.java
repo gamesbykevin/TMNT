@@ -26,7 +26,7 @@ public class PlayerManager
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
         
-        addHero(resources, delay, 200, 150);
+        addHero(resources, delay, 200, 125);
         //addHero(resources, delay, 200, 100);
         //addHero(resources, delay, 200, 200);
         
