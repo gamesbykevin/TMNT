@@ -1,5 +1,6 @@
 package com.gamesbykevin.tmnt.heroes;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
@@ -16,6 +17,8 @@ public final class Donatello extends Hero implements PlayerRules
      */
     public Donatello()
     {
+        super.setType(GamePlayers.Donatello);
+        
         //all default settings for this player
         setupDefaults();
     }

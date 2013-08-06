@@ -2,9 +2,9 @@ package com.gamesbykevin.tmnt.player;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.TimerCollection;
-import java.awt.Color;
 
-import java.awt.Graphics;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -26,6 +26,9 @@ public abstract class Player extends Sprite
         DEAD,
         DEFENSE
     }
+    
+    //we want to know what player this is so we can assign the appropriate assets
+    private GamePlayers type;
     
     //velocity for the appropriate state
     private int velocityWalk = 0;
@@ -56,8 +59,21 @@ public abstract class Player extends Sprite
     
     public Player()
     {
+        //create sprite sheet
         super.createSpriteSheet();
-        setState(State.IDLE);
+        
+        //assign default state of idle
+        super.getSpriteSheet().setCurrent(State.IDLE);
+    }
+    
+    public void setType(final GamePlayers type)
+    {
+        this.type = type;
+    }
+    
+    public GamePlayers getType()
+    {
+        return this.type;
     }
     
     /**
@@ -65,9 +81,14 @@ public abstract class Player extends Sprite
      * does not have a projectile null will be returned.
      * @return Sprite
      */
-    protected Sprite getProjectile()
+    public Sprite getProjectile()
     {
         return this.projectile;
+    }
+    
+    public boolean hasProjectile()
+    {
+        return (projectile != null);
     }
     
     /**
@@ -537,111 +558,33 @@ public abstract class Player extends Sprite
     }
     
     /**
-     * Gets a Rectangle of the players feet with a height of 10% of the total height
-     * @return Rectangle
+     * Gets a Rectangle of the parameter sprite feet with a height of 10% of the total height
+     * 
+     * @return Rectangle The rectangle containing the players feet
      */
     public Rectangle getAnchorLocation()
     {
-        offsetCenter();
-        
-        Rectangle anchor = new Rectangle(getX(), getY() + getHeight() - (int)(getHeight() * .1), getWidth(), (int)(getHeight() * .1));
-        
-        resetCenter();
-            
-        return anchor;
+        return getAnchorLocation(this);
     }
     
     /**
      * Gets a Rectangle of the parameter sprite feet with a height of 10% of the total height
-     * @param sprite
-     * @return Rectangle
+     * @param sprite The object we want the anchor location from
+     * @return Rectangle The rectangle containing the players feet
      */
     public static Rectangle getAnchorLocation(Sprite sprite)
     {
-        offsetCenter(sprite);
-        
-        Rectangle anchor = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * .1), sprite.getWidth(), (int)(sprite.getHeight() * .1));
-        
-        resetCenter(sprite);
-        
-        return anchor;
-    }
-    
-    /**
-     * Offsets the x,y coordinates by half the width/height
-     */
-    private void offsetCenter()
-    {
-        offsetCenter(this);
-        
-        //also include projectile
-        if (projectile != null)
-        {
-            offsetCenter(projectile);
-        }
-    }
-    
-    private static void offsetCenter(Sprite sprite)
-    {
-        int halfWidth = (sprite.getWidth() / 2);
-        int halfHeight = (sprite.getHeight() / 2);
+        final int halfWidth  = (sprite.getWidth()  / 2);
+        final int halfHeight = (sprite.getHeight() / 2);
         
         sprite.setX(sprite.getX() - halfWidth);
         sprite.setY(sprite.getY() - halfHeight);
-    }
-    
-    /**
-     * Resets the x,y back to its original coordinates
-     */
-    private void resetCenter()
-    {
-        resetCenter(this);
         
-        //also include projectile
-        if (projectile != null)
-        {
-            resetCenter(projectile);
-        }
-    }
-    
-    private static void resetCenter(Sprite sprite)
-    {
-        int halfWidth = (sprite.getWidth() / 2);
-        int halfHeight = (sprite.getHeight() / 2);
+        Rectangle tmp = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * .1), sprite.getWidth(), (int)(sprite.getHeight() * .1));
         
         sprite.setX(sprite.getX() + halfWidth);
         sprite.setY(sprite.getY() + halfHeight);
-    }
-    
-    /**
-     * Draw the object
-     * @param g Graphics
-     * @return Graphics
-     */
-    public Graphics render(Graphics g)
-    {
-        offsetCenter();
         
-        super.draw(g);
-        
-        if (projectile != null)
-            projectile.draw(g);
-        
-        g.setColor(Color.BLUE);
-        g.drawRect(getX(), getY(), getWidth(), getHeight());
-        
-        if (projectile != null)
-        {
-            g.setColor(Color.BLUE);
-            g.drawRect(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
-        }
-    
-        resetCenter();
-        
-        g.setColor(Color.RED);
-        Rectangle r = getAnchorLocation();
-        g.drawRect(r.x, r.y, r.width, r.height);
-        
-        return g;
+        return tmp;
     }
 }

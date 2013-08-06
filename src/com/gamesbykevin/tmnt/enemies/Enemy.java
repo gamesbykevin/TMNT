@@ -30,6 +30,9 @@ public class Enemy extends Player
     {
         super.update();
         
+        if (heroes.size() < 1)
+            return;
+        
         //check if projectile has hit hero or off the screen
         checkProjectile(heroes, screen);
         

@@ -16,13 +16,19 @@ public final class Level6 extends Level implements LevelRules
     @Override
     public void setupDefaults()
     {
+        setLevelBounds();
+        
+        //set true or false if we are using a separate background
+        super.setAutoScrollBackground(false);
+    }
+    
+    @Override
+    public void setLevelBounds()
+    {
         int x[] = {0,   505, 505, 0};
         int y[] = {142, 142, 219, 219};
         
         //set the area that is in bounds
-        super.setBounds(new Polygon(x, y, x.length));
-        
-        //set true or false if we are using a separate background
-        super.setAutoScrollBackground(false);
+        super.setBoundary(new Polygon(x, y, x.length));
     }
 }

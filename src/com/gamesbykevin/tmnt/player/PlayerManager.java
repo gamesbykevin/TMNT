@@ -1,14 +1,13 @@
 package com.gamesbykevin.tmnt.player;
 
-import com.gamesbykevin.framework.util.TimerCollection;
+import com.gamesbykevin.framework.base.Sprite;
 
 import com.gamesbykevin.tmnt.enemies.*;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
-import com.gamesbykevin.tmnt.main.ResourceManager.GameHeroes;
-import com.gamesbykevin.tmnt.main.ResourceManager.GameEnemies;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 
-import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,24 +24,13 @@ public class PlayerManager
     {
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
-        
-        addHero(resources, delay, 200, 125);
-        //addHero(resources, delay, 200, 100);
-        //addHero(resources, delay, 200, 200);
-        
-        addEnemy(resources, delay, 350, 100);
-        //addEnemy(resources, delay, 350, 200);
-        //addEnemy(resources, delay, 50, 200);
-        //addEnemy(resources, delay, 50, 100);
     }
     
-    private void addEnemy(final ResourceManager resources, final long delay, final int x, final int y)
+    public void addEnemy(final GamePlayers type) throws Exception
     {
         Enemy enemy = null;
         
-        int rand = (int)(Math.random() * GameEnemies.values().length);
-        
-        switch (GameEnemies.values()[rand])
+        switch (type)
         {
             case FootSoldier1:
                 enemy = new FootSoldier1();
@@ -81,24 +69,17 @@ public class PlayerManager
                 break;
                 
             default:
-                enemy = new FootSoldier9();
-                break;
+                throw new Exception("Player not found");
         }
-        
-        enemy.setImage(resources.getGameEnemy(GameEnemies.values()[rand]));
-        enemy.setDelay(delay);
-        enemy.setLocation(x, y);
         
         enemies.add(enemy);
     }
     
-    private void addHero(final ResourceManager resources, final long delay, final int x, final int y)
+    public void addHero(final GamePlayers type) throws Exception
     {
         Hero hero;
         
-        int heroIndex = (int)(Math.random() * GameHeroes.values().length);
-        
-        switch(GameHeroes.values()[heroIndex])
+        switch(type)
         {
             case Donatello:
                 hero = new Donatello();
@@ -117,23 +98,9 @@ public class PlayerManager
                 break;
                 
             default:
-                hero = new Michelangelo();
-                break;
+                throw new Exception("Player not found");
         }
         
-        hero.setImage(resources.getGameHero(GameHeroes.values()[heroIndex]));
-        hero.setDelay(delay);
-        hero.setLocation(x, y);
-        
-        heroes.add(hero);
-    }
-    
-    /**
-     * Add Player to list
-     * @param player The player we want to add
-     */
-    public void add(Hero hero)
-    {
         heroes.add(hero);
     }
     
@@ -155,11 +122,45 @@ public class PlayerManager
         return this.heroes;
     }
     
+    /**
+     * Add all player related objects to the 
+     * existing levelObjects list.
+     * 
+     * @param levelObjects
+     */
+    public void addAllPlayerObjects(List<Sprite> levelObjects)
+    {
+        //all objects will be contained in this list and sorted so the lowest y value is drawn first
+        
+        for (Player hero : getHeroes())
+        {
+            if (hero.hasProjectile())
+                levelObjects.add(hero.getProjectile());
+
+            levelObjects.add(hero);
+        }
+        
+        for (Player enemy : getEnemies())
+        {
+            if (enemy.hasProjectile())
+                levelObjects.add(enemy.getProjectile());
+
+            levelObjects.add(enemy);
+        }
+    }
+    
     public void update(final Engine engine) throws Exception
     {
         //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
+            if (hero.getImage() == null)
+            {
+                hero.setImage(engine.getResources().getGamePlayer(hero.getType()));
+                hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                hero.setLocation(200, 150);
+            }
+            
             hero.update(engine.getKeyboard(), enemies, engine.getLevelManager().getLevel());
         }
         
@@ -168,6 +169,13 @@ public class PlayerManager
         
         for (Enemy enemy : enemies)
         {
+            if (enemy.getImage() == null)
+            {
+                enemy.setImage(engine.getResources().getGamePlayer(enemy.getType()));
+                enemy.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                enemy.setLocation(300, 150);
+            }
+            
             enemy.update(engine.getMain().getScreen(), heroes);
         }
     }
@@ -238,45 +246,5 @@ public class PlayerManager
         
         tmp.clear();
         tmp = null;
-    }
-    
-    public Graphics render(Graphics g)
-    {
-        //all players will be contained in this list and sorted so the lowest y value is drawn first
-        List<Player> players = new ArrayList<>();
-        
-        for (Hero hero : heroes)
-        {
-            players.add(hero);
-        }
-        
-        for (Enemy enemy : enemies)
-        {
-            players.add(enemy);
-        }
-        
-        for (int i=0; i < players.size(); i++)
-        {
-            for (int x=0; x < players.size(); x++)
-            {
-                if (i == x)
-                    continue;
-                
-                if (players.get(i).getY() + players.get(i).getHeight() < players.get(x).getY() + players.get(x).getHeight())
-                {
-                    Player temp = players.get(i);
-                    
-                    players.set(i, players.get(x));
-                    players.set(x, temp);
-                }
-            }
-        }
-        
-        for (Player player : players)
-        {
-            player.render(g);
-        }
-        
-        return g;
     }
 }

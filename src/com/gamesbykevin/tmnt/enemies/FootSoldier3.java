@@ -1,5 +1,6 @@
 package com.gamesbykevin.tmnt.enemies;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
@@ -19,6 +20,8 @@ public final class FootSoldier3 extends Enemy implements PlayerRules
      */
     public FootSoldier3()
     {
+        super.setType(GamePlayers.FootSoldier3);
+        
         //all default settings for this player
         setupDefaults();
     }

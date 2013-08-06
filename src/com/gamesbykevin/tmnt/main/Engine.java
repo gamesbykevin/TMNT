@@ -1,10 +1,12 @@
 package com.gamesbykevin.tmnt.main;
 
+import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.levels.*;
 import com.gamesbykevin.tmnt.menu.GameMenu;
+import com.gamesbykevin.tmnt.player.Player;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 
 import java.awt.*;
@@ -13,6 +15,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO here we need to have the resources object and the menu object
 
@@ -108,7 +112,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     if (playerManager != null)
                     {
                         this.playerManager.update(this);
-                        this.levelManager.update(playerManager.getEnemies(), playerManager.getHeroes(), main.getScreen());
+                        this.levelManager.update(playerManager, main.getScreen());
                     }
                 }
                 
@@ -141,7 +145,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     {
         this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
         this.levelManager = new LevelManager();
-        this.levelManager.setLevel(ResourceManager.LevelObjects.Level3, resources);
+        this.levelManager.setLevel(ResourceManager.LevelObjects.Level3, resources, main.getScreen());
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
@@ -189,14 +193,56 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         Font f = g2d.getFont();
         g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 16));
         
+        //draw the level first
         if (this.levelManager != null)
-        {
             this.levelManager.render(g2d);
-        }
         
-        if (this.playerManager != null)
+        if (this.playerManager != null && this.levelManager != null)
         {
-            this.playerManager.render(g2d);
+            //all objects will be contained in this list and sorted so the lowest y value is drawn first
+            List<Sprite> levelObjects = new ArrayList<>();
+        
+            //add all level related objects to list
+            levelManager.addAllStageObjects(levelObjects);
+            
+            //add all player related objects to List
+            playerManager.addAllPlayerObjects(levelObjects);
+        
+            for (int i=0; i < levelObjects.size(); i++)
+            {
+                for (int x=0; x < levelObjects.size(); x++)
+                {
+                    if (i == x)
+                        continue;
+
+                    if (levelObjects.get(i).getY() + levelObjects.get(i).getHeight() < levelObjects.get(x).getY() + levelObjects.get(x).getHeight())
+                    {
+                        Sprite temp = levelObjects.get(i);
+
+                        levelObjects.set(i, levelObjects.get(x));
+                        levelObjects.set(x, temp);
+                    }
+                }
+            }
+        
+            for (Sprite levelObject : levelObjects)
+            {
+                //get half the dimensions so we can offset/reset the coordinates
+                int halfWidth = (levelObject.getWidth() / 2);
+                int halfHeight = (levelObject.getHeight() / 2);
+
+                //we need to offset the object location before drawing
+                levelObject.setX(levelObject.getX() - halfWidth);
+                levelObject.setY(levelObject.getY() - halfHeight);
+
+                levelObject.draw(g2d);
+
+                //now that the object is drawn we need to reset the location
+                levelObject.setX(levelObject.getX() + halfWidth);
+                levelObject.setY(levelObject.getY() + halfHeight);
+            }
+            
+            levelObjects.clear();
         }
         
         g2d.setFont(f);

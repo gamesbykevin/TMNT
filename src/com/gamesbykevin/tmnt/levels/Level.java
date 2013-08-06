@@ -22,11 +22,121 @@ public abstract class Level extends Sprite
     //backgrounds
     private List<Sprite> backgrounds;
     
+    //power-ups the hero can collect (will only likely be pizza)
+    private List<Sprite> powerUps;
+    
     //do we automatically scroll the background
     private boolean autoScrollBackground = false;
     
+    private List<Integer> checkpoints;
+    
     public Level()
     {
+        
+    }
+    
+    /**
+     * Each level will get x number of power ups 
+     * placed in random locations throughout the level
+     * 
+     * @param image The image of the power up
+     * @throws Exception 
+     */
+    public void createPowerUps(final Image image) throws Exception
+    {
+        if (getWidth() <= 0)
+        {
+            throw new Exception("Dimensions have to be set first before calling this function");
+        }
+        else
+        {
+            if (getBoundary() == null)
+            {
+                throw new Exception("Level Bounds has to be set first before calling this function");
+            }
+            else
+            {
+                powerUps = new ArrayList<>();
+                
+                //each powerup will have its own section and can be anywhere in that section at random
+                final int eachSectionWidth = (getWidth() / LevelManager.POWERUP_LIMIT);
+                
+                //continue to loop until we have reached our limit
+                while (powerUps.size() < LevelManager.POWERUP_LIMIT)
+                {
+                    Sprite powerUp = new Sprite();
+                    
+                    //set the powerup image
+                    powerUp.setImage(image);
+                    
+                    //set auto size to true so the dimensions will be set automatically based on the image width/height
+                    powerUp.setAutoSize(true);
+                    
+                    //now choose a random location
+                    final int randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
+                    final int randomY = 200;
+                    
+                    //set random location
+                    powerUp.setLocation(randomX, randomY);
+                    
+                    //add powerup to list
+                    powerUps.add(powerUp);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Creates a number of check points when the hero hits the check point the enemies come
+     */
+    public void createCheckPoints(final int total) throws Exception
+    {
+        if (getWidth() <= 0)
+        {
+            throw new Exception("Dimensions have to be set first before calling this function");
+        }
+        else
+        {
+            checkpoints = new ArrayList<>();
+            
+            final int eachCheckpointLength = (getWidth() / total);
+            
+            while (checkpoints.size() < total)
+            {
+                checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
+            }
+        }
+    }
+    
+    /**
+     * Checks current scroll location to see if we have past a checkpoint.
+     * If check point is found remove check point and return true
+     * @return boolean
+     */
+    public boolean hasCheckpoint()
+    {
+        Rectangle r = getBoundary().getBounds();
+        
+        for (int i=0; i < checkpoints.size(); i++)
+        {
+            //if the scroll x coordinate has past a check point 
+            if (r.x + r.width < checkpoints.get(i))
+            {
+                //remove the check point
+                checkpoints.remove(i);
+                
+                //indicate we found one
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    //gets the list of powerups
+    public List<Sprite> getPowerUps()
+    {
+        return this.powerUps;
     }
     
     /**
@@ -38,38 +148,52 @@ public abstract class Level extends Sprite
         return (bounds.getBounds().x + bounds.getBounds().width);
     }
     
-    public void setBackgroundImage(final Image background)
+    
+    
+    /**
+     * Get valid starting point for level
+     * @return 
+     */
+    public Point getStartingPoint()
     {
-        this.backgrounds = new ArrayList<>();
-        
-        Sprite tmp = new Sprite();
-        
-        tmp.setImage(background);
-        tmp.setDimensions(background.getWidth(null), background.getHeight(null));
-        tmp.setX(0 - tmp.getWidth());
-        this.backgrounds.add(tmp);
-        
-        tmp = new Sprite();
-        tmp.setImage(background);
-        tmp.setDimensions(background.getWidth(null), background.getHeight(null));
-        tmp.setX(0);
-        this.backgrounds.add(tmp);
-        
-        tmp = new Sprite();
-        tmp.setImage(background);
-        tmp.setDimensions(background.getWidth(null), background.getHeight(null));
-        tmp.setX(0 + tmp.getWidth());
-        this.backgrounds.add(tmp);
-        
-        tmp = new Sprite();
-        tmp.setImage(background);
-        tmp.setDimensions(background.getWidth(null), background.getHeight(null));
-        tmp.setX(0 + (tmp.getWidth() * 2));
-        this.backgrounds.add(tmp);
+        return new Point(bounds.getBounds().x, bounds.getBounds().y);
     }
     
     /**
-     * If we set the autoscroll, then that means there is a separate background image
+     * Set the background image and creates a specific number
+     * of duplicate background depending on the background
+     * width and the width of the screen that the user will see.
+     * 
+     * @param background Image of our repeating background
+     */
+    public void setBackgroundImage(final Image background, final Rectangle screen) throws Exception
+    {
+        if (getWidth() == 0)
+            throw new Exception("Dimensions have to be set first before calling this function");
+        
+        //the width of the original background image
+        final int backgroundWidth = background.getWidth(null);
+        
+        //make sure we have enough backgrounds so when one background begins to scroll off the screen we are covered
+        final int numBackgrounds = (screen.width / backgroundWidth) + 2;
+        
+        this.backgrounds = new ArrayList<>();
+        
+        //continue adding backgrounds until we have reached our limit
+        while (backgrounds.size() < numBackgrounds)
+        {
+            Sprite tmp = new Sprite();
+
+            tmp.setImage(background);
+            tmp.setDimensions(backgroundWidth, background.getHeight(null));
+            tmp.setX(backgrounds.size() * backgroundWidth);
+            tmp.setY(0);
+            this.backgrounds.add(tmp);
+        }
+    }
+    
+    /**
+     * If we set the auto scroll, then that means there is a separate background image
      * @param autoScrollBackground 
      */
     protected void setAutoScrollBackground(final boolean autoScrollBackground)
@@ -82,12 +206,12 @@ public abstract class Level extends Sprite
         return this.autoScrollBackground;
     }
     
-    protected void setBounds(final Polygon bounds)
+    protected void setBoundary(final Polygon bounds)
     {
         this.bounds = bounds;
     }
     
-    public Polygon getBounds()
+    public Polygon getBoundary()
     {
         return this.bounds;
     }
@@ -98,7 +222,7 @@ public abstract class Level extends Sprite
     }
     
     /**
-     * Set the autoscroll speed of the background
+     * Set the auto scroll speed of the background
      * @param autoScrollSpeed Pixels per frame to scroll
      */
     public void setAutoScrollSpeed(final int autoScrollSpeed)
@@ -131,12 +255,20 @@ public abstract class Level extends Sprite
             }
         }
         
+        //we also need to set the scroll speed for the power ups as well so they move with the level
+        for (Sprite powerUp : powerUps)
+        {
+            powerUp.setVelocityX(-scrollSpeed);
+        }
+        
+        //set the scroll speed for the level
         super.setVelocityX(-scrollSpeed);
     }
     
     /**
-     * Scroll the level and background, and check if background needs to repeat
-     * @param screen
+     * Scroll the level and background, and check if background needs to repeat.
+     * 
+     * @param screen Window of the game the user can see
      * @throws Exception 
      */
     public void update(final Rectangle screen) throws Exception
@@ -158,6 +290,12 @@ public abstract class Level extends Sprite
         {
             //update level position and bounds
             bounds.translate(super.getVelocityX(), 0);
+        }
+        
+        //we also need to set the scroll speed for the power ups as well so they move with the level
+        for (Sprite powerUp : powerUps)
+        {
+            powerUp.update();
         }
         
         super.update();
@@ -183,7 +321,7 @@ public abstract class Level extends Sprite
         
         if (bounds != null)
         {
-            //draw bounds so we can see
+            //draw bounds so we can see for now
             g.setColor(Color.RED);
             g.drawPolygon(bounds);
         }

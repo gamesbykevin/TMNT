@@ -1,5 +1,6 @@
 package com.gamesbykevin.tmnt.heroes;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
@@ -16,6 +17,8 @@ public final class Raphael extends Hero implements PlayerRules
      */
     public Raphael()
     {
+        super.setType(GamePlayers.Raphael);
+        
         //all default settings for this player
         setupDefaults();
     }

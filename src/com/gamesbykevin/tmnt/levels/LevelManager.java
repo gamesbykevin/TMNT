@@ -1,9 +1,11 @@
 package com.gamesbykevin.tmnt.levels;
 
+import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.enemies.Enemy;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.player.Player;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.player.*;
 
 import java.awt.*;
 import java.util.List;
@@ -18,6 +20,9 @@ public class LevelManager
     
     //scroll speed when auto scroll is enabled
     private static final int SCROLL_SPEED = 10;
+    
+    //how many powerups can each level have
+    public static final int POWERUP_LIMIT = 2;
     
     public LevelManager()
     {
@@ -37,7 +42,7 @@ public class LevelManager
      * Set the level number which will create a new instance of level
      * @param num 
      */
-    public void setLevel(ResourceManager.LevelObjects chosenLevel, ResourceManager resources) throws Exception
+    public void setLevel(final ResourceManager.LevelObjects chosenLevel, final ResourceManager resources, final Rectangle screen) throws Exception
     {
         Image image;
         
@@ -49,7 +54,8 @@ public class LevelManager
                 level = new Level1();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level1Background));
+                level.createCheckPoints(3);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level1Background), screen);
                 break;
                 
             case Level2:
@@ -58,6 +64,7 @@ public class LevelManager
                 level = new Level2();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
+                level.createCheckPoints(3);
                 break;
                 
             case Level3:
@@ -66,7 +73,8 @@ public class LevelManager
                 level = new Level3();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level3Background));
+                level.createCheckPoints(4);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level3Background), screen);
                 level.setAutoScrollSpeed(SCROLL_SPEED);
                 break;
                 
@@ -76,7 +84,8 @@ public class LevelManager
                 level = new Level4();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level4Background));
+                level.createCheckPoints(5);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level4Background), screen);
                 break;
                 
             case Level5:
@@ -85,7 +94,8 @@ public class LevelManager
                 level = new Level5();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level5Background));
+                level.createCheckPoints(3);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level5Background), screen);
                 break;
                 
             case Level6:
@@ -94,11 +104,32 @@ public class LevelManager
                 level = new Level6();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level6Background));
+                level.createCheckPoints(0);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level6Background), screen);
                 break;
                 
             default:
                 throw new Exception("Level not found");
+        }
+        
+        //there is only 1 unique power up and all levels will get power ups, so add them now 
+        level.createPowerUps(resources.getLevelObject(ResourceManager.LevelObjects.Pizza));
+    }
+    
+    /**
+     * Add all level related objects to the 
+     * existing levelObjects list.
+     * 
+     * @param levelObjects
+     */
+    public void addAllStageObjects(List<Sprite> levelObjects)
+    {
+        if (getLevel().getPowerUps() != null)
+        {
+            for (Sprite powerUp : getLevel().getPowerUps())
+            {
+                levelObjects.add(powerUp);
+            }
         }
     }
     
@@ -107,7 +138,7 @@ public class LevelManager
      * @param enemies List of existing enemies
      * @param heroes List of existing heroes
      */
-    public void update(List<Enemy> enemies, List<Hero> heroes, final Rectangle screen) throws Exception
+    public void update(final PlayerManager players, final Rectangle screen) throws Exception
     {
         //update level scrolling etc..
         getLevel().update(screen);
@@ -117,16 +148,16 @@ public class LevelManager
         {
             boolean hasEnemies = false;
             
-            for (Enemy enemy : enemies)
+            for (Enemy enemy : players.getEnemies())
             {
                 if (!enemy.isDead())
                 {
-                    //hasEnemies = true;
+                    hasEnemies = true;
                     break;
                 }
             }
             
-            for (Hero hero : heroes)
+            for (Hero hero : players.getHeroes())
             {
                 getLevel().setScrollSpeed(Player.VELOCITY_NONE);
 
@@ -154,6 +185,12 @@ public class LevelManager
                 {
                     hero.setX(leftSide);
                 }
+            }
+            
+            //if there are no existing enemies and we have past a check point add enemies
+            if (!hasEnemies && level.hasCheckpoint())
+            {
+                players.addEnemy(GamePlayers.FootSoldier1);
             }
         }
     }

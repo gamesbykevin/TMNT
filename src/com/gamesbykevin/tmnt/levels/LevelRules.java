@@ -14,4 +14,9 @@ public interface LevelRules
      * Setup the level boundaries and other details
      */
     public void setupDefaults();
+    
+    /**
+     * This is required to set the boundaries for each level
+     */
+    public void setLevelBounds();
 }

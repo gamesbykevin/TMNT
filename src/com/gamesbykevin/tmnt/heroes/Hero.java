@@ -30,7 +30,7 @@ public class Hero extends Player
         if (!isJumping())
         {
             //make note of last valid location in case player is out of bounds
-            if (level.getBounds().contains(getAnchorLocation()))
+            if (level.getBoundary().contains(getAnchorLocation()))
                 validLocation = super.getPoint();
         }
         else
@@ -44,7 +44,7 @@ public class Hero extends Player
         if (!isJumping())
         {
             //if the player is not jumping their anchor location needs to be inside the level boundary
-            if (!level.getBounds().contains(getAnchorLocation()))
+            if (!level.getBoundary().contains(getAnchorLocation()))
                 super.setLocation(validLocation);
         }
         else
