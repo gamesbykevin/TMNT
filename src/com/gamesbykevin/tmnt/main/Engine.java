@@ -6,8 +6,8 @@ import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.levels.*;
 import com.gamesbykevin.tmnt.menu.GameMenu;
-import com.gamesbykevin.tmnt.player.Player;
 import com.gamesbykevin.tmnt.player.PlayerManager;
+import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -40,6 +40,8 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private PlayerManager playerManager;
     
     private LevelManager levelManager;
+    
+    private ProjectileManager projectileManager;
     
     /**
      * The Engine that contains the game/menu objects
@@ -111,6 +113,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     
                     if (playerManager != null)
                     {
+                        this.projectileManager.update(getMain().getScreen(), playerManager.getAllPlayers());
                         this.playerManager.update(this);
                         this.levelManager.update(playerManager, main.getScreen());
                     }
@@ -131,6 +134,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         return this.levelManager;
     }
     
+    public ProjectileManager getProjectileManager()
+    {
+        return this.projectileManager;
+    }
+    
     public Main getMain()
     {
         return main;
@@ -143,11 +151,72 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void reset() throws Exception
     {
+        ResourceManager.LevelMisc level;
+        
+        switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LevelSelect))
+        {
+            case 0:
+                level = ResourceManager.LevelMisc.Level1;
+                break;
+                
+            case 1:
+                level = ResourceManager.LevelMisc.Level2;
+                break;
+                
+            case 2:
+                level = ResourceManager.LevelMisc.Level3;
+                break;
+                
+            case 3:
+                level = ResourceManager.LevelMisc.Level4;
+                break;
+                
+            case 4:
+                level = ResourceManager.LevelMisc.Level5;
+                break;
+                
+            case 5:
+                level = ResourceManager.LevelMisc.Level6;
+                break;
+                
+            default:
+                level = ResourceManager.LevelMisc.Level1;
+                break;
+        }
+        
+        ResourceManager.GamePlayers heroType;
+        
+        switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.HeroSelect))
+        {
+            case 0:
+                heroType = ResourceManager.GamePlayers.Donatello;
+                break;
+                
+            case 1:
+                heroType = ResourceManager.GamePlayers.Raphael;
+                break;
+                
+            case 2:
+                heroType = ResourceManager.GamePlayers.Leonardo;
+                break;
+                
+            case 3:
+                heroType = ResourceManager.GamePlayers.Michelangelo;
+                break;
+                
+            default:
+                heroType = ResourceManager.GamePlayers.Leonardo;
+                break;
+        }
+        
+        final int livesIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LivesSelect);
+        
+        this.projectileManager = new ProjectileManager();
         this.playerManager = new PlayerManager();
         this.levelManager = new LevelManager();
-        this.levelManager.setLevel(ResourceManager.LevelObjects.Level3, resources, main.getScreen());
+        this.levelManager.setLevel(level, resources, main.getScreen());
         
-        this.playerManager.addHero(ResourceManager.GamePlayers.Leonardo);
+        this.playerManager.addHero(heroType, livesIndex + 5);
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
@@ -192,24 +261,26 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
      */
     private Graphics renderGame(Graphics2D g2d) throws Exception
     {
-        Font f = g2d.getFont();
-        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 16));
+        Font tmpFont = g2d.getFont();
+        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 18));
         
-        //draw the level first
-        if (this.levelManager != null)
-            this.levelManager.render(g2d);
-        
-        if (this.playerManager != null && this.levelManager != null)
+        if (this.playerManager != null && this.levelManager != null && this.projectileManager != null)
         {
+            //draw the level first
+            this.levelManager.render(g2d);
+            
             //all objects will be contained in this list and sorted so the lowest y value is drawn first
             List<Sprite> levelObjects = new ArrayList<>();
         
-            //add all level related objects to list
+            //add all level related objects to List
             levelManager.addAllStageObjects(levelObjects);
             
             //add all player related objects to List
             playerManager.addAllPlayerObjects(levelObjects);
         
+            //add all of the projectiles to List
+            projectileManager.addAllProjectiles(levelObjects);
+            
             for (int i=0; i < levelObjects.size(); i++)
             {
                 for (int x=0; x < levelObjects.size(); x++)
@@ -248,9 +319,12 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             }
             
             levelObjects.clear();
+            
+            //draw hero health bars, etc..
+            playerManager.render(g2d, getMain().getScreen());
         }
         
-        g2d.setFont(f);
+        g2d.setFont(tmpFont);
         return g2d;
     }
     

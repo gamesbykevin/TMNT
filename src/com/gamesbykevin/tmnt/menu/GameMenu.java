@@ -8,6 +8,7 @@ import com.gamesbykevin.framework.display.FullScreen;
 import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.menu.*;
 import com.gamesbykevin.framework.util.*;
+import com.gamesbykevin.tmnt.player.PlayerManager;
 import com.gamesbykevin.tmnt.shared.Shared;
 
 import java.awt.Graphics;
@@ -26,22 +27,25 @@ public class GameMenu extends Menu
     public enum OptionKey
     {
         Sound, FullScreen, StartGame, Option, Control, Instruction, Credit, 
-        GoBack, Resume, NewGame, ExitGame, NewGameConfim, NewGameDeny, ExitGameConfirm, ExitGameDeny
+        GoBack, Resume, NewGame, ExitGame, NewGameConfim, NewGameDeny, ExitGameConfirm, ExitGameDeny,
         
+        HeroSelect, LevelSelect, LivesSelect
     }
     
+    private Option optionHero, optionLevel, optionLives;
     private Option optionFullScreen, optionSound;
     private Option optionStartGame, optionOptions, optionControls, optionInstructions, optionCredits;
     private Option optionGoBack, optionResume, optionNewGame, optionExitGame;
     private Option optionNewGameConfirm, optionNewGameDeny, optionExitGameConfirm, optionExitGameDeny;
     
-    //object to identify each Layer
+    //unique key to indentify each layer
     public enum LayerKey 
     {
         GameTitle, Credits, MainTitle, Options, Controls, Instructions1, OptionsInGame, 
         ConfirmNew, Exit, AppletFocus, StartGame, ConfirmNewYes
     }
     
+    //each layer in our menu
     private Layer layerGameTitle, layerCredit, layerMainTitle, layerOption;
     private Layer layerControl, layerInstruction1, layerOptionInGame, layerNew, layerExit;
     private Layer layerAppletFocus, layerStartGame, layerConfirmNewYes;
@@ -51,6 +55,30 @@ public class GameMenu extends Menu
         super(screen);
         
         //setup all options here
+        
+        
+        optionHero = new Option("Hero: ");
+        
+        for (ResourceManager.GamePlayers type : ResourceManager.GamePlayers.values())
+        {
+            if (PlayerManager.isHero(type))
+                optionHero.add(type.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        }
+        
+        optionLevel = new Option("Level: ");
+        optionLevel.add(ResourceManager.LevelMisc.Level1.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add(ResourceManager.LevelMisc.Level2.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add(ResourceManager.LevelMisc.Level3.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add(ResourceManager.LevelMisc.Level4.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add(ResourceManager.LevelMisc.Level5.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add(ResourceManager.LevelMisc.Level6.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        
+        optionLives = new Option("Lives: ");
+        optionLives.add("5", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("6", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("7", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("8", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("9", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         
         optionFullScreen = new Option("FullScreen: ");
         optionFullScreen.add("Off",resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
@@ -135,6 +163,10 @@ public class GameMenu extends Menu
         
         layerOption.add(OptionKey.Sound,          this.optionSound);
         layerOption.add(OptionKey.FullScreen,     this.optionFullScreen);
+        
+        layerOption.add(OptionKey.HeroSelect,     this.optionHero);
+        layerOption.add(OptionKey.LevelSelect,    this.optionLevel);
+        layerOption.add(OptionKey.LivesSelect,    this.optionLives);
         
         layerOption.add(OptionKey.GoBack,     this.optionGoBack);
         

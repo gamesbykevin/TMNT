@@ -259,17 +259,8 @@ public class Main extends Thread
         final String result = updatesDisplay + " UPS, " + framesDisplay + " FPS";
         final int width = g.getFontMetrics().stringWidth(result);
         final int height = g.getFontMetrics().getHeight() + 1;
-        final Rectangle tmp;
+        final Rectangle tmp = new Rectangle(originalSizeWindow.width - width, originalSizeWindow.height - height, width, height);
         
-        if (applet != null)
-        {
-            tmp = new Rectangle(applet.getWidth() - width, applet.getHeight() - height, width, height);
-        }
-        else
-        {
-            tmp = new Rectangle(panel.getWidth() - width, panel.getHeight() - height, width, height);
-        }
-
         g.setColor(Color.BLACK);
         g.fillRect(tmp.x, tmp.y, tmp.width, tmp.height);
         g.setColor(Color.WHITE);

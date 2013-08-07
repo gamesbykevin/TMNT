@@ -6,6 +6,7 @@ package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
 
+import java.awt.geom.Area;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,59 @@ public abstract class Level extends Sprite
     {
         this.enemiesPerCheckpoint = enemiesPerCheckpoint;
         this.enemiesAtOnce        = enemiesAtOnce;
+    }
+    
+    /**
+     * Gets the starting point for the enemies so 
+     * they don't appear out of bounds. The logic 
+     * is as follows. Pick the left or right side 
+     * depending on what is available. The area 
+     * of the level boundary that intersects with 
+     * each side is the location where the enemy
+     * will spawn
+     * 
+     * @param screen The area of the game the user can see
+     * @param playerHeight We need the height to aid picking a random location
+     * @return 
+     */
+    public Point getStart(final Rectangle screen, final int playerHeight)
+    {
+        //the extra part we will check on each side
+        final int extraWidth = (int)(screen.getWidth() * .2);
+        
+        //the edges on both sides
+        Rectangle west = new Rectangle(screen.x - extraWidth, screen.y, extraWidth, screen.height);
+        Rectangle east = new Rectangle(screen.x + screen.width + extraWidth, screen.y, extraWidth, screen.height);
+        
+        Area westSide = new Area(west);
+        Area eastSide = new Area(east);
+        Area levelBounds = new Area(getBoundary());
+        
+        //create area where left side intersects with the level boundary
+        westSide.intersect(levelBounds);
+        
+        //create area where right side intersects with the level boundary
+        eastSide.intersect(levelBounds);
+        
+        Rectangle tmp;
+        
+        if (Math.random() > .5)
+            tmp = westSide.getBounds();
+        else
+            tmp = eastSide.getBounds();
+        
+        if (westSide.getBounds().getWidth() < 1)
+            tmp = eastSide.getBounds();
+        if (eastSide.getBounds().getWidth() < 1)
+            tmp = westSide.getBounds();
+        
+        //random coordinates inside Rectangle
+        final int randX = (int)(Math.random() * tmp.getWidth()) + tmp.x;
+        
+        //offset the height when calculating the y coordinate
+        final int randY = (int)(Math.random() * tmp.getHeight()) + tmp.y - (playerHeight / 2);
+        
+        return new Point(randX, randY);
     }
     
     /**
@@ -127,16 +181,23 @@ public abstract class Level extends Sprite
                     
                     //set the powerup image
                     powerUp.setImage(image);
+                    powerUp.setDimensions(image.getWidth(null),image.getHeight(null));
                     
                     //set auto size to true so the dimensions will be set automatically based on the image width/height
                     powerUp.setAutoSize(true);
                     
                     //now choose a random location
                     final int randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
-                    final int randomY = 200;
+                    
+                    int startY = getBoundary().getBounds().y + (powerUp.getHeight() / 2);
+                    
+                    while (!getBoundary().contains(randomX, startY))
+                    {
+                        startY++;
+                    }
                     
                     //set random location
-                    powerUp.setLocation(randomX, randomY);
+                    powerUp.setLocation(randomX, startY);
                     
                     //add powerup to list
                     powerUps.add(powerUp);
@@ -158,12 +219,15 @@ public abstract class Level extends Sprite
         {
             checkpoints = new ArrayList<>();
             
-            final int eachCheckpointLength = (getWidth() / total);
-            
-            while (checkpoints.size() < total)
+            if (total > 0)
             {
-                //checkpoints.add(checkpoints.size() * eachCheckpointLength);
-                checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
+                final int eachCheckpointLength = (getWidth() / total);
+
+                while (checkpoints.size() < total)
+                {
+                    //checkpoints.add(checkpoints.size() * eachCheckpointLength);
+                    checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
+                }
             }
         }
     }
@@ -194,6 +258,11 @@ public abstract class Level extends Sprite
         }
         
         return false;
+    }
+    
+    public int getCheckpointCount()
+    {
+        return checkpoints.size();
     }
     
     /**

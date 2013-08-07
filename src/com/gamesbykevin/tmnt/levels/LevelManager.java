@@ -1,10 +1,8 @@
 package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
-import com.gamesbykevin.tmnt.enemies.Enemy;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.*;
 
 import java.awt.*;
@@ -42,24 +40,24 @@ public class LevelManager
      * Set the level number which will create a new instance of level
      * @param num 
      */
-    public void setLevel(final ResourceManager.LevelObjects chosenLevel, final ResourceManager resources, final Rectangle screen) throws Exception
+    public void setLevel(final ResourceManager.LevelMisc chosenLevel, final ResourceManager resources, final Rectangle screen) throws Exception
     {
         Image image;
         
         switch(chosenLevel)
         {
             case Level1:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level1);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level1);
                 
                 level = new Level1();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
                 level.createCheckPoints(3);
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level1Background), screen);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level1Background), screen);
                 break;
                 
             case Level2:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level2);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level2);
                 
                 level = new Level2();
                 level.setImage(image);
@@ -68,44 +66,44 @@ public class LevelManager
                 break;
                 
             case Level3:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level3);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level3);
                 
                 level = new Level3();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
                 level.createCheckPoints(4);
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level3Background), screen);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level3Background), screen);
                 level.setAutoScrollSpeed(SCROLL_SPEED);
                 break;
                 
             case Level4:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level4);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level4);
                 
                 level = new Level4();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
                 level.createCheckPoints(5);
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level4Background), screen);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level4Background), screen);
                 break;
                 
             case Level5:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level5);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level5);
                 
                 level = new Level5();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
                 level.createCheckPoints(3);
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level5Background), screen);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level5Background), screen);
                 break;
                 
             case Level6:
-                image = resources.getLevelObject(ResourceManager.LevelObjects.Level6);
+                image = resources.getLevelObject(ResourceManager.LevelMisc.Level6);
                 
                 level = new Level6();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
                 level.createCheckPoints(0);
-                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelObjects.Level6Background), screen);
+                level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level6Background), screen);
                 break;
                 
             default:
@@ -113,7 +111,7 @@ public class LevelManager
         }
         
         //there is only 1 unique power up and all levels will get power ups, so add them now 
-        level.createPowerUps(resources.getLevelObject(ResourceManager.LevelObjects.Pizza));
+        level.createPowerUps(resources.getLevelObject(ResourceManager.LevelMisc.Pizza));
     }
     
     /**
@@ -191,8 +189,11 @@ public class LevelManager
                     //if the current enemy count is less than the amount allowed on the screen at one time, add enemies
                     while (players.getEnemies().size() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
                     {
-                        getLevel().addEnemiesCreatedAtCheckpoint();
+                        //add random enemy to player manager
                         players.addRandomEnemy();
+                        
+                        //increase the count since we need to keep track
+                        getLevel().addEnemiesCreatedAtCheckpoint();
                     }
                 }
                 else
@@ -201,6 +202,12 @@ public class LevelManager
                     
                     //NOTE MAYBE HERE WE CAN ADD A GIF OF APRIL AND SHE WILL BE DISPLAYED ON/OFF EVERY SECOND UNTIL NEXT CHECK POINT
                 }
+            }
+            
+            //no more checkpoints need to add boss
+            if (getLevel().getCheckpointCount() < 1)
+            {
+                
             }
         }
     }

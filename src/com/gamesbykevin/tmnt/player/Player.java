@@ -3,9 +3,11 @@ package com.gamesbykevin.tmnt.player;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.TimerCollection;
 
+import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.List;
 
@@ -40,6 +42,9 @@ public abstract class Player extends Sprite
     private Point jumpPhase1;
     private Point jumpPhase2;
     
+    //if the player can throw a projectile we want to make sure other projectiles don't exist
+    private boolean canThrow = false;
+    
     //this is to check if we are to chain attack states together
     private State nextState;
     
@@ -55,14 +60,11 @@ public abstract class Player extends Sprite
     //0 lives by default
     private int lives = 0;
     
-    //this is the projectile object
-    private Sprite projectile;
-    
-    //the projectile speed will be a factor of the player walk speed
-    private static final double PROJECTILE_SPEED_RATIO = 5;
-    
     //number of frames to execute jump
     public static final int NUM_FRAMES_JUMP = 30;
+    
+    //if the player is out of bounds we reset their location to this
+    private Point previousLocation;
     
     public Player()
     {
@@ -78,7 +80,7 @@ public abstract class Player extends Sprite
         this.health = health;
     }
     
-    private int getHealth()
+    protected int getHealth()
     {
         return this.health;
     }
@@ -103,7 +105,7 @@ public abstract class Player extends Sprite
         setHealth(healthDefault);
     }
     
-    private int getHealthDefault()
+    protected int getHealthDefault()
     {
         return this.healthDefault;
     }
@@ -111,6 +113,11 @@ public abstract class Player extends Sprite
     protected void setLives(final int lives)
     {
         this.lives = lives;
+    }
+    
+    protected int getLives()
+    {
+        return this.lives;
     }
     
     public void deductLife()
@@ -134,30 +141,6 @@ public abstract class Player extends Sprite
     }
     
     /**
-     * Get the projectile the enemy has. If the enemy 
-     * does not have a projectile null will be returned.
-     * @return Sprite
-     */
-    public Sprite getProjectile()
-    {
-        return this.projectile;
-    }
-    
-    public boolean hasProjectile()
-    {
-        return (projectile != null);
-    }
-    
-    /**
-     * Removes the projectile
-     * @param projectile 
-     */
-    protected void removeProjectile()
-    {
-        this.projectile = null;
-    }
-
-    /**
      * For the sprite sheets they are tiled perfectly so we 
      * can use this formula to get the appropriate coordinates.
      * 
@@ -179,7 +162,7 @@ public abstract class Player extends Sprite
         this.velocityWalk = x;
     }
     
-    protected int getVelocityWalk()
+    public int getVelocityWalk()
     {
         return this.velocityWalk;
     }
@@ -334,25 +317,38 @@ public abstract class Player extends Sprite
      * 
      * @param players List of Players we are fighting against
      */
-    public void update(List<Player> players) throws Exception
+    public void update(final ProjectileManager projectileManager, final List<Player> players, final Polygon boundary) throws Exception
     {
+        if (!isJumping())
+        {
+            //make note of last valid location in case player is out of bounds
+            if (boundary.contains(getAnchorLocation()))
+                previousLocation = super.getPoint();
+        }
+        else
+        {
+            
+        }
+        
         getSpriteSheet().update();
         super.update();
         
-        if (projectile != null)
-        {
-            projectile.getSpriteSheet().update();
-            projectile.update();
-        }
+        updateMisc(projectileManager, players);
         
-        //manage miscallaneous stuff here
-        manageState(players);
+        //now that update has been called make sure we are still within the boundary
+        if (!isJumping())
+        {
+            //if the player is not jumping their anchor location needs to be inside the level boundary
+            if (previousLocation != null && !boundary.contains(getAnchorLocation()))
+                super.setLocation(previousLocation);
+        }
+        else
+        {
+            
+        }
     }
     
-    /**
-     * Check the current animation and handle accordingly
-     */
-    private void manageState(List<Player> players)
+    private void updateMisc(final ProjectileManager projectileManager, final List<Player> players)
     {
         if (isJumping())
         {
@@ -374,16 +370,29 @@ public abstract class Player extends Sprite
         
         if (isAttacking())
         {
+            //since we are already attacking we can't throw projectile
+            canThrow = false;
+            
             if (!isJumping())
             {
-                //if the attack is projectile add the projectile
+                //if the attack is projectile and the animation has finished
                 if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
                 {
-                    addProjectile();
+                    //add projectile
+                    projectileManager.add(this);
                 }
             }
             
             checkAttack(players);
+        }
+        else
+        {
+            //NOTE THIS MAY NEED TO CHANGE FOR THE BOSSES AS ROCKSTEADY CAN FIRE MULTIPLE BULLETS
+            //if the player can throw a projectile but does not have one currently
+            if (hasState(State.THROW_PROJECTILE) && !projectileManager.hasProjectile(getType()))
+            {
+                canThrow = true;
+            }
         }
         
         if (isHurt())
@@ -458,43 +467,6 @@ public abstract class Player extends Sprite
     public boolean isDeadComplete()
     {
         return (getState() == State.DEAD && getSpriteSheet().hasFinished());
-    }
-    
-    /**
-     * Add projectile to throw at player
-     */
-    private void addProjectile()
-    {
-        projectile = new Sprite();
-        projectile.createSpriteSheet();
-        projectile.setLocation(getX(), getY());
-        projectile.setDimensions(getWidth(), getHeight());
-        projectile.setImage(getImage());
-
-        if (hasHorizontalFlip())
-        {
-            projectile.setHorizontalFlip(true);
-            projectile.setVelocity(-getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-        }
-        else
-        {
-            projectile.setHorizontalFlip(false);
-            projectile.setVelocity(getVelocityWalk() * PROJECTILE_SPEED_RATIO, VELOCITY_NONE);
-        }
-
-        //we need the delay or else the animation won't update
-        projectile.getSpriteSheet().setDelay(getSpriteSheet().getDelay());
-        
-        //NOTE: all enemies not including bosses have 1 projectile
-        projectile.getSpriteSheet().add(getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1), State.PROJECTILE1);
-        
-        if (getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
-        {
-            projectile.getSpriteSheet().add(getSpriteSheet().getSpriteSheetAnimation(State.PROJECTILE1_FINISH), State.PROJECTILE1_FINISH);
-        }
-        
-        projectile.getSpriteSheet().setCurrent(State.PROJECTILE1);
-        projectile.getSpriteSheet().reset();
     }
     
     /**
@@ -666,7 +638,7 @@ public abstract class Player extends Sprite
      */
     protected boolean canThrowProjectile()
     {
-        return hasState(State.THROW_PROJECTILE);
+        return hasState(State.THROW_PROJECTILE) && canThrow;
     }
     
     /**

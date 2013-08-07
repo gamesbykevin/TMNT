@@ -1,12 +1,12 @@
-package com.gamesbykevin.tmnt.enemies;
+package com.gamesbykevin.tmnt.grunt;
 
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-public final class FootSoldier5 extends Enemy implements PlayerRules
+public final class FootSoldier4 extends Grunt implements PlayerRules
 {
-    private static final int SPRITE_WIDTH  = 60;
+    private static final int SPRITE_WIDTH  = 80;
     private static final int SPRITE_HEIGHT = 80;
     
     private static final int VELOCITY_WALK = 1;
@@ -14,9 +14,9 @@ public final class FootSoldier5 extends Enemy implements PlayerRules
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
-    public FootSoldier5()
+    public FootSoldier4()
     {
-        super.setType(GamePlayers.FootSoldier5);
+        super.setType(GamePlayers.FootSoldier4);
         
         //all default settings for this player
         setupDefaults();
@@ -48,51 +48,46 @@ public final class FootSoldier5 extends Enemy implements PlayerRules
         
         //idle animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,1), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(4,1), getNanoSeconds(250));
+        animation.add(getSpriteRectangle(1,1), getNanoSeconds(250));
+        animation.add(getSpriteRectangle(0,1), getNanoSeconds(250));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.IDLE);
         
         //attack1 animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(550));
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(1,2), getNanoSeconds(650));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(2,2), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK1);
-        
-        //attack2 animation
-        //animation = new SpriteSheetAnimation();
-        //animation.add(getSpriteRectangle(1,0), getNanoSeconds(200));
-        //animation.add(getSpriteRectangle(3,0), getNanoSeconds(75));
-        //getSpriteSheet().add(animation, State.ATTACK2);
         
         //walk horizontal animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(2,2), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(4,1), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(3,1), getNanoSeconds(125));
         animation.add(getSpriteRectangle(0,2), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(1,2), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(2,1), getNanoSeconds(125));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.WALK_HORIZONTAL);
         
         //walk vertical animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(2,2), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(4,1), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(3,1), getNanoSeconds(125));
         animation.add(getSpriteRectangle(0,2), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(1,2), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(2,1), getNanoSeconds(125));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.WALK_VERTICAL);
         
         //hurt animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(4,0), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(0,1), getNanoSeconds(275));
+        animation.add(getSpriteRectangle(1,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(275));
         getSpriteSheet().add(animation, State.HURT);
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(1,1), getNanoSeconds(200));
-        animation.add(getSpriteRectangle(2,1), getNanoSeconds(1800));
+        animation.add(getSpriteRectangle(3,0), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(4,0), getNanoSeconds(1800));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

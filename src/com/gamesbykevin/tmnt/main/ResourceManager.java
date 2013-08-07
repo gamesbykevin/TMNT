@@ -21,7 +21,7 @@ public class ResourceManager
     //collections of resources
     private enum Type
     {
-        MenuImage, MenuAudio, GameFont, GameAudioEffects, GameAudioMusic, GamePlayers, GameBosses, LevelObjects
+        MenuImage, MenuAudio, GameFont, GameAudioEffects, GameAudioMusic, GamePlayers, LevelMisc
     }
     
     //root directory of all resources
@@ -33,15 +33,12 @@ public class ResourceManager
         FootSoldier5, FootSoldier6, FootSoldier7, FootSoldier8, 
         FootSoldier9,
         
-        Donatello, Raphael, Leonardo, Michelangelo
-    }
-    
-    public enum GameBosses
-    {
+        Donatello, Raphael, Leonardo, Michelangelo,
+        
         Boss1, Boss2, Boss3, Boss4, Boss5, Boss6
     }
     
-    public enum LevelObjects
+    public enum LevelMisc
     {
         Level1, Level1Background, 
         Level2, 
@@ -85,17 +82,11 @@ public class ResourceManager
         //load all menu images
         add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", Resources.Type.Image);
         
-        //load all bosses
-        add(Type.GameBosses, (Object[])GameBosses.values(), RESOURCE_DIR + "images/game/boss/{0}.png", "Loading Game Boss Image Resources", Resources.Type.Image);
-        
         //load all players
         add(Type.GamePlayers, (Object[])GamePlayers.values(), RESOURCE_DIR + "images/game/players/{0}.png", "Loading Game Player Image Resources", Resources.Type.Image);
         
         //load all levels
-        add(Type.LevelObjects, (Object[])LevelObjects.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", Resources.Type.Image);
-        
-        //game images
-        //add(Type.GameImage, (Object[])GameImage.values(), RESOURCE_DIR + "images/game/{0}.jpg", "Loading Game Image Resources", Resources.Type.Image);
+        add(Type.LevelMisc, (Object[])LevelMisc.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", Resources.Type.Image);
         
         //load all game fonts
         add(Type.GameFont, (Object[])GameFont.values(), RESOURCE_DIR + "font/{0}.ttf", "Loading Game Font Resources", Resources.Type.Font);
@@ -145,14 +136,9 @@ public class ResourceManager
         return getResources(Type.GamePlayers).getImage(key);
     }
     
-    public Image getGameBoss(final Object key)
-    {
-        return getResources(Type.GameBosses).getImage(key);
-    }
-    
     public Image getLevelObject(final Object key)
     {
-        return getResources(Type.LevelObjects).getImage(key);
+        return getResources(Type.LevelMisc).getImage(key);
     }
     
     /*
