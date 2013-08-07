@@ -1,12 +1,14 @@
 package com.gamesbykevin.tmnt.player;
 
+import com.gamesbykevin.tmnt.grunt.*;
 import com.gamesbykevin.framework.base.Sprite;
 
-import com.gamesbykevin.tmnt.enemies.*;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import java.awt.Color;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,31 +20,62 @@ import java.util.List;
 public class PlayerManager 
 {
     private List<Hero> heroes;
-    private List<Enemy> enemies;
+    private List<Grunt> grunts;
     
     public PlayerManager()
     {
         heroes = new ArrayList<>();
-        enemies = new ArrayList<>();
+        grunts = new ArrayList<>();
+    }
+    
+    public static boolean isEnemy(final GamePlayers type)
+    {
+        switch (type)
+        {
+            case FootSoldier1:
+            case FootSoldier2:
+            case FootSoldier3:
+            case FootSoldier4:
+            case FootSoldier5:
+            case FootSoldier6:
+            case FootSoldier7:
+            case FootSoldier8:
+            case FootSoldier9:
+                return true;
+                
+            default:
+                return false;
+        }
+    }
+    
+    public static boolean isHero(final GamePlayers type)
+    {
+        switch (type)
+        {
+            case Donatello:
+            case Raphael:
+            case Leonardo:
+            case Michelangelo:
+                return true;
+                
+            default:
+                return false;
+        }
     }
     
     /**
-     * Add a random enemy not including bosses
+     * Add a random grunt not including bosses
      * @throws Exception 
      */
     public void addRandomEnemy() throws Exception
     {
         ArrayList possibleEnemies = new ArrayList();
         
-        possibleEnemies.add(GamePlayers.FootSoldier1);
-        possibleEnemies.add(GamePlayers.FootSoldier2);
-        possibleEnemies.add(GamePlayers.FootSoldier3);
-        possibleEnemies.add(GamePlayers.FootSoldier4);
-        possibleEnemies.add(GamePlayers.FootSoldier5);
-        possibleEnemies.add(GamePlayers.FootSoldier6);
-        possibleEnemies.add(GamePlayers.FootSoldier7);
-        possibleEnemies.add(GamePlayers.FootSoldier8);
-        possibleEnemies.add(GamePlayers.FootSoldier9);
+        for (GamePlayers type : GamePlayers.values())
+        {
+            if (isEnemy(type))
+                possibleEnemies.add(type);
+        }
         
         GamePlayers randomEnemy = (GamePlayers)possibleEnemies.get((int)(Math.random() * possibleEnemies.size()));
         
@@ -54,54 +87,54 @@ public class PlayerManager
     
     public void addEnemy(final GamePlayers type) throws Exception
     {
-        Enemy enemy = null;
+        Grunt grunt = null;
         
         switch (type)
         {
             case FootSoldier1:
-                enemy = new FootSoldier1();
+                grunt = new FootSoldier1();
                 break;
                 
             case FootSoldier2:
-                enemy = new FootSoldier2();
+                grunt = new FootSoldier2();
                 break;
                 
             case FootSoldier3:
-                enemy = new FootSoldier3();
+                grunt = new FootSoldier3();
                 break;
                 
             case FootSoldier4:
-                enemy = new FootSoldier4();
+                grunt = new FootSoldier4();
                 break;
                 
             case FootSoldier5:
-                enemy = new FootSoldier5();
+                grunt = new FootSoldier5();
                 break;
                 
             case FootSoldier6:
-                enemy = new FootSoldier6();
+                grunt = new FootSoldier6();
                 break;
                 
             case FootSoldier7:
-                enemy = new FootSoldier7();
+                grunt = new FootSoldier7();
                 break;
                 
             case FootSoldier8:
-                enemy = new FootSoldier8();
+                grunt = new FootSoldier8();
                 break;
                 
             case FootSoldier9:
-                enemy = new FootSoldier9();
+                grunt = new FootSoldier9();
                 break;
                 
             default:
                 throw new Exception("Player not found");
         }
         
-        enemies.add(enemy);
+        grunts.add(grunt);
     }
     
-    public void addHero(final GamePlayers type) throws Exception
+    public void addHero(final GamePlayers type, final int lives) throws Exception
     {
         Hero hero;
         
@@ -127,23 +160,24 @@ public class PlayerManager
                 throw new Exception("Player not found");
         }
         
+        hero.setLives(lives);
         heroes.add(hero);
     }
     
     /**
-     * Get a list of all our enemies
+     * Get a list of all our grunts
      * @return List<Enemy>
      */
-    public List<Enemy> getEnemies()
+    public List<Grunt> getEnemies()
     {
-        return this.enemies;
+        return this.grunts;
     }
     
     public List<Player> getPlayerEnemies()
     {
         List<Player> result = new ArrayList<>();
         
-        for (Player player : enemies)
+        for (Player player : grunts)
         {
             result.add(player);
         }
@@ -173,39 +207,39 @@ public class PlayerManager
     }
     
     /**
-     * Get a list of enemies that are targeting the specific hero of type
-     * @param type List of enemies
+     * Get a list of grunts that are targeting the specific hero of type
+     * @param type List of grunts
      */
-    private List<Enemy> getEnemyTargets(GamePlayers assigned)
+    private List<Grunt> getEnemyTargets(GamePlayers assigned)
     {
-        List<Enemy> enemyTargets = new ArrayList<>();
+        List<Grunt> gruntTargets = new ArrayList<>();
         
-        for (Enemy enemy : enemies)
+        for (Grunt grunt : grunts)
         {
-            if (enemy.getAssignment() == null)
+            if (grunt.getAssignment() == null)
                 continue;
-            if (enemy.getAssignment() == assigned)
-                enemyTargets.add(enemy);
+            if (grunt.getAssignment() == assigned)
+                gruntTargets.add(grunt);
         }
         
-        return enemyTargets;
+        return gruntTargets;
     }
     
     /**
-     * Get a list of enemies that are not assigned a target
-     * @param type List of enemies
+     * Get a list of grunts that are not assigned a target
+     * @param type List of grunts
      */
-    private List<Enemy> getEnemyUnassigned()
+    private List<Grunt> getEnemyUnassigned()
     {
-        List<Enemy> enemyTargets = new ArrayList<>();
+        List<Grunt> gruntTargets = new ArrayList<>();
         
-        for (Enemy enemy : enemies)
+        for (Grunt grunt : grunts)
         {
-            if (enemy.getAssignment() == null)
-                enemyTargets.add(enemy);
+            if (grunt.getAssignment() == null)
+                gruntTargets.add(grunt);
         }
         
-        return enemyTargets;
+        return gruntTargets;
     }
     
     /**
@@ -219,19 +253,30 @@ public class PlayerManager
         
         for (Player hero : getHeroes())
         {
-            if (hero.hasProjectile())
-                levelObjects.add(hero.getProjectile());
-
             levelObjects.add(hero);
         }
         
-        for (Player enemy : getEnemies())
+        for (Player grunt : getEnemies())
         {
-            if (enemy.hasProjectile())
-                levelObjects.add(enemy.getProjectile());
-
-            levelObjects.add(enemy);
+            levelObjects.add(grunt);
         }
+    }
+    
+    public List<Player> getAllPlayers()
+    {
+        List<Player> players = new ArrayList<>();
+        
+        for (Player hero : getHeroes())
+        {
+            players.add(hero);
+        }
+        
+        for (Player grunt : getEnemies())
+        {
+            players.add(grunt);
+        }
+        
+        return players;
     }
     
     public void update(final Engine engine) throws Exception
@@ -246,6 +291,7 @@ public class PlayerManager
             {
                 hero.setImage(engine.getResources().getGamePlayer(hero.getType()));
                 hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                hero.setDimensions();
                 
                 final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
                 
@@ -255,59 +301,65 @@ public class PlayerManager
             //if the death animation is complete and no more lives
             if (hero.isDeadComplete())
             {
+                //if the hero does not have any more lives
                 if (!hero.hasLives())
                 {
-                    heroes.remove(i);
-                    i--;
+                    /*
+                     * if there are more than 1 hero remove the dead hero
+                     * because once all heroes are dead we want to leave the last one on the screen
+                     */
+                    if (heroes.size() > 1)
+                    {
+                        heroes.remove(i);
+                        i--;
+                    }
                 }
                 else
                 {
                     hero.setNewState(Player.State.IDLE);
                 }
             }
-            hero.update(engine.getKeyboard(), getPlayerEnemies(), engine.getLevelManager().getLevel());
+            
+            hero.update(engine.getProjectileManager(), getPlayerEnemies(), engine.getKeyboard(), engine.getLevelManager().getLevel().getBoundary());
         }
         
-        //make sure enemies are targeting heroes
+        //make sure grunts are targeting heroes
         updateEnemyStrategy();
         
-        for (int i=0; i < enemies.size(); i++)
+        for (int i=0; i < grunts.size(); i++)
         {
-            Enemy enemy = enemies.get(i);
+            Grunt grunt = grunts.get(i);
             
-            //if the enemy assets are not loaded yet
-            if (enemy.getImage() == null)
+            //if the grunt assets are not loaded yet
+            if (grunt.getImage() == null)
             {
-                enemy.setImage(engine.getResources().getGamePlayer(enemy.getType()));
-                enemy.setDelay(engine.getMain().getTimeDeductionPerFrame());
-                
-                
-                //NOTE NEED TO SET A STARTING LOCATION HERE
-                
-                //pick a random starting location for the enemies that will be somewhere off the screen
+                grunt.setImage(engine.getResources().getGamePlayer(grunt.getType()));
+                grunt.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                grunt.setDimensions();
+                grunt.setLocation(engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt.getHeight()));
             }
             
-            enemy.update(engine.getMain().getScreen(), getPlayerHeroes());
+            grunt.update(engine.getProjectileManager(), getPlayerHeroes(), engine.getLevelManager().getLevel().getBoundary());
             
-            //if the death animation is complete and no more lives
-            if (enemy.isDeadComplete() && !enemy.hasLives())
+            //if the death animation is complete and no more lives remove the grunt
+            if (grunt.isDeadComplete() && !grunt.hasLives())
             {
-                enemies.remove(i);
+                grunts.remove(i);
                 i--;
             }
         }
     }
     
     /**
-     * This method will make if there are at least 2 enemies that they are set to attack each hero
+     * This method will make if there are at least 2 grunts that they are set to attack each hero
      */
     private void updateEnemyStrategy()
     {
-        //make sure there are enough enemies assigned to each player
+        //make sure there are enough grunts assigned to each player
         for (Hero hero : heroes)
         {
-            List<Enemy> tmp = getEnemyTargets(hero.getType());
-            List<Enemy> unassigned = getEnemyUnassigned();
+            List<Grunt> tmp = getEnemyTargets(hero.getType());
+            List<Grunt> unassigned = getEnemyUnassigned();
             
             //if there are at least 2 assigned to target hero 
             if (tmp.size() >= 2)
@@ -337,7 +389,7 @@ public class PlayerManager
             {
                 boolean attackEast = false;
                 
-                //get attack side so other enemy can be assigned the other
+                //get attack side so other grunt can be assigned the other
                 if (tmp.size() == 1)
                     attackEast = tmp.get(0).hasAttackEast();
                 
@@ -369,13 +421,32 @@ public class PlayerManager
             unassigned.clear();
         }
         
-        List<Enemy> unassigned = getEnemyUnassigned();
+        List<Grunt> unassigned = getEnemyUnassigned();
         
-        //set remaining enemies to random heroes
-        for (Enemy enemy : unassigned)
+        //set remaining grunts to random heroes
+        for (Grunt grunt : unassigned)
         {
-            enemy.setAssignment(heroes.get((int)(Math.random() * heroes.size())).getType());
+            grunt.setAssignment(heroes.get((int)(Math.random() * heroes.size())).getType());
         }
     }
     
+    /**
+     * Here we will draw the health bars for all the heroes
+     * @param g Graphics object we write the information to
+     * @return Graphics
+     */
+    public Graphics render(Graphics g, final Rectangle screen)
+    {
+        int x = (int)((screen.width  * .05) + screen.x);
+        int y = (int)((screen.height * .1) + screen.y);
+        
+        for (Hero hero : heroes)
+        {
+            hero.renderHealthInformation(g, x, y);
+            
+            x += (screen.width / heroes.size());
+        }
+        
+        return g;
+    }
 }

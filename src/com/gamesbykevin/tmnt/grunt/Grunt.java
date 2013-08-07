@@ -1,15 +1,16 @@
-package com.gamesbykevin.tmnt.enemies;
+package com.gamesbykevin.tmnt.grunt;
 
-import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
+import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Enemy extends Player
+public class Grunt extends Player
 {
     //this is the hero the enemy has targeted
     private GamePlayers assigned;
@@ -22,40 +23,30 @@ public class Enemy extends Player
     private static final int HEALTH_DEFAULT = 4;
     private static final int LIVES_DEFAULT = 0;
     
-    public Enemy()
+    public Grunt()
     {
         super.setHealthDefault(HEALTH_DEFAULT);
         super.setLives(LIVES_DEFAULT);
         
-        resetSteps();
+        this.resetSteps();
     }
     
     /**
      * Run the AI here for the enemy
      */
-    public void update(final Rectangle screen, final List<Player> heroes) throws Exception
+    public void update(final ProjectileManager projectileManager, final List<Player> heroes, final Polygon boundary) throws Exception
     {
-        super.update(heroes);
+        //call this update first as it manages the animation and player state
+        super.update(projectileManager, heroes, boundary);
         
         //no heroes
         if (heroes.size() < 1 || getAssignment() == null)
             return;
         
-        //check if projectile has hit any hero, or if it has flown off the screen
-        checkProjectile(heroes, screen);
+        //get the hero that the enemy is targeting
+        Player hero = getAssignment(heroes);
         
-        Player hero = null;
-        
-        for (Player test : heroes)
-        {
-            if (test.getType() == getAssignment())
-            {
-                hero = test;
-                break;
-            }
-        }
-        
-        //no assigned hero
+        //no assigned target
         if (hero == null)
             return;
         
@@ -102,7 +93,8 @@ public class Enemy extends Player
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
                     //if there's an opportunity, take it as long as they are on the screen
-                    if (attackState != null && screen.contains(super.getRectangle()))
+                    //if (attackState != null && screen.contains(super.getRectangle()))
+                    if (attackState != null)
                     {
                         //while attacking the enemy isn't moving
                         setVelocityX(VELOCITY_NONE);
@@ -130,73 +122,6 @@ public class Enemy extends Player
             {
                 setNewState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
-            }
-        }
-    }
-    
-    /**
-     * Check if hero has been hit with projectile or if projectile is still on the main screen.
-     * If projectile is no longer on the main screen it will be removed
-     * @param heroes Heroes to check if they have been hit
-     * @param screen Inbounds area for projectile
-     */
-    private void checkProjectile(List<Player> heroes, final Rectangle screen)
-    {
-        //if the projectile exists and is the correct animation
-        if (getProjectile() != null)
-        {
-            if (getProjectile().getSpriteSheet().getCurrent() == State.PROJECTILE1)
-            {
-                for (Player hero : heroes)
-                {
-                    //all projectiles will be moving when they cause damage to hero
-                    if (!hero.canHurt() || !getProjectile().hasVelocity())
-                        continue;
-
-                    Rectangle anchorProjectile = Player.getAnchorLocation(getProjectile());
-                    Rectangle anchorHero = hero.getAnchorLocation();
-
-                    //projectile has hit hero
-                    if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
-                    {
-                        hero.setNewState(State.HURT);
-
-                        //check if there is an additional animation now that the projectile has hit
-                        if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
-                        {
-                            if (getProjectile().getSpriteSheet().getCurrent() != State.PROJECTILE1_FINISH)
-                            {
-                                getProjectile().setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                                getProjectile().getSpriteSheet().setCurrent(State.PROJECTILE1_FINISH);
-                                getProjectile().getSpriteSheet().reset();
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            //if another animation does not exist then remove the projectile
-                            removeProjectile();
-                            return;
-                        }
-                    }
-                }
-            }
-            
-            if (getProjectile().getSpriteSheet().getCurrent() == State.PROJECTILE1_FINISH)
-            {
-                //if the animation has finished remove projectile
-                if (getProjectile().getSpriteSheet().hasFinished())
-                {
-                    removeProjectile();
-                    return;
-                }
-            }
-                
-            //if the projectile is no longer in the current game window remove it
-            if (!screen.intersects(getProjectile().getRectangle()))
-            {
-                removeProjectile();
-                return;
             }
         }
     }
@@ -441,6 +366,26 @@ public class Enemy extends Player
         return this.assigned;
     }
     
+    /**
+     * Checks the list of heroes and returns the one assigned.
+     * If nothing matches null is then returned.
+     * @param heroes List of heroes we want to check
+     * @return Player The player being targeted by the enemy
+     */
+    public Player getAssignment(List<Player> heroes)
+    {
+        if (heroes.size() < 1)
+            return null;
+        
+        for (Player hero : heroes)
+        {
+            if (hero.getType() == getAssignment())
+                return hero;
+        }
+        
+        return null;
+    }
+    
     public void setAssignment(final GamePlayers assigned)
     {
         this.assigned = assigned;
@@ -507,8 +452,7 @@ public class Enemy extends Player
                 possible.add(State.ATTACK5);
         }
         
-        //currently can only throw 1 projectile at a time
-        if (hasState(State.THROW_PROJECTILE) && getProjectile() == null)
+        if (hasState(State.THROW_PROJECTILE))
             possible.add(State.THROW_PROJECTILE);
         
         return possible;
