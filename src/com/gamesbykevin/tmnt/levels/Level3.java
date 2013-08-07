@@ -27,7 +27,7 @@ public final class Level3 extends Level implements LevelRules
     @Override
     public void setLevelBounds()
     {
-        int x[] = {30,  3330, 3330, 30};
+        int x[] = {0,   3330, 3330, 0};
         int y[] = {123, 123,  190,  190};
         
         //set the area that is in bounds

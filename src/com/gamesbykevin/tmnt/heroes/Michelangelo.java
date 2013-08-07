@@ -170,12 +170,12 @@ public final class Michelangelo extends Hero implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,8), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(4,8), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(5,8), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,8), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(7,8), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(8,8), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(3,8), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(4,8), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(5,8), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(6,8), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(7,8), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(8,8), getNanoSeconds(1500));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

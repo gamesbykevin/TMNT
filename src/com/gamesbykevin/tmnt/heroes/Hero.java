@@ -15,16 +15,23 @@ public class Hero extends Player
 {
     private Point validLocation;
     
+    private static final int HEALTH_DEFAULT = 20;
+    private static final int LIVES_DEFAULT = 10;
+    
     public Hero()
     {
         validLocation = new Point();
+        
+        //all heroes will have the same health and lives
+        super.setHealthDefault(HEALTH_DEFAULT);
+        super.setLives(LIVES_DEFAULT);
     }
     
     /**
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final Keyboard keyboard, List<Enemy> enemies, final Level level) throws Exception
+    public void update(final Keyboard keyboard, List<Player> enemies, final Level level) throws Exception
     {
         //record our location before update is called
         if (!isJumping())
@@ -38,7 +45,7 @@ public class Hero extends Player
             
         }
         
-        super.update();
+        super.update(enemies);
         
         //now that update has been called make sure we are still within the boundary
         if (!isJumping())
@@ -51,9 +58,6 @@ public class Hero extends Player
         {
             
         }
-        
-        if (isAttacking())
-            checkAttack(enemies);
         
         if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
         {
@@ -172,46 +176,6 @@ public class Hero extends Player
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 keyboard.resetAllKeyEvents();
-            }
-        }
-    }
-    
-    private void checkAttack(List<Enemy> enemies)
-    {
-        //if the attacking animation is finished check for collision and reset animation
-        if (getSpriteSheet().hasFinished())
-        {
-            for (Enemy enemy : enemies)
-            {
-                if (!enemy.canHurt())
-                    continue;
-
-                Rectangle anchorHero = getAnchorLocation();
-                Rectangle anchorEnemy = enemy.getAnchorLocation();
-
-                //we have made collision with the enemy
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(enemy.getCenter()) && !hasState(State.THROW_PROJECTILE))
-                {
-                    //make sure hero is facing the enemy, NOTE: even though we hit the enemy do not exit loop because we may damage multiple
-                    if (enemy.getCenter().x >= getCenter().x && !hasHorizontalFlip() ||
-                        enemy.getCenter().x <= getCenter().x && hasHorizontalFlip())
-                    {
-                        enemy.setHorizontalFlip(!hasHorizontalFlip());
-                        enemy.setNewState(State.HURT);
-                        enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                    }
-                }
-            }
-
-            //since the attack animation is finished reset it, but not if the hero is jumping
-            if (!isJumping())
-            {
-                //once we are complete jumping we go back to idle
-                setNewState(State.IDLE);
-                
-                //if there is another state
-                if (getNextState() != null)
-                    applyNextState();
             }
         }
     }

@@ -191,6 +191,7 @@ public class LevelManager
                     //if the current enemy count is less than the amount allowed on the screen at one time, add enemies
                     while (players.getEnemies().size() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
                     {
+                        getLevel().addEnemiesCreatedAtCheckpoint();
                         players.addRandomEnemy();
                     }
                 }

@@ -92,8 +92,8 @@ public final class FootSoldier2 extends Enemy implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,1), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(1,1), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(0,1), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(1,1), getNanoSeconds(1800));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

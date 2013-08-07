@@ -162,12 +162,12 @@ public final class Raphael extends Hero implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,9), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(4,9), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(5,9), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,9), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(7,9), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(8,9), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(3,9), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(4,9), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(5,9), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(6,9), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(7,9), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(8,9), getNanoSeconds(1500));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

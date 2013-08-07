@@ -164,12 +164,12 @@ public final class Donatello extends Hero implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(5,6), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,6), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(7,6), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(8,6), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(9,6), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(0,7), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(5,6), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(6,6), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(7,6), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(8,6), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(9,6), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(0,7), getNanoSeconds(1500));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

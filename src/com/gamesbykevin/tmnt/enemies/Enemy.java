@@ -19,28 +19,34 @@ public class Enemy extends Player
     
     private boolean step1 = true, step2 = false, step3 = false;
     
+    private static final int HEALTH_DEFAULT = 4;
+    private static final int LIVES_DEFAULT = 0;
+    
     public Enemy()
     {
+        super.setHealthDefault(HEALTH_DEFAULT);
+        super.setLives(LIVES_DEFAULT);
+        
         resetSteps();
     }
     
     /**
      * Run the AI here for the enemy
      */
-    public void update(final Rectangle screen, final List<Hero> heroes) throws Exception
+    public void update(final Rectangle screen, final List<Player> heroes) throws Exception
     {
-        super.update();
+        super.update(heroes);
         
         //no heroes
-        if (heroes.size() < 1)
+        if (heroes.size() < 1 || getAssignment() == null)
             return;
         
         //check if projectile has hit any hero, or if it has flown off the screen
         checkProjectile(heroes, screen);
         
-        Hero hero = null;
+        Player hero = null;
         
-        for (Hero test : heroes)
+        for (Player test : heroes)
         {
             if (test.getType() == getAssignment())
             {
@@ -63,11 +69,7 @@ public class Enemy extends Player
                 setHorizontalFlip(true);
             
             //if we are attacking check for collision as well as reset animation
-            if (isAttacking())
-            {
-                checkAttack(heroes);
-            }
-            else
+            if (!isAttacking())
             {
                 //make sure enemy can walk or if they are walking to follow the logic below
                 if (canWalk() || isWalking())
@@ -85,15 +87,16 @@ public class Enemy extends Player
 
                     //next, line up the y-cooridnate to get ready to attack
                     if (!step1 && step2)
-                        lineupAttack(anchor, anchorHero, hero.isJumping());
+                        lineAttack(anchor, anchorHero, hero.isJumping());
 
                     //then, close/spread the gap
                     if (!step1 && !step2 && step3)
                         closeGap(anchor, anchorHero, hero.getX());
 
+                    //NOTE: MAY ADD THIS IN FUTURE
                     //if we aren't getting ready to attack we should be avoiding our targeted hero
-                    if (!step2 && !step3)
-                        avoidAttack(anchor, anchorHero, hero.isJumping());
+                    //if (!step2 && !step3)
+                    //    avoidAttack(anchor, anchorHero, hero.isJumping());
 
                     //here we check for the opportunity to attack
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
@@ -132,89 +135,19 @@ public class Enemy extends Player
     }
     
     /**
-     * If the enemy is not attacking the assigned hero they should be avoiding attack
-     * @param anchor The Rectangle representing the foot area of this enemy
-     * @param anchorHero The Rectangle representing the foot area of the hero
-     * @param jumping Is the hero jumping
-     */
-    private void avoidAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean jumping)
-    {
-        if (1==1)
-            return;
-        
-        if (jumping)
-            return;
-        
-        //if the hero is not jumping and we are lined up
-        if (isLinedUp(anchor, anchorHero))
-        {
-            if (anchor.getY() < anchorHero.getY())
-            {
-                setState(State.WALK_VERTICAL);
-                setVelocityX(VELOCITY_NONE);
-                setVelocityY(-getVelocityWalk());
-            }
-            
-            if (anchor.getY() > anchorHero.getY())
-            {
-                setState(State.WALK_VERTICAL);
-                setVelocityX(VELOCITY_NONE);
-                setVelocityY(getVelocityWalk());
-            }
-        }
-    }
-    
-    /**
-     * Here we will check if the enemy has hurt any of the heroes
-     * @param heroes List of heroes
-     */
-    private void checkAttack(List<Hero> heroes)
-    {
-        //if the attacking animation is finished check for collision and reset animation
-        if (getSpriteSheet().hasFinished())
-        {
-            for (Hero hero : heroes)
-            {
-                //if we can't hurt the enemy or if we are throwing a projectile, its the projectile that can hurt
-                if (!hero.canHurt() || hasState(State.THROW_PROJECTILE))
-                    continue;
-
-                Rectangle anchorEnemy = getAnchorLocation();
-                Rectangle anchorHero = hero.getAnchorLocation();
-
-                //we have hit the enemy so lets exit the loop as the cpu can only hurt one enemy at a time
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()))
-                {
-                    hero.setHorizontalFlip(!hasHorizontalFlip());
-                    hero.setNewState(State.HURT);
-                    hero.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                    break;
-                }
-            }
-
-            //now that attack animation is complete reset
-            setNewState(State.IDLE);
-
-            //if another attack is available start it now
-            if (getNextState() != null)
-                applyNextState();
-        }
-    }
-    
-    /**
      * Check if hero has been hit with projectile or if projectile is still on the main screen.
      * If projectile is no longer on the main screen it will be removed
      * @param heroes Heroes to check if they have been hit
      * @param screen Inbounds area for projectile
      */
-    private void checkProjectile(List<Hero> heroes, final Rectangle screen)
+    private void checkProjectile(List<Player> heroes, final Rectangle screen)
     {
         //if the projectile exists and is the correct animation
         if (getProjectile() != null)
         {
             if (getProjectile().getSpriteSheet().getCurrent() == State.PROJECTILE1)
             {
-                for (Hero hero : heroes)
+                for (Player hero : heroes)
                 {
                     //all projectiles will be moving when they cause damage to hero
                     if (!hero.canHurt() || !getProjectile().hasVelocity())
@@ -349,6 +282,11 @@ public class Enemy extends Player
         //if the enemy can throw a projectile we will handle this differently
         if (hasState(State.THROW_PROJECTILE))
         {
+            resetSteps();
+            
+            if (1==1)
+                return;
+            
             //move away from hero since we are preparing to throw a projectile
             if (getX() <= heroX)
             {
@@ -388,7 +326,7 @@ public class Enemy extends Player
      * lineup with the hero, basically getting ready to attack.
      * @param hero The hero we are targeting.
      */
-    private void lineupAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean isJumping)
+    private void lineAttack(final Rectangle anchor, final Rectangle anchorHero, final boolean isJumping)
     {
         //if the x velocity is still active or the hero is jumping we will not move into attack position
         if (isJumping)
@@ -427,7 +365,7 @@ public class Enemy extends Player
      * They will position themselves on the appropriate side
      * @param hero The hero to surround.
      */
-    private void surroundEnemy(final Hero hero)
+    private void surroundEnemy(final Player hero)
     {
         if (attackEast)
         {
@@ -440,8 +378,17 @@ public class Enemy extends Player
             }
             else
             {
-                //we are done with the current step
-                setStep1(false);
+                if (getX() > hero.getX() + (hero.getWidth() * 2))
+                {
+                    setState(State.WALK_HORIZONTAL);
+                    setVelocityX(-getVelocityWalk());
+                    setVelocityY(VELOCITY_NONE);
+                }
+                else
+                {
+                    //we are done with the current step
+                    setStep1(false);
+                }
             }
         }
         
@@ -456,8 +403,17 @@ public class Enemy extends Player
             }
             else
             {
-                //we are done with the current step
-                setStep1(false);
+                if (getX() < hero.getX() - (hero.getWidth() * 2))
+                {
+                    setState(State.WALK_HORIZONTAL);
+                    setVelocityX(getVelocityWalk());
+                    setVelocityY(VELOCITY_NONE);
+                }
+                else
+                {
+                    //we are done with the current step
+                    setStep1(false);
+                }
             }
         }
     }

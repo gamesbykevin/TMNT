@@ -139,6 +139,30 @@ public class PlayerManager
         return this.enemies;
     }
     
+    public List<Player> getPlayerEnemies()
+    {
+        List<Player> result = new ArrayList<>();
+        
+        for (Player player : enemies)
+        {
+            result.add(player);
+        }
+        
+        return result;
+    }
+    
+    public List<Player> getPlayerHeroes()
+    {
+        List<Player> result = new ArrayList<>();
+        
+        for (Player player : heroes)
+        {
+            result.add(player);
+        }
+        
+        return result;
+    }
+    
     /**
      * Get a list of all our heroes
      * @return List<Hero>
@@ -146,26 +170,6 @@ public class PlayerManager
     public List<Hero> getHeroes()
     {
         return this.heroes;
-    }
-    
-    /**
-     * Get the hero based on the type, if one does not exist null is returned.
-     * 
-     * @param type Which hero are we checking for
-     * @return Hero the hero if exists
-     */
-    private Hero getHero(GamePlayers type)
-    {
-        if (heroes.size() < 1)
-            return null;
-        
-        for (Hero hero : heroes)
-        {
-            if (hero.getType() == type)
-                return hero;
-        }
-        
-        return null;
     }
     
     /**
@@ -233,8 +237,10 @@ public class PlayerManager
     public void update(final Engine engine) throws Exception
     {
         //NOTE: all heroes are human for now, we may have AI friends
-        for (Hero hero : heroes)
+        for (int i=0; i < heroes.size(); i++)
         {
+            Hero hero = heroes.get(i);
+            
             //if the hero assets are not loaded yet
             if (hero.getImage() == null)
             {
@@ -246,14 +252,29 @@ public class PlayerManager
                 hero.setLocation(r.x + hero.getWidth() + 1, r.y);
             }
             
-            hero.update(engine.getKeyboard(), enemies, engine.getLevelManager().getLevel());
+            //if the death animation is complete and no more lives
+            if (hero.isDeadComplete())
+            {
+                if (!hero.hasLives())
+                {
+                    heroes.remove(i);
+                    i--;
+                }
+                else
+                {
+                    hero.setNewState(Player.State.IDLE);
+                }
+            }
+            hero.update(engine.getKeyboard(), getPlayerEnemies(), engine.getLevelManager().getLevel());
         }
         
         //make sure enemies are targeting heroes
         updateEnemyStrategy();
-                
-        for (Enemy enemy : enemies)
+        
+        for (int i=0; i < enemies.size(); i++)
         {
+            Enemy enemy = enemies.get(i);
+            
             //if the enemy assets are not loaded yet
             if (enemy.getImage() == null)
             {
@@ -266,7 +287,14 @@ public class PlayerManager
                 //pick a random starting location for the enemies that will be somewhere off the screen
             }
             
-            enemy.update(engine.getMain().getScreen(), getHeroes());
+            enemy.update(engine.getMain().getScreen(), getPlayerHeroes());
+            
+            //if the death animation is complete and no more lives
+            if (enemy.isDeadComplete() && !enemy.hasLives())
+            {
+                enemies.remove(i);
+                i--;
+            }
         }
     }
     

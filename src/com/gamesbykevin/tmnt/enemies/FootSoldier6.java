@@ -84,8 +84,8 @@ public final class FootSoldier6 extends Enemy implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,0), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(3,0), getNanoSeconds(1800));
         getSpriteSheet().add(animation, State.DEAD);
     }    
 }

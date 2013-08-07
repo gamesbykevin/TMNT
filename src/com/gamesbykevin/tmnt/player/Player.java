@@ -7,6 +7,7 @@ import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.List;
 
 public abstract class Player extends Sprite
 {
@@ -48,6 +49,12 @@ public abstract class Player extends Sprite
     //# of hits player can take before they die
     private int health = 0;
     
+    //when your health runs out and you still have lives what do you reset the health to
+    private int healthDefault = 0;
+    
+    //0 lives by default
+    private int lives = 0;
+    
     //this is the projectile object
     private Sprite projectile;
     
@@ -64,6 +71,56 @@ public abstract class Player extends Sprite
         
         //assign default state of idle
         super.getSpriteSheet().setCurrent(State.IDLE);
+    }
+    
+    private void setHealth(final int health)
+    {
+        this.health = health;
+    }
+    
+    private int getHealth()
+    {
+        return this.health;
+    }
+    
+    public void deductHealth()
+    {
+        setHealth(getHealth() - 1);
+    }
+    
+    private boolean hasHealth()
+    {
+        return (getHealth() > 0);
+    }
+    
+    /**
+     * Set the default health when a player loses a life
+     * @param healthDefault 
+     */
+    public void setHealthDefault(final int healthDefault)
+    {
+        this.healthDefault = healthDefault;
+        setHealth(healthDefault);
+    }
+    
+    private int getHealthDefault()
+    {
+        return this.healthDefault;
+    }
+    
+    protected void setLives(final int lives)
+    {
+        this.lives = lives;
+    }
+    
+    public void deductLife()
+    {
+        this.lives--;
+    }
+    
+    public boolean hasLives()
+    {
+        return (this.lives > 0);
     }
     
     public void setType(final GamePlayers type)
@@ -111,16 +168,6 @@ public abstract class Player extends Sprite
     protected final Rectangle getSpriteRectangle(final int col, final int row)
     {
         return new Rectangle(col * getWidth(), row * getHeight(), getWidth(), getHeight());
-    }
-    
-    protected void setHealth(final int health)
-    {
-        this.health = health;
-    }
-    
-    protected int getHealth()
-    {
-        return this.health;
     }
     
     /**
@@ -284,9 +331,10 @@ public abstract class Player extends Sprite
      * Updates the current animation for the player
      * as well as the location based on the current
      * velocity set. Also updates the timers
+     * 
+     * @param players List of Players we are fighting against
      */
-    @Override
-    public void update() throws Exception
+    public void update(List<Player> players) throws Exception
     {
         getSpriteSheet().update();
         super.update();
@@ -298,13 +346,13 @@ public abstract class Player extends Sprite
         }
         
         //manage miscallaneous stuff here
-        manageState();
+        manageState(players);
     }
     
     /**
      * Check the current animation and handle accordingly
      */
-    private void manageState()
+    private void manageState(List<Player> players)
     {
         if (isJumping())
         {
@@ -324,13 +372,18 @@ public abstract class Player extends Sprite
             }
         }
         
-        if (isAttacking() && !isJumping())
+        if (isAttacking())
         {
-            //if the attack is projectile add the projectile
-            if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
+            if (!isJumping())
             {
-                addProjectile();
+                //if the attack is projectile add the projectile
+                if (getState() == State.THROW_PROJECTILE && getSpriteSheet().hasFinished())
+                {
+                    addProjectile();
+                }
             }
+            
+            checkAttack(players);
         }
         
         if (isHurt())
@@ -340,6 +393,71 @@ public abstract class Player extends Sprite
                 setNewState(State.IDLE);
             }
         }
+        
+        if (!hasHealth())
+        {
+            if (getState() != State.DEAD)
+            {
+                deductLife();
+                setNewState(State.DEAD);
+                
+                if (hasLives())
+                    setHealth(getHealthDefault());
+            }
+        }
+    }
+    
+    /**
+     * Check if the player has hit any targets
+     * @param targets The enemies the player is targeting 
+     */
+    private void checkAttack(List<Player> targets)
+    {
+        //if the attacking animation is finished check for collision and reset animation
+        if (getSpriteSheet().hasFinished())
+        {
+            for (Player target : targets)
+            {
+                if (!target.canHurt())
+                    continue;
+
+                Rectangle anchorHero = getAnchorLocation();
+                Rectangle anchorEnemy = target.getAnchorLocation();
+
+                //we have made collision with the enemy
+                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(target.getCenter()) && !hasState(State.THROW_PROJECTILE))
+                {
+                    //make sure hero is facing the enemy, NOTE: even though we hit the enemy do not exit loop because we may damage multiple
+                    if (target.getCenter().x >= getCenter().x && !hasHorizontalFlip() || target.getCenter().x <= getCenter().x && hasHorizontalFlip())
+                    {
+                        target.setHorizontalFlip(!hasHorizontalFlip());
+                        target.setNewState(State.HURT);
+                        target.deductHealth();
+                        target.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                    }
+                }
+            }
+
+            //since the attack animation is finished reset it, but not if the hero is jumping
+            if (!isJumping())
+            {
+                //once we are complete jumping we go back to idle
+                setNewState(State.IDLE);
+                
+                //if there is another state
+                if (getNextState() != null)
+                    applyNextState();
+            }
+        }
+    }
+    
+    /**
+     * Is the dead animation complete
+     * @return boolean
+     */
+    public boolean isDeadComplete()
+    {
+        return (getState() == State.DEAD && getSpriteSheet().hasFinished());
     }
     
     /**
