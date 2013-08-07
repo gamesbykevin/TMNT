@@ -102,7 +102,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     keyboard.resetAllKeyEvents();
                 }
 
-                menu.update(main, this, resources, keyboard, mouse);
+                menu.update(this);
 
                 //if the menu is on the last layer and the window has focus
                 if (menu.isMenuFinished() && menu.hasFocus())
@@ -143,9 +143,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void reset() throws Exception
     {
-        this.playerManager = new PlayerManager(resources, getMain().getTimeDeductionPerFrame());
+        this.playerManager = new PlayerManager();
         this.levelManager = new LevelManager();
         this.levelManager.setLevel(ResourceManager.LevelObjects.Level3, resources, main.getScreen());
+        
+        this.playerManager.addHero(ResourceManager.GamePlayers.Leonardo);
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
@@ -227,6 +229,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         
             for (Sprite levelObject : levelObjects)
             {
+                if (levelObject.getImage() == null)
+                    continue;
+                
                 //get half the dimensions so we can offset/reset the coordinates
                 int halfWidth = (levelObject.getWidth() / 2);
                 int halfHeight = (levelObject.getHeight() / 2);

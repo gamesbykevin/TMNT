@@ -140,25 +140,18 @@ public class LevelManager
      */
     public void update(final PlayerManager players, final Rectangle screen) throws Exception
     {
-        //update level scrolling etc..
-        getLevel().update(screen);
-        
         //make sure level has been created
         if (getLevel() != null)
         {
-            boolean hasEnemies = false;
+            //update level scrolling etc..
+            getLevel().update(screen);
             
-            for (Enemy enemy : players.getEnemies())
-            {
-                if (!enemy.isDead())
-                {
-                    hasEnemies = true;
-                    break;
-                }
-            }
+            //doesn't matter if enemy is dead
+            boolean hasEnemies = (players.getEnemies().size() > 0);
             
             for (Hero hero : players.getHeroes())
             {
+                //default the scroll speed to 0 before we check
                 getLevel().setScrollSpeed(Player.VELOCITY_NONE);
 
                 //right edge where hero can't go past
@@ -187,10 +180,26 @@ public class LevelManager
                 }
             }
             
-            //if there are no existing enemies and we have past a check point add enemies
-            if (!hasEnemies && level.hasCheckpoint())
+            //check for adding enemies if we hit a check point of if there are existing enemies on the screen
+            final boolean checkAddEnemies = (!hasEnemies && getLevel().hasCheckpoint() || hasEnemies);
+            
+            if (checkAddEnemies)
             {
-                players.addEnemy(GamePlayers.FootSoldier1);
+                //if the total amount of enemies created so far is less than the total per check point
+                if (getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
+                {
+                    //if the current enemy count is less than the amount allowed on the screen at one time, add enemies
+                    while (players.getEnemies().size() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
+                    {
+                        players.addRandomEnemy();
+                    }
+                }
+                else
+                {
+                    //we have defeated all enemies and will be able to continue forward
+                    
+                    //NOTE MAYBE HERE WE CAN ADD A GIF OF APRIL AND SHE WILL BE DISPLAYED ON/OFF EVERY SECOND UNTIL NEXT CHECK POINT
+                }
             }
         }
     }

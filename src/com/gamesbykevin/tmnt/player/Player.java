@@ -191,11 +191,11 @@ public abstract class Player extends Sprite
      * Is the player's next move another attack
      * so we can chain together a combo then set 
      * the next attack here.
-     * @param state set what the current Player is doing
+     * @param state Set what the current Player should do next
      */
-    public void setNextState(final State state)
+    public void setNextState(final State nextState)
     {
-        this.nextState = state;
+        this.nextState = nextState;
     }
     
     public State getNextState()
@@ -209,8 +209,20 @@ public abstract class Player extends Sprite
      */
     public void applyNextState()
     {
-        setState(getNextState());
+        setNewState(getNextState());
         setNextState(null);
+    }
+    
+    /**
+     * This method calls setState() and once 
+     * setState() is called the sprite sheet is reset.
+     * 
+     * @param state What the current Player is doing
+     */
+    public void setNewState(final State state)
+    {
+        setState(state);
+        reset();
     }
     
     /**
@@ -235,7 +247,7 @@ public abstract class Player extends Sprite
     /**
      * Only reset sprite sheet animation
      */
-    public void reset()
+    private void reset()
     {
         this.getSpriteSheet().reset();
     }
@@ -290,7 +302,7 @@ public abstract class Player extends Sprite
     }
     
     /**
-     * Check the animations for miscellaneous things
+     * Check the current animation and handle accordingly
      */
     private void manageState()
     {
@@ -307,8 +319,7 @@ public abstract class Player extends Sprite
             {
                 setY(getJumpPhase2().getY());
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                setState(State.IDLE);
-                reset();
+                setNewState(State.IDLE);
                 nextState = null;
             }
         }
@@ -326,8 +337,7 @@ public abstract class Player extends Sprite
         {
             if (getSpriteSheet().hasFinished())
             {
-                setState(State.IDLE);
-                reset();
+                setNewState(State.IDLE);
             }
         }
     }

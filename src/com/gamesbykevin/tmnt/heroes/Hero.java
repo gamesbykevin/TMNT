@@ -98,10 +98,9 @@ public class Hero extends Player
             if (canJump())
             {
                 setVelocity(getVelocityX(), -getVelocityJump());
-                setState(State.JUMP);
+                setNewState(State.JUMP);
                 setJumpPhase1(getX(), getY() - (getVelocityJump() * Player.NUM_FRAMES_JUMP));
                 setJumpPhase2(getX(), getY());
-                reset();
             }
         }
 
@@ -118,7 +117,7 @@ public class Hero extends Player
                 }
                 else
                 {
-                    setState(State.ATTACK1);
+                    setNewState(State.ATTACK1);
                     setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     keyboard.removeKeyPressed(KeyEvent.VK_S);
                 }
@@ -198,8 +197,7 @@ public class Hero extends Player
                         enemy.getCenter().x <= getCenter().x && hasHorizontalFlip())
                     {
                         enemy.setHorizontalFlip(!hasHorizontalFlip());
-                        enemy.setState(State.HURT);
-                        enemy.getSpriteSheet().reset();
+                        enemy.setNewState(State.HURT);
                         enemy.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     }
                 }
@@ -208,9 +206,8 @@ public class Hero extends Player
             //since the attack animation is finished reset it, but not if the hero is jumping
             if (!isJumping())
             {
-                //reset the animation
-                reset();
-                setState(State.IDLE);
+                //once we are complete jumping we go back to idle
+                setNewState(State.IDLE);
                 
                 //if there is another state
                 if (getNextState() != null)

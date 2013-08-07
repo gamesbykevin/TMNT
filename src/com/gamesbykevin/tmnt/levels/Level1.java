@@ -10,6 +10,8 @@ public final class Level1 extends Level implements LevelRules
 {
     public Level1()
     {
+        super(10, 8);
+        
         setupDefaults();
     }
     

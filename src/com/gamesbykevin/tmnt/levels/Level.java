@@ -30,9 +30,68 @@ public abstract class Level extends Sprite
     
     private List<Integer> checkpoints;
     
-    public Level()
+    //total number of enemies to spawn for each check point
+    private int enemiesPerCheckpoint;
+    
+    //the current number of enemies we have added so far at the current checkpoint
+    private int enemiesCreatedAtCheckpoint;
+    
+    //total number of enemies that can be on the screen at the same time
+    private int enemiesAtOnce;
+    
+    /**
+     * Create new Level
+     * 
+     * @param enemiesPerCheckpoint How many enemies to spawn per check point
+     * @param enemiesAtOnce  How many enemies can be on the screen at once
+     */
+    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce)
     {
-        
+        this.enemiesPerCheckpoint = enemiesPerCheckpoint;
+        this.enemiesAtOnce        = enemiesAtOnce;
+    }
+    
+    /**
+     * the current number of enemies we have added so far at the current checkpoint
+     * @return int
+     */
+    public int getEnemiesCreatedAtCheckpoint()
+    {
+        return this.enemiesCreatedAtCheckpoint;
+    }
+    
+    /**
+     * reset the count back to 0
+     */
+    private void resetEnemiesCreatedAtCheckpoint()
+    {
+        this.enemiesCreatedAtCheckpoint = 0;
+    }
+
+    /**
+     * Increment the total by 1
+     */
+    public void addEnemiesCreatedAtCheckpoint()
+    {
+        this.enemiesCreatedAtCheckpoint++;
+    }
+    
+    /**
+     * total number of enemies to spawn for each check point
+     * @return int
+     */
+    public int getEnemiesPerCheckpoint()
+    {
+        return this.enemiesPerCheckpoint;
+    }
+    
+    /**
+     * total number of enemies that can be on the screen at the same time
+     * @return int
+     */
+    public int getEnemiesAtOnce()
+    {
+        return this.enemiesAtOnce;
     }
     
     /**
@@ -103,6 +162,7 @@ public abstract class Level extends Sprite
             
             while (checkpoints.size() < total)
             {
+                //checkpoints.add(checkpoints.size() * eachCheckpointLength);
                 checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
             }
         }
@@ -122,6 +182,9 @@ public abstract class Level extends Sprite
             //if the scroll x coordinate has past a check point 
             if (r.x + r.width < checkpoints.get(i))
             {
+                //reset counter
+                resetEnemiesCreatedAtCheckpoint();
+                
                 //remove the check point
                 checkpoints.remove(i);
                 
@@ -133,7 +196,10 @@ public abstract class Level extends Sprite
         return false;
     }
     
-    //gets the list of powerups
+    /**
+     * gets the list of power ups
+     * @return List Sprtie
+     */
     public List<Sprite> getPowerUps()
     {
         return this.powerUps;
@@ -146,17 +212,6 @@ public abstract class Level extends Sprite
     public int getEastBoundsX()
     {
         return (bounds.getBounds().x + bounds.getBounds().width);
-    }
-    
-    
-    
-    /**
-     * Get valid starting point for level
-     * @return 
-     */
-    public Point getStartingPoint()
-    {
-        return new Point(bounds.getBounds().x, bounds.getBounds().y);
     }
     
     /**
@@ -211,6 +266,13 @@ public abstract class Level extends Sprite
         this.bounds = bounds;
     }
     
+    /**
+     * Return the boundary set for this level. This boundary
+     * is used so we can determine where the players are 
+     * able to walk.
+     * 
+     * @return Polygon the boundary set for this level 
+     */
     public Polygon getBoundary()
     {
         return this.bounds;

@@ -7,7 +7,7 @@ import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 
-import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +20,36 @@ public class PlayerManager
     private List<Hero> heroes;
     private List<Enemy> enemies;
     
-    public PlayerManager(final ResourceManager resources, final long delay)
+    public PlayerManager()
     {
         heroes = new ArrayList<>();
         enemies = new ArrayList<>();
+    }
+    
+    /**
+     * Add a random enemy not including bosses
+     * @throws Exception 
+     */
+    public void addRandomEnemy() throws Exception
+    {
+        ArrayList possibleEnemies = new ArrayList();
+        
+        possibleEnemies.add(GamePlayers.FootSoldier1);
+        possibleEnemies.add(GamePlayers.FootSoldier2);
+        possibleEnemies.add(GamePlayers.FootSoldier3);
+        possibleEnemies.add(GamePlayers.FootSoldier4);
+        possibleEnemies.add(GamePlayers.FootSoldier5);
+        possibleEnemies.add(GamePlayers.FootSoldier6);
+        possibleEnemies.add(GamePlayers.FootSoldier7);
+        possibleEnemies.add(GamePlayers.FootSoldier8);
+        possibleEnemies.add(GamePlayers.FootSoldier9);
+        
+        GamePlayers randomEnemy = (GamePlayers)possibleEnemies.get((int)(Math.random() * possibleEnemies.size()));
+        
+        addEnemy(randomEnemy);
+        
+        possibleEnemies.clear();
+        possibleEnemies = null;
     }
     
     public void addEnemy(final GamePlayers type) throws Exception
@@ -123,10 +149,65 @@ public class PlayerManager
     }
     
     /**
-     * Add all player related objects to the 
-     * existing levelObjects list.
+     * Get the hero based on the type, if one does not exist null is returned.
      * 
-     * @param levelObjects
+     * @param type Which hero are we checking for
+     * @return Hero the hero if exists
+     */
+    private Hero getHero(GamePlayers type)
+    {
+        if (heroes.size() < 1)
+            return null;
+        
+        for (Hero hero : heroes)
+        {
+            if (hero.getType() == type)
+                return hero;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get a list of enemies that are targeting the specific hero of type
+     * @param type List of enemies
+     */
+    private List<Enemy> getEnemyTargets(GamePlayers assigned)
+    {
+        List<Enemy> enemyTargets = new ArrayList<>();
+        
+        for (Enemy enemy : enemies)
+        {
+            if (enemy.getAssignment() == null)
+                continue;
+            if (enemy.getAssignment() == assigned)
+                enemyTargets.add(enemy);
+        }
+        
+        return enemyTargets;
+    }
+    
+    /**
+     * Get a list of enemies that are not assigned a target
+     * @param type List of enemies
+     */
+    private List<Enemy> getEnemyUnassigned()
+    {
+        List<Enemy> enemyTargets = new ArrayList<>();
+        
+        for (Enemy enemy : enemies)
+        {
+            if (enemy.getAssignment() == null)
+                enemyTargets.add(enemy);
+        }
+        
+        return enemyTargets;
+    }
+    
+    /**
+     * Add all player related objects to the existing levelObjects list.
+     * 
+     * @param levelObjects List of all objects in the level
      */
     public void addAllPlayerObjects(List<Sprite> levelObjects)
     {
@@ -154,97 +235,119 @@ public class PlayerManager
         //NOTE: all heroes are human for now, we may have AI friends
         for (Hero hero : heroes)
         {
+            //if the hero assets are not loaded yet
             if (hero.getImage() == null)
             {
                 hero.setImage(engine.getResources().getGamePlayer(hero.getType()));
                 hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
-                hero.setLocation(200, 150);
+                
+                final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
+                
+                hero.setLocation(r.x + hero.getWidth() + 1, r.y);
             }
             
             hero.update(engine.getKeyboard(), enemies, engine.getLevelManager().getLevel());
         }
         
-        //make sure we have enemies attacking the heroes
-        updateStrategy();
-        
+        //make sure enemies are targeting heroes
+        updateEnemyStrategy();
+                
         for (Enemy enemy : enemies)
         {
+            //if the enemy assets are not loaded yet
             if (enemy.getImage() == null)
             {
                 enemy.setImage(engine.getResources().getGamePlayer(enemy.getType()));
                 enemy.setDelay(engine.getMain().getTimeDeductionPerFrame());
-                enemy.setLocation(300, 150);
+                
+                
+                //NOTE NEED TO SET A STARTING LOCATION HERE
+                
+                //pick a random starting location for the enemies that will be somewhere off the screen
             }
             
-            enemy.update(engine.getMain().getScreen(), heroes);
+            enemy.update(engine.getMain().getScreen(), getHeroes());
         }
     }
     
     /**
-     * This method will make if there are at least 2 enemies that they are set to attack
+     * This method will make if there are at least 2 enemies that they are set to attack each hero
      */
-    private void updateStrategy()
+    private void updateEnemyStrategy()
     {
-        int count = 0;
-        
-        //is there an enemy attacking from the east
-        boolean attackEast = false;
-        
-        //temp list
-        List<Enemy> tmp = new ArrayList<>();
-        
-        for (Enemy enemy : enemies)
+        //make sure there are enough enemies assigned to each player
+        for (Hero hero : heroes)
         {
-            //if there is an existing enemy already in the process of attacking
-            if (enemy.hasStep2() || enemy.hasStep3())
+            List<Enemy> tmp = getEnemyTargets(hero.getType());
+            List<Enemy> unassigned = getEnemyUnassigned();
+            
+            //if there are at least 2 assigned to target hero 
+            if (tmp.size() >= 2)
             {
-                if (enemy.hasAttackEast())
-                    attackEast = true;
+                int count = 0;
                 
-                count++;
+                for (int i=0; i < tmp.size(); i++)
+                {
+                    if (tmp.get(i).hasStep2() || tmp.get(i).hasStep3())
+                    {
+                        count++;
+                        tmp.remove(i);
+                    }
+                }
+                
+                while(count < 2)
+                {
+                    final int randomIndex = (int)(Math.random() * tmp.size());
+                    
+                    tmp.get(randomIndex).setStep2(true);
+                    tmp.remove(randomIndex);
+                    
+                    count++;
+                }
             }
             else
             {
-                //if enemy is not attacking add them to possible list
-                tmp.add(enemy);
+                boolean attackEast = false;
+                
+                //get attack side so other enemy can be assigned the other
+                if (tmp.size() == 1)
+                    attackEast = tmp.get(0).hasAttackEast();
+                
+                while (tmp.size() < 2 && unassigned.size() > 0)
+                {
+                    final int randIndex = (int)(Math.random() * unassigned.size());
+                    
+                    if (!unassigned.get(randIndex).hasStep2() && !unassigned.get(randIndex).hasStep3())
+                        unassigned.get(randIndex).setStep2(true);
+                    
+                    if (tmp.isEmpty())
+                    {
+                        attackEast = unassigned.get(randIndex).hasAttackEast();
+                    }
+                    else
+                    {
+                        unassigned.get(randIndex).setAttackEast(!attackEast);
+                    }
+                    
+                    unassigned.get(randIndex).setAssignment(hero.getType());
+                    
+                    tmp.add(unassigned.get(randIndex));
+                    
+                    unassigned.remove(randIndex);
+                }
             }
+            
+            tmp.clear();
+            unassigned.clear();
         }
         
-        while (count < 2)
+        List<Enemy> unassigned = getEnemyUnassigned();
+        
+        //set remaining enemies to random heroes
+        for (Enemy enemy : unassigned)
         {
-            if (tmp.size() > 0)
-            {
-                final int rand = (int)(Math.random() * tmp.size());
-                tmp.get(rand).setStep2(true);
-                
-                if (attackEast)
-                {
-                    //if there is an enemy already attacking the east we must attack west
-                    tmp.get(rand).setAttackEast(false);
-                }
-                else
-                {
-                    //pick a random attack direction
-                    final boolean result = (Math.random()> .5);
-                    
-                    //if result is true set east attack
-                    if (result)
-                        attackEast = true;
-                    
-                    tmp.get(rand).setAttackEast(result);
-                }
-                
-                tmp.remove(rand);
-                
-                count++;
-            }
-            else
-            {
-                break;
-            }
+            enemy.setAssignment(heroes.get((int)(Math.random() * heroes.size())).getType());
         }
-        
-        tmp.clear();
-        tmp = null;
     }
+    
 }

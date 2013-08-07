@@ -203,8 +203,13 @@ public class GameMenu extends Menu
         setLayerFinish(LayerKey.StartGame);//this is the last layer
     }
     
-    public void update(final Main main, final Engine engine, final ResourceManager resources, final Keyboard ki, final Mouse mi) throws Exception
+    public void update(final Engine engine) throws Exception
     {
+        final Main main                 = engine.getMain();
+        final ResourceManager resources = engine.getResources();
+        final Keyboard ki               = engine.getKeyboard();
+        final Mouse mi                  = engine.getMouse();
+        
         if (!isMenuFinished())
         {   //if the menu is not on the last layer we need to check for changes made in the menu
             if (isCurrentLayer(LayerKey.MainTitle) && !resetGame)

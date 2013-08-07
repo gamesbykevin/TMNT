@@ -1,6 +1,7 @@
 package com.gamesbykevin.tmnt.enemies;
 
 import com.gamesbykevin.tmnt.heroes.Hero;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 
 import java.awt.Point;
@@ -11,7 +12,7 @@ import java.util.List;
 public class Enemy extends Player
 {
     //this is the hero the enemy has targeted
-    private int assigned = -1;
+    private GamePlayers assigned;
     
     //the direction the player will attempt to attack from if not east then west
     private boolean attackEast = (Math.random() > .5);
@@ -30,22 +31,32 @@ public class Enemy extends Player
     {
         super.update();
         
+        //no heroes
         if (heroes.size() < 1)
             return;
         
-        //check if projectile has hit hero or off the screen
+        //check if projectile has hit any hero, or if it has flown off the screen
         checkProjectile(heroes, screen);
         
-        //make sure enemy has a hero targeted
-        checkAssignment(heroes);
+        Hero hero = null;
         
-        //get the hero the enemy is assigned to attack
-        Hero hero = heroes.get(assigned);
+        for (Hero test : heroes)
+        {
+            if (test.getType() == getAssignment())
+            {
+                hero = test;
+                break;
+            }
+        }
+        
+        //no assigned hero
+        if (hero == null)
+            return;
         
         //make sure the hero isn't hurt or dead
         if (!hero.isDead() && !hero.isHurt() && !isDead() && !isHurt())
         {
-            //face the direction hero is
+            //face the hero
             if (getX() < hero.getX())
                 setHorizontalFlip(false);
             else
@@ -84,11 +95,11 @@ public class Enemy extends Player
                     if (!step2 && !step3)
                         avoidAttack(anchor, anchorHero, hero.isJumping());
 
-                    //here we check for the opportunity to attack and take it if available
+                    //here we check for the opportunity to attack
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
-                    //if there is an attack opportunity and the hero isn't hurt, take it
-                    if (attackState != null && !hero.isHurt())
+                    //if there's an opportunity, take it as long as they are on the screen
+                    if (attackState != null && screen.contains(super.getRectangle()))
                     {
                         //while attacking the enemy isn't moving
                         setVelocityX(VELOCITY_NONE);
@@ -98,10 +109,7 @@ public class Enemy extends Player
                         resetSteps();
 
                         //start attack here
-                        setState(attackState);
-                        
-                        //now that new state is set reset animation
-                        reset();
+                        setNewState(attackState);
                     }
                 }
             }
@@ -117,8 +125,7 @@ public class Enemy extends Player
             
             if (isAttacking() && getSpriteSheet().hasFinished())
             {
-                setState(State.IDLE);
-                reset();
+                setNewState(State.IDLE);
                 setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
             }
         }
@@ -179,16 +186,14 @@ public class Enemy extends Player
                 if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(hero.getCenter()))
                 {
                     hero.setHorizontalFlip(!hasHorizontalFlip());
-                    hero.setState(State.HURT);
-                    hero.reset();
+                    hero.setNewState(State.HURT);
                     hero.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     break;
                 }
             }
 
             //now that attack animation is complete reset
-            setState(State.IDLE);
-            reset();
+            setNewState(State.IDLE);
 
             //if another attack is available start it now
             if (getNextState() != null)
@@ -221,8 +226,7 @@ public class Enemy extends Player
                     //projectile has hit hero
                     if (anchorProjectile.intersects(anchorHero) && getProjectile().getRectangle().contains(hero.getCenter()))
                     {
-                        hero.setState(State.HURT);
-                        hero.reset();
+                        hero.setNewState(State.HURT);
 
                         //check if there is an additional animation now that the projectile has hit
                         if (getProjectile().getSpriteSheet().hasAnimation(State.PROJECTILE1_FINISH))
@@ -473,18 +477,17 @@ public class Enemy extends Player
     }
     
     /**
-     * If the enemy is not assigned a hero to attack do so now.
-     * NOTE: WILL NEED TO ADD LOGIC HERE SO IF THERE ARE MORE THAN 1 HERO
-     * THE ENEMIES ASSIGNED TO EACH HERO IS EQUALLY SPREAD OUT
-     * @param heroes Heroes to choose from
+     * Which hero is the enemy currently assigned
+     * @return GamePlayers
      */
-    private void checkAssignment(final List<Hero> heroes)
+    public GamePlayers getAssignment()
     {
-        if (assigned < 0 || assigned >= heroes.size())
-        {
-            //now we have an assigned target
-            assigned = (int)(Math.random() * heroes.size());
-        }
+        return this.assigned;
+    }
+    
+    public void setAssignment(final GamePlayers assigned)
+    {
+        this.assigned = assigned;
     }
     
     /**
