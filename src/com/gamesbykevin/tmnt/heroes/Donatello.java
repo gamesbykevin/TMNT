@@ -63,7 +63,7 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(6,1), getNanoSeconds(75));
         animation.add(getSpriteRectangle(7,1), getNanoSeconds(75));
         animation.add(getSpriteRectangle(8,1), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(9,1), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(9,1), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK1);
         
         //attack2 animation
@@ -74,7 +74,7 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(3,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(4,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(5,2), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(6,2), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(6,2), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK2);
         
         //attack3 animation
@@ -83,7 +83,7 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(8,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(9,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(0,3), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(1,3), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(1,3), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK3);
         
         //attack4 animation
@@ -91,10 +91,11 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(2,3), getNanoSeconds(75));
         animation.add(getSpriteRectangle(3,3), getNanoSeconds(75));
         animation.add(getSpriteRectangle(4,3), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(5,3), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(5,3), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK4);
 
         //attack5 animation
+        /*
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(2,5), getNanoSeconds(75));
         animation.add(getSpriteRectangle(3,5), getNanoSeconds(75));
@@ -102,8 +103,9 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(5,5), getNanoSeconds(75));
         animation.add(getSpriteRectangle(6,5), getNanoSeconds(75));
         animation.add(getSpriteRectangle(7,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(8,5), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(8,5), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK5);
+        */
         
         //jump animation
         animation = new SpriteSheetAnimation();
@@ -164,12 +166,13 @@ public final class Donatello extends Hero implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(5,6), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(6,6), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(7,6), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(8,6), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(9,6), getNanoSeconds(150));
-        animation.add(getSpriteRectangle(0,7), getNanoSeconds(1500));
+        animation.add(getSpriteRectangle(4,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(5,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(6,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(7,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(8,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(9,8), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(0,9), getNanoSeconds(1500));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

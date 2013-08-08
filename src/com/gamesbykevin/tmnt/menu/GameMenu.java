@@ -147,7 +147,7 @@ public class GameMenu extends Menu
         layerMainTitle.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleBackground));
         layerMainTitle.setForce(false);
         layerMainTitle.setPause(true);
-        layerMainTitle.setTimer(new Timer(TimerCollection.toNanoSeconds(30000L)));
+        layerMainTitle.setTimer(new Timer(TimerCollection.toNanoSeconds(5000L)));
         layerMainTitle.add(OptionKey.StartGame,  this.optionStartGame);
         layerMainTitle.add(OptionKey.Option,     this.optionOptions);
         layerMainTitle.add(OptionKey.Control,    this.optionControls);
@@ -159,7 +159,7 @@ public class GameMenu extends Menu
         layerOption.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleBackground));
         layerOption.setForce(false);
         layerOption.setPause(true);
-        layerOption.setTimer(new Timer(TimerCollection.toNanoSeconds(30000L)));
+        layerOption.setTimer(new Timer(TimerCollection.toNanoSeconds(5000L)));
         
         layerOption.add(OptionKey.Sound,          this.optionSound);
         layerOption.add(OptionKey.FullScreen,     this.optionFullScreen);

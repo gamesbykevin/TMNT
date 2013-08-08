@@ -4,6 +4,7 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager;
 import com.gamesbykevin.tmnt.player.*;
+import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
 
 import java.awt.*;
 import java.util.List;
@@ -155,10 +156,44 @@ public class LevelManager
                 //right edge where hero can't go past
                 final int rightSide = screen.x + (int)(screen.width * .9);
 
+                //get temp anchor and make sure the hero doesn't go out of bounds
+                Rectangle tmpAnchor = hero.getAnchorLocation();
+
+                if (hero.isJumping())
+                    tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
+
+                //calculate future position and stop velocity if no longer in boundary
+                if (hero.getVelocityX() != VELOCITY_NONE)
+                {
+                    tmpAnchor.translate(hero.getVelocityX(), VELOCITY_NONE);
+
+                    if (!getLevel().getBoundary().contains(tmpAnchor))
+                    {
+                        tmpAnchor.translate(-hero.getVelocityX(), VELOCITY_NONE);
+                        hero.setVelocityX(VELOCITY_NONE);
+                    }
+                }
+                else
+                {
+                    if (!hero.isJumping())
+                    {
+                        tmpAnchor.translate(VELOCITY_NONE, hero.getVelocityY());
+
+                        if (!getLevel().getBoundary().contains(tmpAnchor))
+                        {
+                            tmpAnchor.translate(VELOCITY_NONE, -hero.getVelocityY());
+                            hero.setVelocityY(VELOCITY_NONE);
+                        }
+                    }
+                }
+                
                 //if the hero is moving east make sure they still stay on screen
                 if (hero.getVelocityX() > 0 && hero.getX() >= rightSide)
                 {
-                    if (!hasEnemies)
+                    //move temp anchor to check for collision before we scroll
+                    tmpAnchor.translate(hero.getVelocityX(), Player.VELOCITY_NONE);
+                    
+                    if (!hasEnemies && getLevel().getBoundary().contains(tmpAnchor))
                         getLevel().setScrollSpeed(hero.getVelocityX());
 
                     //stop level scroll if at end of level
@@ -175,6 +210,18 @@ public class LevelManager
                 if (hero.getVelocityX() < 0 && hero.getX() <= leftSide)
                 {
                     hero.setX(leftSide);
+                }
+                
+                List<Sprite> powerUps = getLevel().getPowerUps();
+                
+                for (int i=0; i < powerUps.size(); i++)
+                {
+                    if (tmpAnchor.intersects(powerUps.get(i).getRectangle()))
+                    {
+                        hero.resetHealth();
+                        powerUps.remove(i);
+                        i--;
+                    }
                 }
             }
             

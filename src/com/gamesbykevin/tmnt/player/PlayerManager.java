@@ -298,6 +298,8 @@ public class PlayerManager
                 hero.setLocation(r.x + hero.getWidth() + 1, r.y);
             }
             
+            hero.update(engine.getProjectileManager(), getPlayerEnemies(), engine.getKeyboard(), engine.getLevelManager().getLevel().getBoundary());
+            
             //if the death animation is complete and no more lives
             if (hero.isDeadComplete())
             {
@@ -319,8 +321,6 @@ public class PlayerManager
                     hero.setNewState(Player.State.IDLE);
                 }
             }
-            
-            hero.update(engine.getProjectileManager(), getPlayerEnemies(), engine.getKeyboard(), engine.getLevelManager().getLevel().getBoundary());
         }
         
         //make sure grunts are targeting heroes
@@ -387,27 +387,12 @@ public class PlayerManager
             }
             else
             {
-                boolean attackEast = false;
-                
-                //get attack side so other grunt can be assigned the other
-                if (tmp.size() == 1)
-                    attackEast = tmp.get(0).hasAttackEast();
-                
                 while (tmp.size() < 2 && unassigned.size() > 0)
                 {
                     final int randIndex = (int)(Math.random() * unassigned.size());
                     
                     if (!unassigned.get(randIndex).hasStep2() && !unassigned.get(randIndex).hasStep3())
                         unassigned.get(randIndex).setStep2(true);
-                    
-                    if (tmp.isEmpty())
-                    {
-                        attackEast = unassigned.get(randIndex).hasAttackEast();
-                    }
-                    else
-                    {
-                        unassigned.get(randIndex).setAttackEast(!attackEast);
-                    }
                     
                     unassigned.get(randIndex).setAssignment(hero.getType());
                     

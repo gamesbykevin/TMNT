@@ -32,9 +32,7 @@ public class ResourceManager
         FootSoldier1, FootSoldier2, FootSoldier3, FootSoldier4, 
         FootSoldier5, FootSoldier6, FootSoldier7, FootSoldier8, 
         FootSoldier9,
-        
         Donatello, Raphael, Leonardo, Michelangelo,
-        
         Boss1, Boss2, Boss3, Boss4, Boss5, Boss6
     }
     
@@ -46,7 +44,9 @@ public class ResourceManager
         Level4, Level4Background, 
         Level5, Level5Background, 
         Level6, Level6Background, 
-        Pizza
+        Pizza,
+        April,
+        DonInfo, RaphInfo, MikeInfo, LeoInfo
     }
     
     public enum MenuAudio

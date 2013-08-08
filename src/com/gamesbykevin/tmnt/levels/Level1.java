@@ -10,7 +10,7 @@ public final class Level1 extends Level implements LevelRules
 {
     public Level1()
     {
-        super(10, 8);
+        super(1, 5);
         
         setupDefaults();
     }
@@ -27,7 +27,7 @@ public final class Level1 extends Level implements LevelRules
     @Override
     public void setLevelBounds()
     {
-        int x[] = {0,   866, 879, 1160, 1191, 2304, 2392, 0};
+        int x[] = {0,   880, 892, 1135, 1154, 2304, 2392, 0};
         int y[] = {137, 137, 160,  160, 137, 137, 224, 224};
         
         //set the area that is in bounds

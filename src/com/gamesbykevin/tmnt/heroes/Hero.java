@@ -18,8 +18,8 @@ import java.util.List;
 
 public class Hero extends Player
 {
-    private static final int HEALTH_DEFAULT = 20;
-    private static final int LIVES_DEFAULT = 10;
+    private static final int HEALTH_DEFAULT = 10;
+    private static final int LIVES_DEFAULT = 5;
     
     public Hero()
     {

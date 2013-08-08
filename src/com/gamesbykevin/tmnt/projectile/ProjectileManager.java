@@ -22,9 +22,17 @@ public class ProjectileManager
     //the projectile speed will be a factor of the player walk speed
     private static final double PROJECTILE_SPEED_RATIO = 5;
     
+    //the amount of existing projectiles at one time
+    private static final int PROJECTILE_LIMIT = 2;
+    
     public ProjectileManager()
     {
         this.projectiles = new ArrayList<>();
+    }
+    
+    public boolean canAddProjectile()
+    {
+        return (projectiles.size() < PROJECTILE_LIMIT);
     }
     
     public boolean hasProjectile(GamePlayers type)
@@ -120,6 +128,7 @@ public class ProjectileManager
                     if (anchorProjectile.intersects(anchorHero) && projectile.getRectangle().contains(target.getCenter()))
                     {
                         target.setNewState(Player.State.HURT);
+                        target.deductHealth();
 
                         //check if there is an additional animation now that the projectile has hit
                         if (projectile.getSpriteSheet().hasAnimation(Player.State.PROJECTILE1_FINISH))

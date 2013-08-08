@@ -262,7 +262,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Graphics renderGame(Graphics2D g2d) throws Exception
     {
         Font tmpFont = g2d.getFont();
-        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 18));
+        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 12));
         
         if (this.playerManager != null && this.levelManager != null && this.projectileManager != null)
         {

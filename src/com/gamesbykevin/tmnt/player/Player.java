@@ -63,9 +63,6 @@ public abstract class Player extends Sprite
     //number of frames to execute jump
     public static final int NUM_FRAMES_JUMP = 30;
     
-    //if the player is out of bounds we reset their location to this
-    private Point previousLocation;
-    
     public Player()
     {
         //create sprite sheet
@@ -93,6 +90,11 @@ public abstract class Player extends Sprite
     private boolean hasHealth()
     {
         return (getHealth() > 0);
+    }
+    
+    public void resetHealth()
+    {
+        setHealth(getHealthDefault());
     }
     
     /**
@@ -194,7 +196,7 @@ public abstract class Player extends Sprite
      * This will contain the Y peak coordinate
      * @return Point with the Y coordinate where we the jump has peaked and we need to start declining
      */
-    protected Point getJumpPhase1()
+    public Point getJumpPhase1()
     {
         return this.jumpPhase1;
     }
@@ -212,7 +214,7 @@ public abstract class Player extends Sprite
      * This will contain the Y finish coordinate
      * @return Point with the Y coordinate where we need to stop the jumping at
      */
-    protected Point getJumpPhase2()
+    public Point getJumpPhase2()
     {
         return this.jumpPhase2;
     }
@@ -319,37 +321,9 @@ public abstract class Player extends Sprite
      */
     public void update(final ProjectileManager projectileManager, final List<Player> players, final Polygon boundary) throws Exception
     {
-        if (!isJumping())
-        {
-            //make note of last valid location in case player is out of bounds
-            if (boundary.contains(getAnchorLocation()))
-                previousLocation = super.getPoint();
-        }
-        else
-        {
-            
-        }
-        
         getSpriteSheet().update();
         super.update();
         
-        updateMisc(projectileManager, players);
-        
-        //now that update has been called make sure we are still within the boundary
-        if (!isJumping())
-        {
-            //if the player is not jumping their anchor location needs to be inside the level boundary
-            if (previousLocation != null && !boundary.contains(getAnchorLocation()))
-                super.setLocation(previousLocation);
-        }
-        else
-        {
-            
-        }
-    }
-    
-    private void updateMisc(final ProjectileManager projectileManager, final List<Player> players)
-    {
         if (isJumping())
         {
             //have we reached the peak of our jump
@@ -389,7 +363,7 @@ public abstract class Player extends Sprite
         {
             //NOTE THIS MAY NEED TO CHANGE FOR THE BOSSES AS ROCKSTEADY CAN FIRE MULTIPLE BULLETS
             //if the player can throw a projectile but does not have one currently
-            if (hasState(State.THROW_PROJECTILE) && !projectileManager.hasProjectile(getType()))
+            if (hasState(State.THROW_PROJECTILE) && !projectileManager.hasProjectile(getType()) && projectileManager.canAddProjectile())
             {
                 canThrow = true;
             }
@@ -408,6 +382,7 @@ public abstract class Player extends Sprite
             if (getState() != State.DEAD)
             {
                 deductLife();
+                setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 setNewState(State.DEAD);
                 
                 if (hasLives())

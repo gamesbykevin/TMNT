@@ -10,7 +10,7 @@ public final class Level4 extends Level implements LevelRules
 {
     public Level4()
     {
-        super(10, 7);
+        super(10, 6);
         
         setupDefaults();
     }
