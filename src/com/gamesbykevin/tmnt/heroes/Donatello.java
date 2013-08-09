@@ -17,7 +17,7 @@ public final class Donatello extends Hero implements PlayerRules
      */
     public Donatello()
     {
-        super.setType(GamePlayers.Donatello);
+        super(GamePlayers.Donatello);
         
         //all default settings for this player
         setupDefaults();

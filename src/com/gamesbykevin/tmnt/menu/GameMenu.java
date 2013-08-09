@@ -162,6 +162,7 @@ public class GameMenu extends Menu
         
         layerOption = new Layer(Layer.Type.SCROLL_HORIZONTAL_WEST_REPEAT, screen);
         layerOption.setTitle("Options");
+        //layerOption.setSound(null);
         layerOption.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleBackground));
         layerOption.setForce(false);
         layerOption.setPause(true);

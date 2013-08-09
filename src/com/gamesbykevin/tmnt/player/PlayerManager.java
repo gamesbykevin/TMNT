@@ -7,10 +7,10 @@ import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.main.ResourceManager.LevelMisc;
-import java.awt.Color;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -338,7 +338,14 @@ public class PlayerManager
                 grunt.setImage(engine.getResources().getGamePlayer(grunt.getType()));
                 grunt.setDelay(engine.getMain().getTimeDeductionPerFrame());
                 grunt.setDimensions();
-                grunt.setLocation(engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt.getHeight()));
+                
+                final Point start = engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt.getWidth(), grunt.getHeight());
+                grunt.setLocation(start);
+                
+                final Rectangle screen = engine.getMain().getScreen();
+                final boolean rightSide = start.x >= screen.x + screen.width;
+                
+                grunt.setAttackEast(!rightSide);
             }
             
             grunt.update(engine.getProjectileManager(), getPlayerHeroes(), engine.getLevelManager().getLevel().getBoundary());
@@ -357,63 +364,47 @@ public class PlayerManager
      */
     private void updateEnemyStrategy()
     {
-        //make sure there are enough grunts assigned to each player
+        //enemies that are not assigned a target
+        List<Grunt> unassigned = getEnemyUnassigned();
+        
+        //assign a target to every enemy
+        for (Grunt grunt : unassigned)
+        {
+            grunt.setAssignment((heroes.get((int)(Math.random() * heroes.size()))).getType());
+        }
+        
+        unassigned.clear();
+        
+        //check every hero and make sure a certain number of enemies are trying to attack each one
         for (Hero hero : heroes)
         {
+            //get list of enemies that are targeting this hero
             List<Grunt> tmp = getEnemyTargets(hero.getType());
-            List<Grunt> unassigned = getEnemyUnassigned();
             
-            //if there are at least 2 assigned to target hero 
-            if (tmp.size() >= 2)
+            int count = 0;
+
+            for (int i=0; i < tmp.size(); i++)
             {
-                int count = 0;
-                
-                for (int i=0; i < tmp.size(); i++)
+                //this grunt is attacking or getting close to attacking
+                if (tmp.get(i).hasStep2() || tmp.get(i).hasStep3())
                 {
-                    if (tmp.get(i).hasStep2() || tmp.get(i).hasStep3())
-                    {
-                        count++;
-                        tmp.remove(i);
-                    }
-                }
-                
-                while(count < 2)
-                {
-                    final int randomIndex = (int)(Math.random() * tmp.size());
-                    
-                    tmp.get(randomIndex).setStep2(true);
-                    tmp.remove(randomIndex);
-                    
                     count++;
+                    tmp.remove(i);
                 }
             }
-            else
+
+            //we want at least 2 enemies attacking at any time if possible
+            while(count < 2 && tmp.size() > 0)
             {
-                while (tmp.size() < 2 && unassigned.size() > 0)
-                {
-                    final int randIndex = (int)(Math.random() * unassigned.size());
-                    
-                    if (!unassigned.get(randIndex).hasStep2() && !unassigned.get(randIndex).hasStep3())
-                        unassigned.get(randIndex).setStep2(true);
-                    
-                    unassigned.get(randIndex).setAssignment(hero.getType());
-                    
-                    tmp.add(unassigned.get(randIndex));
-                    
-                    unassigned.remove(randIndex);
-                }
+                final int randomIndex = (int)(Math.random() * tmp.size());
+
+                tmp.get(randomIndex).setStep2(true);
+                tmp.remove(randomIndex);
+
+                count++;
             }
             
             tmp.clear();
-            unassigned.clear();
-        }
-        
-        List<Grunt> unassigned = getEnemyUnassigned();
-        
-        //set remaining grunts to random heroes
-        for (Grunt grunt : unassigned)
-        {
-            grunt.setAssignment(heroes.get((int)(Math.random() * heroes.size())).getType());
         }
     }
     

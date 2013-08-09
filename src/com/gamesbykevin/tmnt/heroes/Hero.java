@@ -5,6 +5,7 @@ import com.gamesbykevin.framework.input.Keyboard;
 import com.gamesbykevin.tmnt.grunt.Grunt;
 import com.gamesbykevin.tmnt.levels.Level;
 import com.gamesbykevin.tmnt.main.ResourceManager;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 import java.awt.Color;
@@ -21,8 +22,10 @@ public class Hero extends Player
     private static final int HEALTH_DEFAULT = 10;
     private static final int LIVES_DEFAULT = 5;
     
-    public Hero()
+    public Hero(final GamePlayers type)
     {
+        super(type);
+        
         //all heroes will have the same health and lives
         super.setHealthDefault(HEALTH_DEFAULT);
         super.setLives(LIVES_DEFAULT);

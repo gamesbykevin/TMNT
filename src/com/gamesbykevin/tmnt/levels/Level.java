@@ -85,7 +85,7 @@ public abstract class Level extends Sprite
      * @param playerHeight We need the height to aid picking a random location
      * @return 
      */
-    public Point getStart(final Rectangle screen, final int playerHeight)
+    public Point getStart(final Rectangle screen, final int playerWidth, final int playerHeight)
     {
         //the extra part we will check on each side
         final int extraWidth = (int)(screen.getWidth() * .2);
@@ -113,7 +113,7 @@ public abstract class Level extends Sprite
             tmp = eastSide.getBounds();
         
         //if the west side in not a possibility then they have to spawn from the east side
-        if (westSide.getBounds().getWidth() < 1)
+        if (westSide.getBounds().getWidth() < 1 || westSide.getBounds().x - playerWidth < 0)
             tmp = eastSide.getBounds();
         
         //if the east side in not a possibility then they have to spawn from the west side
@@ -268,7 +268,7 @@ public abstract class Level extends Sprite
             
             if (total > 0)
             {
-                final int eachCheckpointLength = (getWidth() / total);
+                final int eachCheckpointLength = (int)((getWidth() / total) * .75);
 
                 while (checkpoints.size() < total)
                 {
@@ -282,16 +282,19 @@ public abstract class Level extends Sprite
     /**
      * Checks current scroll location to see if we have past a checkpoint.
      * If check point is found remove check point and return true
+     * 
+     * @param playerWidth extra pixels to account for
+     * 
      * @return boolean
      */
-    public boolean hasCheckpoint()
+    public boolean hasCheckpoint(final int playerWidth)
     {
         Rectangle r = getBoundary().getBounds();
         
         for (int i=0; i < checkpoints.size(); i++)
         {
             //if the scroll x coordinate has past a check point 
-            if (r.x + r.width < checkpoints.get(i))
+            if (r.x + r.width < checkpoints.get(i) + playerWidth)
             {
                 //reset counter
                 resetEnemiesCreatedAtCheckpoint();

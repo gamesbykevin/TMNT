@@ -1,9 +1,12 @@
 package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
+
+import com.gamesbykevin.tmnt.grunt.Grunt;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager;
 import com.gamesbykevin.tmnt.player.*;
+
 import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
 
 import java.awt.*;
@@ -32,6 +35,18 @@ public class LevelManager
     public Level getLevel()
     {
         return this.level;
+    }
+    
+    /**
+     * Checks if the scroll boundary has reached the end
+     * 
+     * @param screen Window user can see
+     * @param extraPixels Extra player pixels to account in the boundary
+     * @return boolean
+     */
+    public boolean hasFinished(final Rectangle screen)
+    {
+        return (screen.x + screen.width > getLevel().getEastBoundsX() - (screen.width / 3));
     }
     
     /**
@@ -145,8 +160,14 @@ public class LevelManager
             //doesn't matter if enemy is dead
             boolean hasEnemies = (players.getEnemies().size() > 0);
             
+            //get hero with the most width
+            int mostWidth = 0;
+            
             for (Hero hero : players.getHeroes())
             {
+                if (hero.getWidth() > mostWidth)
+                    mostWidth = hero.getWidth() + 1;
+                
                 //default the scroll speed to 0 before we check
                 getLevel().setScrollSpeed(Player.VELOCITY_NONE);
 
@@ -164,7 +185,7 @@ public class LevelManager
                 {
                     tmpAnchor.translate(hero.getVelocityX(), VELOCITY_NONE);
 
-                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                    if (!getLevel().getBoundary().contains(tmpAnchor) || !screen.contains(tmpAnchor))
                     {
                         tmpAnchor.translate(-hero.getVelocityX(), VELOCITY_NONE);
                         hero.setVelocityX(VELOCITY_NONE);
@@ -176,7 +197,7 @@ public class LevelManager
                     {
                         tmpAnchor.translate(VELOCITY_NONE, hero.getVelocityY());
 
-                        if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                        if (!getLevel().getBoundary().contains(tmpAnchor)) // || !screen.contains(tmpAnchor))
                         {
                             tmpAnchor.translate(VELOCITY_NONE, -hero.getVelocityY());
                             hero.setVelocityY(VELOCITY_NONE);
@@ -213,8 +234,36 @@ public class LevelManager
                 }
             }
             
+            for (Grunt grunt : players.getEnemies())
+            {
+                //get temp anchor and make sure the hero doesn't go out of bounds
+                Rectangle tmpAnchor = grunt.getAnchorLocation();
+
+                //calculate future position and stop velocity if no longer in boundary
+                if (grunt.getVelocityX() != VELOCITY_NONE)
+                {
+                    tmpAnchor.translate(grunt.getVelocityX(), VELOCITY_NONE);
+
+                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                    {
+                        tmpAnchor.translate(-grunt.getVelocityX(), VELOCITY_NONE);
+                        grunt.setVelocityX(VELOCITY_NONE);
+                    }
+                }
+                else
+                {
+                    tmpAnchor.translate(VELOCITY_NONE, grunt.getVelocityY());
+
+                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                    {
+                        tmpAnchor.translate(VELOCITY_NONE, -grunt.getVelocityY());
+                        grunt.setVelocityY(VELOCITY_NONE);
+                    }
+                }
+            }
+            
             //check for adding enemies if we hit a check point of if there are existing enemies on the screen
-            final boolean checkAddEnemies = (!hasEnemies && getLevel().hasCheckpoint() || hasEnemies);
+            final boolean checkAddEnemies = (!hasEnemies && getLevel().hasCheckpoint(mostWidth) || hasEnemies);
             
             if (checkAddEnemies)
             {
@@ -259,7 +308,7 @@ public class LevelManager
         }
         
         //if scroll screen is to be displayed the image will not be null
-        if (display)
+        if (display && !hasFinished(screen))
         {
             final int x = screen.x + screen.width - image.getWidth(null);
             final int y = screen.y + (screen.height / 2) - (image.getHeight(null) / 2);

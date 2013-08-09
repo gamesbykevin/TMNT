@@ -16,15 +16,17 @@ public class Grunt extends Player
     private GamePlayers assigned;
     
     //the direction the player will attempt to attack from if not east then west
-    private boolean attackEast = (Math.random() > .5);
+    private boolean attackEast;
     
     private boolean step1 = true, step2 = false, step3 = false;
     
     private static final int HEALTH_DEFAULT = 4;
     private static final int LIVES_DEFAULT = 0;
     
-    public Grunt()
+    public Grunt(GamePlayers type)
     {
+        super(type);
+        
         super.setHealthDefault(HEALTH_DEFAULT);
         super.setLives(LIVES_DEFAULT);
         

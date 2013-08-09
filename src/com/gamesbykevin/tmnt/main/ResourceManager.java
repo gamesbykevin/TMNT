@@ -33,7 +33,7 @@ public class ResourceManager
         FootSoldier5, FootSoldier6, FootSoldier7, FootSoldier8, 
         FootSoldier9,
         Donatello, Raphael, Leonardo, Michelangelo,
-        Boss1, Boss2, Boss3, Boss4, Boss5, Boss6
+        Slash, Krang, Leatherhead, Bebop, Shredder, Rocksteady
     }
     
     public enum LevelMisc
@@ -44,9 +44,9 @@ public class ResourceManager
         Level4, Level4Background, 
         Level5, Level5Background, 
         Level6, Level6Background, 
-        Pizza,
-        April,
-        DonInfo, RaphInfo, MikeInfo, LeoInfo
+        Pizza, 
+        April, 
+        DonInfo, RaphInfo, MikeInfo, LeoInfo 
     }
     
     public enum MenuAudio
@@ -190,7 +190,7 @@ public class ResourceManager
         getResources(Type.GameAudioMusic).stopAllAudio();
     }
     
-    public void update(final Class source) 
+    public void update(final Class source) throws Exception
     {
         Object[] keys = everyResource.keySet().toArray();
         

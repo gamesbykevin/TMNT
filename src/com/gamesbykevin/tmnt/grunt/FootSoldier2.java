@@ -16,7 +16,7 @@ public final class FootSoldier2 extends Grunt implements PlayerRules
      */
     public FootSoldier2()
     {
-        super.setType(GamePlayers.FootSoldier2);
+        super(GamePlayers.FootSoldier2);
         
         //all default settings for this player
         setupDefaults();
@@ -55,7 +55,7 @@ public final class FootSoldier2 extends Grunt implements PlayerRules
         
         //throw projectile animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(700));
+        animation.add(getSpriteRectangle(3,2), getNanoSeconds(800));
         animation.add(getSpriteRectangle(0,0), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.THROW_PROJECTILE);
         

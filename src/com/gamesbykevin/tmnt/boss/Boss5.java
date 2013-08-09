@@ -1,7 +1,9 @@
 package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
+
 import com.gamesbykevin.tmnt.grunt.Grunt;
+import static com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
 public class Boss5 extends Grunt implements PlayerRules
@@ -16,6 +18,8 @@ public class Boss5 extends Grunt implements PlayerRules
      */
     public Boss5()
     {
+        super(GamePlayers.Shredder);
+        
         //all default settings for this player
         setupDefaults();
     }

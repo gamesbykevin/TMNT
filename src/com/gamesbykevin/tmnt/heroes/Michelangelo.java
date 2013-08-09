@@ -17,7 +17,7 @@ public final class Michelangelo extends Hero implements PlayerRules
      */
     public Michelangelo()
     {
-        super.setType(GamePlayers.Michelangelo);
+        super(GamePlayers.Michelangelo);
         
         //all default settings for this player
         setupDefaults();

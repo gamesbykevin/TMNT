@@ -17,7 +17,7 @@ public final class Leonardo extends Hero implements PlayerRules
      */
     public Leonardo()
     {
-        super.setType(GamePlayers.Leonardo);
+        super(GamePlayers.Leonardo);
         
         //all default settings for this player
         setupDefaults();

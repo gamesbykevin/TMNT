@@ -17,7 +17,7 @@ public final class Raphael extends Hero implements PlayerRules
      */
     public Raphael()
     {
-        super.setType(GamePlayers.Raphael);
+        super(GamePlayers.Raphael);
         
         //all default settings for this player
         setupDefaults();

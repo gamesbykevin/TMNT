@@ -63,8 +63,10 @@ public abstract class Player extends Sprite
     //number of frames to execute jump
     public static final int NUM_FRAMES_JUMP = 30;
     
-    public Player()
+    public Player(final GamePlayers type)
     {
+        setType(type);
+        
         //create sprite sheet
         super.createSpriteSheet();
         
@@ -132,7 +134,7 @@ public abstract class Player extends Sprite
         return (this.lives > 0);
     }
     
-    public void setType(final GamePlayers type)
+    private void setType(final GamePlayers type)
     {
         this.type = type;
     }

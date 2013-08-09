@@ -16,7 +16,7 @@ public final class FootSoldier5 extends Grunt implements PlayerRules
      */
     public FootSoldier5()
     {
-        super.setType(GamePlayers.FootSoldier5);
+        super(GamePlayers.FootSoldier5);
         
         //all default settings for this player
         setupDefaults();
