@@ -3,7 +3,7 @@ package com.gamesbykevin.tmnt.levels;
 import java.awt.Polygon;
 
 /**
- * Specifications for Level1
+ * Specifications for Level 3
  * @author GOD
  */
 public final class Level3 extends Level implements LevelRules

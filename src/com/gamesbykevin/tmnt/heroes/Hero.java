@@ -172,12 +172,14 @@ public class Hero extends Player
         
         for (int i=0; i < super.getHealth(); i++)
         {
-            result += "I";
+            result += "|";
         }
         
-        result += "  " + super.getLives();
-        
         g.drawString(result, x, y);
+        
+        final int width = g.getFontMetrics().stringWidth("IIIIIIII");
+        
+        g.drawString(super.getLives() + "", x + width, y - (int)(g.getFontMetrics().getHeight() * 1.2));
         
         return g;
     }

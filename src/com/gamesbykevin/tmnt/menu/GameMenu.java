@@ -79,6 +79,12 @@ public class GameMenu extends Menu
         optionLives.add("7", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         optionLives.add("8", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         optionLives.add("9", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("10", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("11", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("12", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("13", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("14", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("15", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         
         optionFullScreen = new Option("FullScreen: ");
         optionFullScreen.add("Off",resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));

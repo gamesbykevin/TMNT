@@ -20,9 +20,6 @@ public class LevelManager
     //scroll speed when auto scroll is enabled
     private static final int SCROLL_SPEED = 10;
     
-    //how many powerups can each level have
-    public static final int POWERUP_LIMIT = 2;
-    
     public LevelManager()
     {
         
@@ -112,7 +109,7 @@ public class LevelManager
         }
         
         //there is only 1 unique power up and all levels will get power ups, so add them now 
-        level.createPowerUps(resources.getLevelObject(ResourceManager.LevelMisc.Pizza));
+        level.createPowerUps(resources.getLevelObject(ResourceManager.LevelMisc.Pizza), screen);
     }
     
     /**
@@ -154,7 +151,7 @@ public class LevelManager
                 getLevel().setScrollSpeed(Player.VELOCITY_NONE);
 
                 //right edge where hero can't go past
-                final int rightSide = screen.x + (int)(screen.width * .9);
+                final int rightSide = screen.x + (int)(screen.width * .8);
 
                 //get temp anchor and make sure the hero doesn't go out of bounds
                 Rectangle tmpAnchor = hero.getAnchorLocation();
@@ -167,7 +164,7 @@ public class LevelManager
                 {
                     tmpAnchor.translate(hero.getVelocityX(), VELOCITY_NONE);
 
-                    if (!getLevel().getBoundary().contains(tmpAnchor))
+                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
                     {
                         tmpAnchor.translate(-hero.getVelocityX(), VELOCITY_NONE);
                         hero.setVelocityX(VELOCITY_NONE);
@@ -179,7 +176,7 @@ public class LevelManager
                     {
                         tmpAnchor.translate(VELOCITY_NONE, hero.getVelocityY());
 
-                        if (!getLevel().getBoundary().contains(tmpAnchor))
+                        if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
                         {
                             tmpAnchor.translate(VELOCITY_NONE, -hero.getVelocityY());
                             hero.setVelocityY(VELOCITY_NONE);
@@ -203,15 +200,6 @@ public class LevelManager
                     hero.setX(rightSide);
                 }
 
-                //left edge where hero can't go past
-                final int leftSide = screen.x + (int)(screen.width * .1);
-
-                //if the hero is moving west make sure they still stay on screen
-                if (hero.getVelocityX() < 0 && hero.getX() <= leftSide)
-                {
-                    hero.setX(leftSide);
-                }
-                
                 List<Sprite> powerUps = getLevel().getPowerUps();
                 
                 for (int i=0; i < powerUps.size(); i++)
@@ -243,15 +231,9 @@ public class LevelManager
                         getLevel().addEnemiesCreatedAtCheckpoint();
                     }
                 }
-                else
-                {
-                    //we have defeated all enemies and will be able to continue forward
-                    
-                    //NOTE MAYBE HERE WE CAN ADD A GIF OF APRIL AND SHE WILL BE DISPLAYED ON/OFF EVERY SECOND UNTIL NEXT CHECK POINT
-                }
             }
             
-            //no more checkpoints need to add boss
+            //no more check points so hero has reached end of level
             if (getLevel().getCheckpointCount() < 1)
             {
                 
@@ -259,11 +241,30 @@ public class LevelManager
         }
     }
     
-    public Graphics render(Graphics g)
+    /**
+     * Draw Level and Level Objects. Will
+     * also draw an image so the user 
+     * knows more scrolling is needed.
+     * 
+     * @param g Graphics objects will be drawn to
+     * @param image Image to draw if more scrolling is needed
+     * @param screen The portion of the window that displays the game
+     * @return Graphics
+     */
+    public Graphics render(final Graphics g, final boolean display, final Image image, final Rectangle screen)
     {
         if (level != null)
         {
             level.render(g);
+        }
+        
+        //if scroll screen is to be displayed the image will not be null
+        if (display)
+        {
+            final int x = screen.x + screen.width - image.getWidth(null);
+            final int y = screen.y + (screen.height / 2) - (image.getHeight(null) / 2);
+            
+            g.drawImage(image, x, y, null);
         }
         
         return g;

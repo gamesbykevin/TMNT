@@ -5,6 +5,7 @@ import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.levels.*;
+import com.gamesbykevin.tmnt.main.ResourceManager.LevelMisc;
 import com.gamesbykevin.tmnt.menu.GameMenu;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
@@ -111,11 +112,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                 {
                     //MAIN GAME LOGIC RUN HERE
                     
-                    if (playerManager != null)
+                    if (getPlayerManager() != null)
                     {
-                        this.projectileManager.update(getMain().getScreen(), playerManager.getAllPlayers());
-                        this.playerManager.update(this);
-                        this.levelManager.update(playerManager, main.getScreen());
+                        getProjectileManager().update(getMain().getScreen(), getPlayerManager().getAllPlayers());
+                        getPlayerManager().update(this);
+                        getLevelManager().update(getPlayerManager(), main.getScreen());
                     }
                 }
                 
@@ -132,6 +133,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     public LevelManager getLevelManager()
     {
         return this.levelManager;
+    }
+    
+    public PlayerManager getPlayerManager()
+    {
+        return this.playerManager;
     }
     
     public ProjectileManager getProjectileManager()
@@ -262,24 +268,24 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Graphics renderGame(Graphics2D g2d) throws Exception
     {
         Font tmpFont = g2d.getFont();
-        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 12));
+        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 8));
         
-        if (this.playerManager != null && this.levelManager != null && this.projectileManager != null)
+        if (getPlayerManager() != null && getLevelManager() != null && getProjectileManager() != null)
         {
             //draw the level first
-            this.levelManager.render(g2d);
+            getLevelManager().render(g2d, getPlayerManager().getEnemies().size() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
             
             //all objects will be contained in this list and sorted so the lowest y value is drawn first
             List<Sprite> levelObjects = new ArrayList<>();
         
             //add all level related objects to List
-            levelManager.addAllStageObjects(levelObjects);
+            getLevelManager().addAllStageObjects(levelObjects);
             
             //add all player related objects to List
-            playerManager.addAllPlayerObjects(levelObjects);
+            getPlayerManager().addAllPlayerObjects(levelObjects);
         
             //add all of the projectiles to List
-            projectileManager.addAllProjectiles(levelObjects);
+            getProjectileManager().addAllProjectiles(levelObjects);
             
             for (int i=0; i < levelObjects.size(); i++)
             {
@@ -321,7 +327,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             levelObjects.clear();
             
             //draw hero health bars, etc..
-            playerManager.render(g2d, getMain().getScreen());
+            getPlayerManager().render(g2d, getMain().getScreen(), resources);
         }
         
         g2d.setFont(tmpFont);

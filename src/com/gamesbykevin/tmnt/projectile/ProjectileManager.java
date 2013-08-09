@@ -59,6 +59,10 @@ public class ProjectileManager
     
     public void add(final Player sprite)
     {
+        //make sure we don't have too many projectiles already
+        if (!canAddProjectile())
+            return;
+            
         Projectile projectile = new Projectile(sprite.getType());
         projectile.createSpriteSheet();
         projectile.setLocation(sprite.getX(), sprite.getY());

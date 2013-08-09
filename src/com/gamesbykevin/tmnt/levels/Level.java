@@ -40,6 +40,12 @@ public abstract class Level extends Sprite
     //total number of enemies that can be on the screen at the same time
     private int enemiesAtOnce;
     
+    //how many powerups will the level have by default
+    private static final int POWERUP_LIMIT_DEFAULT = 2;
+    
+    //how many power ups will this level have
+    private int powerUpLimit = POWERUP_LIMIT_DEFAULT;
+    
     /**
      * Create new Level
      * 
@@ -50,6 +56,20 @@ public abstract class Level extends Sprite
     {
         this.enemiesPerCheckpoint = enemiesPerCheckpoint;
         this.enemiesAtOnce        = enemiesAtOnce;
+    }
+    
+    /**
+     * Set the power up limit for this level
+     * @param powerUpLimit  Number of power ups we will have
+     */
+    public void setPowerUpLimit(final int powerUpLimit)
+    {
+        this.powerUpLimit = powerUpLimit;
+    }
+    
+    private int getPowerUpLimit()
+    {
+        return this.powerUpLimit;
     }
     
     /**
@@ -86,23 +106,36 @@ public abstract class Level extends Sprite
         
         Rectangle tmp;
         
+        //pick the random side to spawn
         if (Math.random() > .5)
             tmp = westSide.getBounds();
         else
             tmp = eastSide.getBounds();
         
+        //if the west side in not a possibility then they have to spawn from the east side
         if (westSide.getBounds().getWidth() < 1)
             tmp = eastSide.getBounds();
+        
+        //if the east side in not a possibility then they have to spawn from the west side
         if (eastSide.getBounds().getWidth() < 1)
             tmp = westSide.getBounds();
         
         //random coordinates inside Rectangle
-        final int randX = (int)(Math.random() * tmp.getWidth()) + tmp.x;
+        final int randomX = (int)(Math.random() * tmp.getWidth()) + tmp.x;
         
-        //offset the height when calculating the y coordinate
-        final int randY = (int)(Math.random() * tmp.getHeight()) + tmp.y - (playerHeight / 2);
+        List<Integer> possibilities = new ArrayList<>();
+
+        for (int y = screen.y; y < screen.y + screen.height - (playerHeight / 2); y++)
+        {
+            if (getBoundary().contains(randomX, y))
+                possibilities.add(y);
+        }
+
+        //get random y coordinate
+        final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
         
-        return new Point(randX, randY);
+        
+        return new Point(randomX, randomY);
     }
     
     /**
@@ -155,7 +188,7 @@ public abstract class Level extends Sprite
      * @param image The image of the power up
      * @throws Exception 
      */
-    public void createPowerUps(final Image image) throws Exception
+    public void createPowerUps(final Image image, final Rectangle screen) throws Exception
     {
         if (getWidth() <= 0)
         {
@@ -171,33 +204,47 @@ public abstract class Level extends Sprite
             {
                 powerUps = new ArrayList<>();
                 
-                //each powerup will have its own section and can be anywhere in that section at random
-                final int eachSectionWidth = (getWidth() / LevelManager.POWERUP_LIMIT);
+                //each powerup will be placed in a different area
+                final int eachSectionWidth = (int)((getWidth() / getPowerUpLimit()) * .9);
                 
                 //continue to loop until we have reached our limit
-                while (powerUps.size() < LevelManager.POWERUP_LIMIT)
+                while (powerUps.size() < getPowerUpLimit())
                 {
                     Sprite powerUp = new Sprite();
                     
                     //set the powerup image
                     powerUp.setImage(image);
-                    powerUp.setDimensions(image.getWidth(null),image.getHeight(null));
+                    powerUp.setDimensions(image.getWidth(null), image.getHeight(null));
                     
                     //set auto size to true so the dimensions will be set automatically based on the image width/height
                     powerUp.setAutoSize(true);
                     
                     //now choose a random location
-                    final int randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
+                    final int randomX;
                     
-                    int startY = getBoundary().getBounds().y + (powerUp.getHeight() / 2);
-                    
-                    while (!getBoundary().contains(randomX, startY))
+                    //if the first power up make adjustment so it doesn't appear on initial screen
+                    if (powerUps.size() < 1)
                     {
-                        startY++;
+                        randomX = (int)(Math.random() * (eachSectionWidth - screen.width)) + screen.width;
+                    }
+                    else
+                    {
+                        randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
+                    }
+
+                    List<Integer> possibilities = new ArrayList<>();
+                    
+                    for (int y = screen.y; y < screen.y + screen.height; y++)
+                    {
+                        if (getBoundary().contains(randomX, y))
+                            possibilities.add(y);
                     }
                     
+                    //get random y coordinate
+                    final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
+                    
                     //set random location
-                    powerUp.setLocation(randomX, startY);
+                    powerUp.setLocation(randomX, randomY);
                     
                     //add powerup to list
                     powerUps.add(powerUp);

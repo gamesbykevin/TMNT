@@ -6,9 +6,11 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.ResourceManager.LevelMisc;
 import java.awt.Color;
 
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -420,14 +422,41 @@ public class PlayerManager
      * @param g Graphics object we write the information to
      * @return Graphics
      */
-    public Graphics render(Graphics g, final Rectangle screen)
+    public Graphics render(Graphics g, final Rectangle screen, final ResourceManager resources)
     {
         int x = (int)((screen.width  * .05) + screen.x);
         int y = (int)((screen.height * .1) + screen.y);
         
         for (Hero hero : heroes)
         {
-            hero.renderHealthInformation(g, x, y);
+            final Image image;
+            
+            switch (hero.getType())
+            {
+                case Donatello:
+                    image = resources.getLevelObject(LevelMisc.DonInfo);
+                    break;
+                    
+                case Leonardo: 
+                    image = resources.getLevelObject(LevelMisc.LeoInfo);
+                    break;
+                    
+                case Raphael: 
+                    image = resources.getLevelObject(LevelMisc.RaphInfo);
+                    break;
+                    
+                case Michelangelo: 
+                    image = resources.getLevelObject(LevelMisc.MikeInfo);
+                    break;
+                    
+                default:
+                    image = resources.getLevelObject(LevelMisc.LeoInfo);
+                    break;
+            }
+            
+            g.drawImage(image, x, y, null);
+            
+            hero.renderHealthInformation(g, x + (int)(image.getWidth(null) * .05), y + image.getHeight(null) - (int)(image.getHeight(null) * .15));
             
             x += (screen.width / heroes.size());
         }
