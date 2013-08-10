@@ -63,6 +63,8 @@ public abstract class Player extends Sprite
     //number of frames to execute jump
     public static final int NUM_FRAMES_JUMP = 30;
     
+    public static final double ANCHOR_HEIGHT_RATIO = .1;
+    
     public Player(final GamePlayers type)
     {
         setType(type);
@@ -657,7 +659,7 @@ public abstract class Player extends Sprite
         sprite.setX(sprite.getX() - halfWidth);
         sprite.setY(sprite.getY() - halfHeight);
         
-        Rectangle tmp = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * .1), sprite.getWidth(), (int)(sprite.getHeight() * .1));
+        Rectangle tmp = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * ANCHOR_HEIGHT_RATIO), sprite.getWidth(), (int)(sprite.getHeight() * ANCHOR_HEIGHT_RATIO));
         
         sprite.setX(sprite.getX() + halfWidth);
         sprite.setY(sprite.getY() + halfHeight);

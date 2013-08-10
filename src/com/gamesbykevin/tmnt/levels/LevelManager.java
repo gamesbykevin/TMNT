@@ -178,7 +178,10 @@ public class LevelManager
                 Rectangle tmpAnchor = hero.getAnchorLocation();
 
                 if (hero.isJumping())
-                    tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
+                {
+                    //tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
+                    tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2) - (int)(hero.getHeight() * Player.ANCHOR_HEIGHT_RATIO);
+                }
 
                 //calculate future position and stop velocity if no longer in boundary
                 if (hero.getVelocityX() != VELOCITY_NONE)

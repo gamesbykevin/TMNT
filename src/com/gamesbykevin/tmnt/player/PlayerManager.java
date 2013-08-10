@@ -297,7 +297,7 @@ public class PlayerManager
                 
                 final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
                 
-                hero.setLocation(r.x + hero.getWidth() + 1, r.y);
+                hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
             }
             
             hero.update(engine.getProjectileManager(), getPlayerEnemies(), engine.getKeyboard(), engine.getLevelManager().getLevel().getBoundary());
@@ -326,7 +326,7 @@ public class PlayerManager
         }
         
         //make sure grunts are targeting heroes
-        updateEnemyStrategy();
+        updateEnemyStrategy(engine.getMain().getScreen());
         
         for (int i=0; i < grunts.size(); i++)
         {
@@ -360,9 +360,9 @@ public class PlayerManager
     }
     
     /**
-     * This method will make if there are at least 2 grunts that they are set to attack each hero
+     * This method will check if there are at least 2 grunts that they are set to attack each hero
      */
-    private void updateEnemyStrategy()
+    private void updateEnemyStrategy(final Rectangle screen)
     {
         //enemies that are not assigned a target
         List<Grunt> unassigned = getEnemyUnassigned();
@@ -385,8 +385,22 @@ public class PlayerManager
 
             for (int i=0; i < tmp.size(); i++)
             {
+                Grunt grunt = tmp.get(i);
+                
+                //if the grunt is no longer fully on the screen
+                if (!screen.contains(grunt.getPoint()))
+                {
+                    //if the enemy is on the left side of the screen and is set to attack the west side
+                    if (grunt.getX() <= screen.x && !grunt.hasAttackEast())
+                        grunt.setAttackEast(!grunt.hasAttackEast());
+                    
+                    //if the enemy is on the right side of the screen and is set to attack the east side
+                    if (grunt.getX() >= screen.x + screen.width && grunt.hasAttackEast())
+                        grunt.setAttackEast(!grunt.hasAttackEast());
+                }
+                
                 //this grunt is attacking or getting close to attacking
-                if (tmp.get(i).hasStep2() || tmp.get(i).hasStep3())
+                if (grunt.hasStep2() || grunt.hasStep3())
                 {
                     count++;
                     tmp.remove(i);

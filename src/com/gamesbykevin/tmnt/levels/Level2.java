@@ -10,7 +10,7 @@ public final class Level2 extends Level implements LevelRules
 {
     public Level2()
     {
-        super(10, 5);
+        super(0, 0);
         
         setupDefaults();
     }
@@ -27,8 +27,8 @@ public final class Level2 extends Level implements LevelRules
     @Override
     public void setLevelBounds()
     {
-        int x[] = {0,   484, 514, 721, 730, 2023, 2076, 2366, 2432, 2432, 0};
-        int y[] = {177, 177, 201, 201, 177, 177,  113,  113,  177,  223,  223};
+        int x[] = {0,   525, 525, 700, 700, 2023, 2023, 2432, 2432, 0};
+        int y[] = {157, 157, 191, 191, 157, 157,  99,   99,   223,  223};
         
         //set the area that is in bounds
         super.setBoundary(new Polygon(x, y, x.length));

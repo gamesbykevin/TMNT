@@ -66,12 +66,12 @@ public class GameMenu extends Menu
         }
         
         optionLevel = new Option("Level: ");
-        optionLevel.add(ResourceManager.LevelMisc.Level1.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add(ResourceManager.LevelMisc.Level2.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add(ResourceManager.LevelMisc.Level3.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add(ResourceManager.LevelMisc.Level4.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add(ResourceManager.LevelMisc.Level5.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add(ResourceManager.LevelMisc.Level6.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("1", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("2", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("3", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("4", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("5", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("6", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         
         optionLives = new Option("Lives: ");
         optionLives.add("5", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
