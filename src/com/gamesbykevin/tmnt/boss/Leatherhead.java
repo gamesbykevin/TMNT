@@ -2,21 +2,20 @@ package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import com.gamesbykevin.tmnt.grunt.Grunt;
 import static com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-public class Boss3 extends Grunt implements PlayerRules
+public class Leatherhead extends Boss implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 130;
     private static final int SPRITE_HEIGHT = 100;
     
-    private static final int VELOCITY_WALK = 4;
+    private static final int VELOCITY_WALK = 3;
     
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
-    public Boss3()
+    public Leatherhead()
     {
         super(GamePlayers.Leatherhead);
         

@@ -12,15 +12,15 @@ import java.util.List;
 
 public class Grunt extends Player
 {
-    //this is the hero the enemy has targeted
-    private GamePlayers assigned;
-    
     //the direction the player will attempt to attack from if not east then west
     private boolean attackEast;
     
     private boolean step1 = true, step2 = false, step3 = false;
     
+    //each enemy will die after 4 hits
     private static final int HEALTH_DEFAULT = 4;
+    
+    //each enemy will start at 0 extra lives
     private static final int LIVES_DEFAULT = 0;
     
     public Grunt(GamePlayers type)
@@ -113,6 +113,17 @@ public class Grunt extends Player
         }
         else
         {
+            //is the hero hurt reset animation back to idle
+            if (hero.isHurt())
+            {
+                if (isAttacking() && !getSpriteSheet().hasStarted())
+                {
+                    setNewState(State.IDLE);
+                    setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+                }
+            }
+            
+            //make sure this enemy is not dead and not hurt
             if (!isDead() && !isHurt())
             {
                 //if the hero is dead and the enemy is not jumping set them to an idle state
@@ -122,6 +133,7 @@ public class Grunt extends Player
                     setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
                 }
 
+                //if the enemy is attacking and animation is finished reset back to idle
                 if (isAttacking() && getSpriteSheet().hasFinished())
                 {
                     setNewState(State.IDLE);
@@ -209,29 +221,10 @@ public class Grunt extends Player
             return;
         }
         
-        //if the enemy can throw a projectile we will handle this differently
+        //can the enemy throw a projectile
         if (hasState(State.THROW_PROJECTILE))
         {
             resetSteps();
-            
-            if (1==1)
-                return;
-            
-            //move away from hero since we are preparing to throw a projectile
-            if (getX() <= heroX)
-            {
-                setState(State.WALK_HORIZONTAL);
-                setVelocityX(-getVelocityWalk());
-                setVelocityY(VELOCITY_NONE);
-            }
-            
-            //move away from hero since we are preparing to throw a projectile
-            if (getX() > heroX)
-            {
-                setState(State.WALK_HORIZONTAL);
-                setVelocityX(getVelocityWalk());
-                setVelocityY(VELOCITY_NONE);
-            }
         }
         else
         {
@@ -363,15 +356,6 @@ public class Grunt extends Player
     }
     
     /**
-     * Which hero is the enemy currently assigned
-     * @return GamePlayers
-     */
-    public GamePlayers getAssignment()
-    {
-        return this.assigned;
-    }
-    
-    /**
      * Checks the list of heroes and returns the one assigned.
      * If nothing matches null is then returned.
      * @param heroes List of heroes we want to check
@@ -389,11 +373,6 @@ public class Grunt extends Player
         }
         
         return null;
-    }
-    
-    public void setAssignment(final GamePlayers assigned)
-    {
-        this.assigned = assigned;
     }
     
     /**

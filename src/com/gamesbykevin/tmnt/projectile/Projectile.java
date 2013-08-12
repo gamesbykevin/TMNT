@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.projectile;
 import com.gamesbykevin.framework.base.Sprite;
 
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.player.PlayerManager;
 
 public class Projectile extends Sprite
 {
@@ -21,5 +22,14 @@ public class Projectile extends Sprite
     public GamePlayers getSource()
     {
         return this.source;
+    }
+    
+    /**
+     * Tells if this projectile came from an enemy or boss
+     * @return boolean
+     */
+    public boolean isEnemySource()
+    {
+        return PlayerManager.isEnemy(getSource());
     }
 }

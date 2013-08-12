@@ -126,7 +126,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     
                     if (getPlayerManager() != null)
                     {
-                        getProjectileManager().update(getMain().getScreen(), getPlayerManager().getAllPlayers());
+                        getProjectileManager().update(getMain().getScreen(), getPlayerManager());
                         getPlayerManager().update(this);
                         getLevelManager().update(getPlayerManager(), main.getScreen());
                     }
@@ -338,7 +338,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             
             levelObjects.clear();
             
-            //draw hero health bars, etc..
+            //draw hero info, etc....
             getPlayerManager().render(g2d, getMain().getScreen(), resources);
         }
         

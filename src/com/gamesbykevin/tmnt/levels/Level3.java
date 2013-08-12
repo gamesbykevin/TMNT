@@ -1,5 +1,7 @@
 package com.gamesbykevin.tmnt.levels;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+
 import java.awt.Polygon;
 
 /**
@@ -10,7 +12,8 @@ public final class Level3 extends Level implements LevelRules
 {
     public Level3() throws Exception
     {
-        super(9, 5);
+        super(0, 0, GamePlayers.Slash);
+        //super(9, 5);
         
         setupDefaults();
     }

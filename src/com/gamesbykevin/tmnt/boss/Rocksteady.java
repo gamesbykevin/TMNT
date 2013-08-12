@@ -2,22 +2,20 @@ package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.main.ResourceManager;
 import static com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-public class Boss6 extends Grunt implements PlayerRules
+public class Rocksteady extends Boss implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 90;
     private static final int SPRITE_HEIGHT = 110;
     
-    private static final int VELOCITY_WALK = 4;
+    private static final int VELOCITY_WALK = 3;
     
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
-    public Boss6()
+    public Rocksteady()
     {
         super(GamePlayers.Rocksteady);
         

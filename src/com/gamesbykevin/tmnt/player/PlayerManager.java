@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.player;
 import com.gamesbykevin.tmnt.grunt.*;
 import com.gamesbykevin.framework.base.Sprite;
 
+import com.gamesbykevin.tmnt.boss.*;
 import com.gamesbykevin.tmnt.heroes.*;
 import com.gamesbykevin.tmnt.main.*;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
@@ -23,6 +24,7 @@ public class PlayerManager
 {
     private List<Hero> heroes;
     private List<Grunt> grunts;
+    private List<Boss> bosses;
     
     private static final int CONSECUTIVE_ATTACKERS = 2;
     
@@ -30,6 +32,7 @@ public class PlayerManager
     {
         heroes = new ArrayList<>();
         grunts = new ArrayList<>();
+        bosses = new ArrayList<>();
     }
     
     /**
@@ -42,6 +45,23 @@ public class PlayerManager
         
         grunts.clear();
         grunts = null;
+    }
+    
+    public static boolean isBoss(final GamePlayers type)
+    {
+        switch (type)
+        {
+            case Slash:
+            case Bebop:
+            case Rocksteady:
+            case Leatherhead:
+            case Krang:
+            case Shredder:
+                return true;
+                
+            default:
+                return false;
+        }
     }
     
     public static boolean isEnemy(final GamePlayers type)
@@ -211,6 +231,44 @@ public class PlayerManager
         heroes.add(hero);
     }
     
+    public void addBoss(final GamePlayers type) throws Exception
+    {
+        Boss boss;
+        
+        switch (type)
+        {
+            case Slash:
+                boss = new Slash();
+                break;
+                
+            case Bebop:
+                boss = new Bebop();
+                break;
+                
+            case Krang:
+                boss = new Krang();
+                break;
+                
+            case Leatherhead:
+                boss = new Leatherhead();
+                break;
+                
+            case Rocksteady:
+                boss = new Rocksteady();
+                break;
+                
+            case Shredder:
+                boss = new Shredder();
+                break;
+                
+            default:
+                throw new Exception("Player not found");
+        }
+        
+        //add boss to list
+        bosses.add(boss);
+    }
+    
     /**
      * Do we already have an enemy that can throw projectiles
      * 
@@ -218,7 +276,7 @@ public class PlayerManager
      */
     public boolean hasEnemyProjectile()
     {
-        for (Grunt grunt : grunts)
+        for (Player grunt : grunts)
         {
             if (isEnemyProjectile(grunt.getType()))
                 return true;
@@ -234,7 +292,7 @@ public class PlayerManager
      */
     public boolean hasEnemyType(final GamePlayers type)
     {
-        for (Grunt grunt : grunts)
+        for (Player grunt : grunts)
         {
             if (grunt.getType() == type)
                 return true;
@@ -244,37 +302,61 @@ public class PlayerManager
     }
     
     /**
-     * Get a list of all our grunts
-     * @return List<Enemy>
+     * Get a list of all enemies not including the bosses
+     * @return List<Grunt>
      */
     public List<Grunt> getEnemies()
     {
         return this.grunts;
     }
     
+    /**
+     * Get a list of all bosses
+     * @return List<Player>
+     */
+    public List<Player> getPlayerBosses()
+    {
+        List<Player> allBosses = new ArrayList<>();
+        
+        for (Boss boss : bosses)
+        {
+            allBosses.add(boss);
+        }
+        
+        return allBosses;
+    }    
+    
+    /**
+     * Get a list of all enemies
+     * @return List<Player>
+     */
     public List<Player> getPlayerEnemies()
     {
-        List<Player> result = new ArrayList<>();
+        List<Player> allEnemies = new ArrayList<>();
         
-        for (Player player : grunts)
+        for (Grunt grunt : grunts)
         {
-            result.add(player);
+            allEnemies.add(grunt);
         }
         
-        return result;
-    }
+        return allEnemies;
+    }    
     
+    /**
+     * Get a list of all heroes
+     * @return List<Player>
+     */
     public List<Player> getPlayerHeroes()
     {
-        List<Player> result = new ArrayList<>();
+        List<Player> allHeroes = new ArrayList<>();
         
-        for (Player player : heroes)
+        for (Hero hero : heroes)
         {
-            result.add(player);
+            allHeroes.add(hero);
         }
         
-        return result;
-    }
+        return allHeroes;
+    }    
     
     /**
      * Get a list of all our heroes
@@ -283,6 +365,11 @@ public class PlayerManager
     public List<Hero> getHeroes()
     {
         return this.heroes;
+    }
+    
+    public List<Boss> getBosses()
+    {
+        return this.bosses;
     }
     
     /**
@@ -322,6 +409,23 @@ public class PlayerManager
     }
     
     /**
+     * Get a list of grunts that are not assigned a target
+     * @param type List of grunts
+     */
+    private List<Boss> getBossUnassigned()
+    {
+        List<Boss> bossTargets = new ArrayList<>();
+        
+        for (Boss boss : bosses)
+        {
+            if (boss.getAssignment() == null)
+                bossTargets.add(boss);
+        }
+        
+        return bossTargets;
+    }
+    
+    /**
      * Add all player related objects to the existing levelObjects list.
      * 
      * @param levelObjects List of all objects in the level
@@ -339,23 +443,6 @@ public class PlayerManager
         {
             levelObjects.add(grunt);
         }
-    }
-    
-    public List<Player> getAllPlayers()
-    {
-        List<Player> players = new ArrayList<>();
-        
-        for (Player hero : getHeroes())
-        {
-            players.add(hero);
-        }
-        
-        for (Player grunt : getEnemies())
-        {
-            players.add(grunt);
-        }
-        
-        return players;
     }
     
     public void update(final Engine engine) throws Exception
@@ -376,6 +463,9 @@ public class PlayerManager
                 
                 hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
             }
+            
+            if (hero.getDelay() < 0)
+                hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
             
             hero.update(engine.getProjectileManager(), getPlayerEnemies(), engine.getKeyboard(), engine.getLevelManager().getLevel().getBoundary());
             
@@ -425,6 +515,9 @@ public class PlayerManager
                 grunt.setAttackEast(!rightSide);
             }
             
+            if (grunt.getDelay() < 0)
+                grunt.setDelay(engine.getMain().getTimeDeductionPerFrame());
+            
             grunt.update(engine.getProjectileManager(), getPlayerHeroes(), engine.getLevelManager().getLevel().getBoundary());
             
             //if the death animation is complete and no more lives remove the grunt
@@ -434,6 +527,46 @@ public class PlayerManager
                 i--;
             }
         }
+        
+        //make sure the boss(es) have a target
+        updateBossStrategy(engine.getMain().getScreen());
+        
+        for (int i=0; i < bosses.size(); i++)
+        {
+            Boss boss = bosses.get(i);
+            
+            //if the boss assets are not loaded yet
+            if (boss.getImage() == null)
+            {
+                boss.setImage(engine.getResources().getGamePlayer(boss.getType()));
+                boss.createImages();
+                boss.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                boss.setDimensions();
+                
+                final Point start = engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), boss.getWidth(), boss.getHeight());
+                boss.setLocation(start);
+            }
+            
+            if (boss.getDelay() < 0)
+                boss.setDelay(engine.getMain().getTimeDeductionPerFrame());
+            
+            boss.update(engine.getProjectileManager(), getPlayerHeroes(), engine.getLevelManager().getLevel().getBoundary());
+            
+        }
+    }
+    
+    private void updateBossStrategy(final Rectangle screen)
+    {
+        //enemies that are not assigned a target
+        List<Boss> unassigned = getBossUnassigned();
+        
+        //assign a target to every enemy
+        for (Boss boss : unassigned)
+        {
+            boss.setAssignment((heroes.get((int)(Math.random() * heroes.size()))).getType());
+        }
+        
+        unassigned.clear();
     }
     
     /**

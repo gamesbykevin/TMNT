@@ -6,6 +6,7 @@ package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.player.Player;
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 
 import java.awt.geom.Area;
 import java.awt.*;
@@ -53,19 +54,36 @@ public abstract class Level extends Sprite
     //the different rate to scroll the background
     private int BACKGROUND_SCROLL_OFFSET = 2;
     
+    private static final double EXTRA_WIDTH_SPAWN_RATIO = .2;
+    
+    //this will be the boss the player will face at the end of the level
+    private GamePlayers type;
+    
     /**
      * Create new Level
      * 
      * @param enemiesPerCheckpoint How many enemies to spawn per check point
      * @param enemiesAtOnce  How many enemies can be on the screen at once
+     * @param type The boss the hero will face at the end of the level
      */
-    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce) throws Exception
+    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce, final GamePlayers type) throws Exception
     {
         this.enemiesPerCheckpoint = enemiesPerCheckpoint;
         this.enemiesAtOnce        = enemiesAtOnce;
+        this.type                 = type;
         
         if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
             throw new Exception("Can't have more than 6 enemies at once");
+    }
+    
+    /**
+     * Get the boss that is assigned to be at the end of this level
+     * 
+     * @return Boss type
+     */
+    public GamePlayers getBoss()
+    {
+        return this.type;
     }
     
     /**
@@ -115,7 +133,7 @@ public abstract class Level extends Sprite
     public Point getStart(final Rectangle screen, final int playerWidth, final int playerHeight)
     {
         //the extra part we will check on each side
-        final int extraWidth = (int)(screen.getWidth() * .2);
+        final int extraWidth = (int)(screen.getWidth() * EXTRA_WIDTH_SPAWN_RATIO);
         
         //the edges on both sides
         Rectangle west = new Rectangle(screen.x - extraWidth, screen.y, extraWidth, screen.height);

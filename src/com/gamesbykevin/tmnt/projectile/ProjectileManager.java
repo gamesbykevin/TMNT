@@ -1,6 +1,9 @@
 package com.gamesbykevin.tmnt.projectile;
 
 import com.gamesbykevin.framework.base.Sprite;
+
+import com.gamesbykevin.tmnt.grunt.Grunt;
+import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
@@ -107,7 +110,7 @@ public class ProjectileManager
         projectiles.add(projectile);
     }
     
-    public void update(final Rectangle screen, List<Player> targets) throws Exception
+    public void update(final Rectangle screen, PlayerManager players) throws Exception
     {
         for (int i=0; i < projectiles.size(); i++)
         {
@@ -116,55 +119,28 @@ public class ProjectileManager
             projectile.getSpriteSheet().update();
             projectile.update();
             
-            //is this projectile targeting the heroes
-            final boolean attackHero1 = PlayerManager.isEnemy(projectile.getSource());
+            if (!projectile.hasVelocity())
+                continue;
             
             if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1)
             {
-                for (Player target : targets)
+                boolean result = false;
+                
+                //if the projectile came from enemy
+                if (projectile.isEnemySource())
                 {
-                    //is this player targeting the heroes
-                    final boolean attackHero2 = PlayerManager.isEnemy(target.getType());
+                    result = checkPlayers(players.getHeroes(), projectile);
                     
-                    //if the projectile came from a hero then it can't attack a hero, and same for enemy
-                    if ((attackHero1 && attackHero2) || (!attackHero1 && !attackHero2))
-                        continue;
-                    
-                    //all projectiles must be moving and the target has to be vulnerable
-                    if (!target.canHurt() || !projectile.hasVelocity())
-                        continue;
-
-                    Rectangle anchorProjectile = Player.getAnchorLocation(projectile);
-                    Rectangle anchorHero = target.getAnchorLocation();
-
-                    //projectile has hit hero
-                    if (anchorProjectile.intersects(anchorHero) && projectile.getRectangle().contains(target.getCenter()))
+                    if (result)
                     {
-                        target.setNewState(Player.State.HURT);
-                        target.deductHealth();
-
-                        //check if there is an additional animation now that the projectile has hit
-                        if (projectile.getSpriteSheet().hasAnimation(Player.State.PROJECTILE1_FINISH))
-                        {
-                            if (projectile.getSpriteSheet().getCurrent() != Player.State.PROJECTILE1_FINISH)
-                            {
-                                projectile.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                                projectile.getSpriteSheet().setCurrent(Player.State.PROJECTILE1_FINISH);
-                                projectile.getSpriteSheet().reset();
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            //if another animation does not exist then remove the projectile
-                            projectiles.remove(i);
-                            i--;
-                            break;
-                        }
+                        projectiles.remove(i);
+                        i--;
+                        continue;
                     }
                 }
             }
             
+            //is this projectile currently displaying the finish animation if it has one
             if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1_FINISH)
             {
                 //if the animation has finished remove projectile
@@ -183,7 +159,66 @@ public class ProjectileManager
                 i--;
                 continue;
             }
-            
         }
+    }
+    
+    private boolean checkPlayers(final List<Hero> players, final Projectile projectile)
+    {
+        for (Player player : players)
+        {
+            boolean result = checkPlayer(player, projectile);
+            
+            if (result)
+                return result;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check the player and return true
+     * if they have hit and do not have 
+     * a finish animation so we can remove 
+     * them from the list of projectiles.
+     * 
+     * @param target List of player we want to check for collision
+     * @param projectile Projectile we are testing
+     * @return boolean
+     */
+    private boolean checkPlayer(final Player target, final Projectile projectile)
+    {
+        //the target has to be vulnerable
+        if (!target.canHurt())
+            return false;
+
+        //get anchor location of target and projectile to determine if they y-coordinate is level
+        Rectangle anchorProjectile = Player.getAnchorLocation(projectile);
+        Rectangle anchor = target.getAnchorLocation();
+
+        //projectile has hit target
+        if (anchorProjectile.intersects(anchor) && projectile.getRectangle().contains(target.getCenter()))
+        {
+            target.setNewState(Player.State.HURT);
+            target.deductHealth();
+
+            //check if there is an additional animation now that the projectile has hit
+            if (projectile.getSpriteSheet().hasAnimation(Player.State.PROJECTILE1_FINISH))
+            {
+                if (projectile.getSpriteSheet().getCurrent() != Player.State.PROJECTILE1_FINISH)
+                {
+                    projectile.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+                    projectile.getSpriteSheet().setCurrent(Player.State.PROJECTILE1_FINISH);
+                    projectile.getSpriteSheet().reset();
+                    return false;
+                }
+            }
+            else
+            {
+                //if another animation does not exist then remove the projectile
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

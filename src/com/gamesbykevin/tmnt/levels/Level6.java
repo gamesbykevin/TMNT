@@ -1,5 +1,7 @@
 package com.gamesbykevin.tmnt.levels;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+
 import java.awt.Polygon;
 
 /**
@@ -11,7 +13,7 @@ public final class Level6 extends Level implements LevelRules
     public Level6() throws Exception
     {
         //this level will not have any enemies besides the boss
-        super(0, 0);
+        super(0, 0, GamePlayers.Shredder);
         
         //this level will only have 1 power up
         super.setPowerUpLimit(1);

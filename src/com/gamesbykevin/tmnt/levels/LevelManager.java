@@ -2,8 +2,6 @@ package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
 
-import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.ResourceManager;
 import com.gamesbykevin.tmnt.player.*;
 
@@ -175,7 +173,7 @@ public class LevelManager
             //get hero with the most width
             int mostWidth = 0;
             
-            for (Hero hero : players.getHeroes())
+            for (Player hero : players.getHeroes())
             {
                 if (hero.getWidth() > mostWidth)
                     mostWidth = hero.getWidth() + 1;
@@ -255,7 +253,7 @@ public class LevelManager
                 }
             }
             
-            for (Grunt grunt : players.getEnemies())
+            for (Player grunt : players.getEnemies())
             {
                 //get temp anchor and make sure the hero doesn't go out of bounds
                 Rectangle tmpAnchor = grunt.getAnchorLocation();
@@ -306,7 +304,8 @@ public class LevelManager
             //no more check points so hero has reached end of level
             if (getLevel().getCheckpointCount() < 1)
             {
-                
+                if (players.getBosses().size() < 1)
+                    players.addBoss(getLevel().getBoss());
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.gamesbykevin.tmnt.levels;
 
+import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+
 import java.awt.Polygon;
 
 /**
@@ -10,7 +12,8 @@ public final class Level1 extends Level implements LevelRules
 {
     public Level1() throws Exception
     {
-        super(10, 4);
+        super(0, 0, GamePlayers.Bebop);
+        //super(10, 4);
         
         setupDefaults();
     }

@@ -65,6 +65,9 @@ public abstract class Player extends Sprite
     
     public static final double ANCHOR_HEIGHT_RATIO = .1;
     
+    //this is the hero the enemy has targeted
+    private GamePlayers assigned;
+    
     public Player(final GamePlayers type)
     {
         setType(type);
@@ -74,6 +77,24 @@ public abstract class Player extends Sprite
         
         //assign default state of idle
         super.getSpriteSheet().setCurrent(State.IDLE);
+    }
+    
+    /**
+     * Which player is this player currently assigned to target
+     * @return GamePlayers
+     */
+    public GamePlayers getAssignment()
+    {
+        return this.assigned;
+    }
+    
+    /**
+     * Set the assigned player for this player
+     * @param assigned 
+     */
+    public void setAssignment(final GamePlayers assigned)
+    {
+        this.assigned = assigned;
     }
     
     private void setHealth(final int health)
@@ -314,6 +335,11 @@ public abstract class Player extends Sprite
     public void setDelay(final long delay)
     {
         this.getSpriteSheet().setDelay(delay);
+    }
+    
+    public long getDelay()
+    {
+        return getSpriteSheet().getDelay();
     }
     
     /**
