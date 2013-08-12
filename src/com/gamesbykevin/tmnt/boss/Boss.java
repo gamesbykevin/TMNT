@@ -9,4 +9,9 @@ public class Boss extends Player
     {
         super(type);
     }
+    
+    public void update()
+    {
+        
+    }
 }
