@@ -23,11 +23,20 @@ public class ProjectileManager
     private static final double PROJECTILE_SPEED_RATIO = 5;
     
     //the amount of existing projectiles at one time
-    private static final int PROJECTILE_LIMIT = 2;
+    private static final int PROJECTILE_LIMIT = 1;
     
     public ProjectileManager()
     {
         this.projectiles = new ArrayList<>();
+    }
+    
+    /**
+     * Proper house keeping
+     */
+    public void dispose()
+    {
+        projectiles.clear();
+        projectiles = null;
     }
     
     public boolean canAddProjectile()

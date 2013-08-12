@@ -8,9 +8,9 @@ import java.awt.Polygon;
  */
 public final class Level4 extends Level implements LevelRules
 {
-    public Level4()
+    public Level4() throws Exception
     {
-        super(0, 6);
+        super(10, 6);
         
         setupDefaults();
     }
@@ -27,8 +27,8 @@ public final class Level4 extends Level implements LevelRules
     @Override
     public void setLevelBounds()
     {
-        int x[] = {0,   3817, 3817, 4223, 4223, 0};
-        int y[] = {133, 133,  105,  105,  221,  221};
+        int x[] = {0,   4223, 4223, 0};
+        int y[] = {133, 133,  221,  221};
         
         //set the area that is in bounds
         super.setBoundary(new Polygon(x, y, x.length));

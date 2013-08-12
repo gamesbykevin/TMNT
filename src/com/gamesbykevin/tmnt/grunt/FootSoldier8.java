@@ -63,7 +63,7 @@ public final class FootSoldier8 extends Grunt implements PlayerRules
         
         //throw projectile animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(500));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(850));
         animation.add(getSpriteRectangle(0,0), getNanoSeconds(150));
         getSpriteSheet().add(animation, Player.State.THROW_PROJECTILE);
         

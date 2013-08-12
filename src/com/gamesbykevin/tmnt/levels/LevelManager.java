@@ -29,6 +29,18 @@ public class LevelManager
     }
     
     /**
+     * Proper house keeping
+     */
+    public void dispose()
+    {
+        if (level != null)
+        {
+            level.dispose();
+            level = null;
+        }
+    }
+    
+    /**
      * Get the current level
      * @return Level
      */
@@ -65,7 +77,7 @@ public class LevelManager
                 level = new Level1();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.createCheckPoints(3);
+                level.createCheckPoints(4);
                 level.setBackgroundImage(resources.getLevelObject(ResourceManager.LevelMisc.Level1Background), screen);
                 break;
                 
@@ -75,7 +87,7 @@ public class LevelManager
                 level = new Level2();
                 level.setImage(image);
                 level.setDimensions(image.getWidth(null), image.getHeight(null));
-                level.createCheckPoints(3);
+                level.createCheckPoints(4);
                 break;
                 
             case Level3:
@@ -182,6 +194,24 @@ public class LevelManager
                     //tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
                     tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2) - (int)(hero.getHeight() * Player.ANCHOR_HEIGHT_RATIO);
                 }
+                else
+                {
+                    //the hero can't collect a power up if they are jumping
+                    
+                    //get the list of power ups
+                    List<Sprite> powerUps = getLevel().getPowerUps();
+
+                    //check each power up for collision
+                    for (int i=0; i < powerUps.size(); i++)
+                    {
+                        if (tmpAnchor.intersects(powerUps.get(i).getRectangle()))
+                        {
+                            hero.resetHealth();
+                            powerUps.remove(i);
+                            i--;
+                        }
+                    }
+                }
 
                 //calculate future position and stop velocity if no longer in boundary
                 if (hero.getVelocityX() != VELOCITY_NONE)
@@ -223,18 +253,6 @@ public class LevelManager
 
                     hero.setX(rightSide);
                 }
-
-                List<Sprite> powerUps = getLevel().getPowerUps();
-                
-                for (int i=0; i < powerUps.size(); i++)
-                {
-                    if (tmpAnchor.intersects(powerUps.get(i).getRectangle()))
-                    {
-                        hero.resetHealth();
-                        powerUps.remove(i);
-                        i--;
-                    }
-                }
             }
             
             for (Grunt grunt : players.getEnemies())
@@ -247,7 +265,7 @@ public class LevelManager
                 {
                     tmpAnchor.translate(grunt.getVelocityX(), VELOCITY_NONE);
 
-                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                    if (!getLevel().getBoundary().contains(tmpAnchor))
                     {
                         tmpAnchor.translate(-grunt.getVelocityX(), VELOCITY_NONE);
                         grunt.setVelocityX(VELOCITY_NONE);
@@ -257,7 +275,7 @@ public class LevelManager
                 {
                     tmpAnchor.translate(VELOCITY_NONE, grunt.getVelocityY());
 
-                    if (!getLevel().getBoundary().contains(tmpAnchor))// || !screen.contains(tmpAnchor))
+                    if (!getLevel().getBoundary().contains(tmpAnchor))
                     {
                         tmpAnchor.translate(VELOCITY_NONE, -grunt.getVelocityY());
                         grunt.setVelocityY(VELOCITY_NONE);

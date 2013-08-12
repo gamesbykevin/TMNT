@@ -8,9 +8,9 @@ import java.awt.Polygon;
  */
 public final class Level5 extends Level implements LevelRules
 {
-    public Level5()
+    public Level5() throws Exception
     {
-        super(0, 6);
+        super(8, 6);
         
         setupDefaults();
     }

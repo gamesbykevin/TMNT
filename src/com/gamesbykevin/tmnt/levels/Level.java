@@ -5,6 +5,7 @@
 package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
+import com.gamesbykevin.tmnt.player.Player;
 
 import java.awt.geom.Area;
 import java.awt.*;
@@ -46,16 +47,42 @@ public abstract class Level extends Sprite
     //how many power ups will this level have
     private int powerUpLimit = POWERUP_LIMIT_DEFAULT;
     
+    //limit of how many enemies we can have at once because there are only 5 unique types and 4 unique enemy projectile types
+    private static final int ENEMIES_AT_ONCE_LIMIT = 6;
+    
+    //the different rate to scroll the background
+    private int BACKGROUND_SCROLL_OFFSET = 2;
+    
     /**
      * Create new Level
      * 
      * @param enemiesPerCheckpoint How many enemies to spawn per check point
      * @param enemiesAtOnce  How many enemies can be on the screen at once
      */
-    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce)
+    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce) throws Exception
     {
         this.enemiesPerCheckpoint = enemiesPerCheckpoint;
         this.enemiesAtOnce        = enemiesAtOnce;
+        
+        if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
+            throw new Exception("Can't have more than 6 enemies at once");
+    }
+    
+    /**
+     * Proper house keeping
+     */
+    public void dispose()
+    {
+        bounds = null;
+        
+        backgrounds.clear();
+        backgrounds = null;
+        
+        powerUps.clear();
+        powerUps = null;
+    
+        checkpoints.clear();
+        checkpoints = null;
     }
     
     /**
@@ -113,7 +140,7 @@ public abstract class Level extends Sprite
             tmp = eastSide.getBounds();
         
         //if the west side in not a possibility then they have to spawn from the east side
-        if (westSide.getBounds().getWidth() < 1 || westSide.getBounds().x - playerWidth < 0)
+        if (westSide.getBounds().getWidth() < 1 || westSide.getBounds().x - playerWidth <= getWestBoundsX())
             tmp = eastSide.getBounds();
         
         //if the east side in not a possibility then they have to spawn from the west side
@@ -133,7 +160,6 @@ public abstract class Level extends Sprite
 
         //get random y coordinate
         final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
-        
         
         return new Point(randomX, randomY);
     }
@@ -214,10 +240,7 @@ public abstract class Level extends Sprite
                     
                     //set the powerup image
                     powerUp.setImage(image);
-                    powerUp.setDimensions(image.getWidth(null), image.getHeight(null));
-                    
-                    //set auto size to true so the dimensions will be set automatically based on the image width/height
-                    powerUp.setAutoSize(true);
+                    powerUp.setDimensions(image);
                     
                     //now choose a random location
                     final int randomX;
@@ -236,7 +259,7 @@ public abstract class Level extends Sprite
                     
                     for (int y = screen.y; y < screen.y + screen.height; y++)
                     {
-                        if (getBoundary().contains(randomX, y))
+                        if (getBoundary().contains(new Rectangle(randomX, y, powerUp.getWidth(), powerUp.getHeight())))
                             possibilities.add(y);
                     }
                     
@@ -322,6 +345,15 @@ public abstract class Level extends Sprite
     public List<Sprite> getPowerUps()
     {
         return this.powerUps;
+    }
+
+    /**
+     * Get the west most x coordinagte
+     * @return int x-coordinate
+     */
+    private int getWestBoundsX()
+    {
+        return bounds.getBounds().x;
     }
     
     /**
@@ -423,10 +455,10 @@ public abstract class Level extends Sprite
             {
                 for (Sprite background : backgrounds)
                 {
-                    //if there is a scrolling speed it needs to be more than the level scroll
-                    if (scrollSpeed != 0)
+                    //if there is a scrolling speed it needs to be less than the level scroll
+                    if (scrollSpeed != Player.VELOCITY_NONE)
                     {
-                        background.setVelocityX(-(scrollSpeed - 2));
+                        background.setVelocityX(-(scrollSpeed - BACKGROUND_SCROLL_OFFSET));
                     }
                     else
                     {
@@ -470,7 +502,7 @@ public abstract class Level extends Sprite
         if (bounds != null)
         {
             //update level position and bounds
-            bounds.translate(super.getVelocityX(), 0);
+            bounds.translate(super.getVelocityX(), Player.VELOCITY_NONE);
         }
         
         //we also need to set the scroll speed for the power ups as well so they move with the level
@@ -499,13 +531,6 @@ public abstract class Level extends Sprite
         
         //now draw level on top of background
         super.draw(g);
-        
-        if (bounds != null)
-        {
-            //draw bounds so we can see for now
-            g.setColor(Color.RED);
-            g.drawPolygon(bounds);
-        }
         
         //return result
         return g;

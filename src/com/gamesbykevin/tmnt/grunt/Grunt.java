@@ -113,17 +113,20 @@ public class Grunt extends Player
         }
         else
         {
-            //if the hero is dead and the enemy is not jumping set them to an idle state
-            if (hero.isDead() && !isJumping())
+            if (!isDead() && !isHurt())
             {
-                setState(State.IDLE);
-                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
-            }
-            
-            if (isAttacking() && getSpriteSheet().hasFinished())
-            {
-                setNewState(State.IDLE);
-                setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+                //if the hero is dead and the enemy is not jumping set them to an idle state
+                if (hero.isDead() && !isJumping())
+                {
+                    setState(State.IDLE);
+                    setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+                }
+
+                if (isAttacking() && getSpriteSheet().hasFinished())
+                {
+                    setNewState(State.IDLE);
+                    setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
+                }
             }
         }
     }
@@ -305,7 +308,7 @@ public class Grunt extends Player
             }
             else
             {
-                if (getX() > hero.getX() + (hero.getWidth() * 2))
+                if (getX() > hero.getX() + hero.getWidth())
                 {
                     setState(State.WALK_HORIZONTAL);
                     setVelocityX(-getVelocityWalk());

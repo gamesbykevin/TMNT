@@ -32,11 +32,11 @@ public class Main extends Thread
     //updates per second
     private int updates = 0;
     
-    //display this variable every second
-    private int framesDisplay  = 0;
+    //frames per second current count
+    private int currentFPS  = 0;
     
-    //display this variable every second
-    private int updatesDisplay = 0;
+    //updates per second current count
+    private int currentUPS = 0;
     
     //how many nanoseconds are there in one second
     private static final double NANO_SECONDS_PER_SECOND = 1000000000.0;
@@ -85,7 +85,7 @@ public class Main extends Thread
         long lastRun = System.nanoTime();
         
         //this will reset ups/fps count every second
-        long timer = System.currentTimeMillis();
+        long timer = System.nanoTime();
         
         double delta = 0;
         
@@ -94,7 +94,7 @@ public class Main extends Thread
             try
             {
                 long now = System.nanoTime();
-                delta += (now - lastRun) / nanoSecondsPerUpdate;
+                delta += ((now - lastRun) / nanoSecondsPerUpdate);
                 lastRun = now;
                 
                 while(delta >= 1)
@@ -109,13 +109,17 @@ public class Main extends Thread
                 drawScreen();
                 frames++;
                 
-                if (System.currentTimeMillis() - timer > 1000)
+                //if 1 second has passed
+                if (System.nanoTime() - timer > NANO_SECONDS_PER_SECOND)
                 {
-                    timer += 1000;
+                    //add 1 second time for next update
+                    timer += NANO_SECONDS_PER_SECOND;
                     
-                    updatesDisplay = updates;
-                    framesDisplay = frames;
+                    //store the current fps/ups to be displayed to the user
+                    currentUPS = updates;
+                    currentFPS = frames;
                     
+                    //reset the counter
                     updates = 0;
                     frames = 0;
                 }
@@ -256,7 +260,7 @@ public class Main extends Thread
      */
     private Graphics renderCounter(Graphics g)
     {
-        final String result = updatesDisplay + " UPS, " + framesDisplay + " FPS";
+        final String result = currentUPS + " UPS, " + currentFPS + " FPS";
         final int width = g.getFontMetrics().stringWidth(result);
         final int height = g.getFontMetrics().getHeight() + 1;
         final Rectangle tmp = new Rectangle(originalSizeWindow.width - width, originalSizeWindow.height - height, width, height);
@@ -327,15 +331,10 @@ public class Main extends Thread
     @Override
     public void destroy()
     {
-        if (bufferedImage != null)
-            bufferedImage.flush();
+        engine.dispose();
+        engine = null;
         
         bufferedImage = null;
-        
-        if (engine != null)
-            engine.dispose();
-        
-        engine = null;
         
         originalSizeWindow = null;
         fullSizeWindow = null;

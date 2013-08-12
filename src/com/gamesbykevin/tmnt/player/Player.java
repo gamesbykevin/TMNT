@@ -321,7 +321,9 @@ public abstract class Player extends Sprite
      * as well as the location based on the current
      * velocity set. Also updates the timers
      * 
+     * @param projectileManager Projectiles in play
      * @param players List of Players we are fighting against
+     * @param boundary The area that is in bounds for the current Level
      */
     public void update(final ProjectileManager projectileManager, final List<Player> players, final Polygon boundary) throws Exception
     {
@@ -375,6 +377,8 @@ public abstract class Player extends Sprite
         
         if (isHurt())
         {
+            super.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
+            
             if (getSpriteSheet().hasFinished())
             {
                 setNewState(State.IDLE);
@@ -613,6 +617,8 @@ public abstract class Player extends Sprite
     
     /**
      * Checks to see if the player has the ability to throw a projectile
+     * Includes if they are allowed and have the throw animation.
+     * 
      * @return boolean
      */
     protected boolean canThrowProjectile()

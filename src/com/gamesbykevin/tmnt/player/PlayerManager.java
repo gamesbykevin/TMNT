@@ -24,10 +24,24 @@ public class PlayerManager
     private List<Hero> heroes;
     private List<Grunt> grunts;
     
+    private static final int CONSECUTIVE_ATTACKERS = 2;
+    
     public PlayerManager()
     {
         heroes = new ArrayList<>();
         grunts = new ArrayList<>();
+    }
+    
+    /**
+     * Proper house keeping
+     */
+    public void dispose()
+    {
+        heroes.clear();
+        heroes = null;
+        
+        grunts.clear();
+        grunts = null;
     }
     
     public static boolean isEnemy(final GamePlayers type)
@@ -50,6 +64,21 @@ public class PlayerManager
         }
     }
     
+    public static boolean isEnemyProjectile(final GamePlayers type)
+    {
+        switch (type)
+        {
+            case FootSoldier2:
+            case FootSoldier7:
+            case FootSoldier8:
+            case FootSoldier9:
+                return true;
+            
+            default:
+                return false;
+        }
+    }
+    
     public static boolean isHero(final GamePlayers type)
     {
         switch (type)
@@ -66,7 +95,10 @@ public class PlayerManager
     }
     
     /**
-     * Add a random grunt not including bosses
+     * Add a random grunt not including bosses.
+     * A random grunt capable of throwing a projectile 
+     * is a possibility as long as another one doesn't exist
+     * 
      * @throws Exception 
      */
     public void addRandomEnemy() throws Exception
@@ -75,8 +107,21 @@ public class PlayerManager
         
         for (GamePlayers type : GamePlayers.values())
         {
-            if (isEnemy(type))
-                possibleEnemies.add(type);
+            //first make sure this type is an enemy and we didn't already add this enemy
+            if (isEnemy(type) && !hasEnemyType(type))
+            {
+                //make sure an enemy capable of throwing projectiles doesn't already exist
+                if (!hasEnemyProjectile())
+                {
+                    possibleEnemies.add(type);
+                }
+                else
+                {
+                    //if this enemy can't throw projectiles add them for sure
+                    if (!isEnemyProjectile(type))
+                        possibleEnemies.add(type);
+                }
+            }
         }
         
         GamePlayers randomEnemy = (GamePlayers)possibleEnemies.get((int)(Math.random() * possibleEnemies.size()));
@@ -87,7 +132,7 @@ public class PlayerManager
         possibleEnemies = null;
     }
     
-    public void addEnemy(final GamePlayers type) throws Exception
+    private void addEnemy(final GamePlayers type) throws Exception
     {
         Grunt grunt = null;
         
@@ -164,6 +209,38 @@ public class PlayerManager
         
         hero.setLives(lives);
         heroes.add(hero);
+    }
+    
+    /**
+     * Do we already have an enemy that can throw projectiles
+     * 
+     * @return boolean
+     */
+    public boolean hasEnemyProjectile()
+    {
+        for (Grunt grunt : grunts)
+        {
+            if (isEnemyProjectile(grunt.getType()))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if we already have an enemy of this type
+     * @param type
+     * @return boolean
+     */
+    public boolean hasEnemyType(final GamePlayers type)
+    {
+        for (Grunt grunt : grunts)
+        {
+            if (grunt.getType() == type)
+                return true;
+        }
+        
+        return false;
     }
     
     /**
@@ -360,7 +437,7 @@ public class PlayerManager
     }
     
     /**
-     * This method will check if there are at least 2 grunts that they are set to attack each hero
+     * This method will check if there are at least x grunts that they are set to attack each hero
      */
     private void updateEnemyStrategy(final Rectangle screen)
     {
@@ -381,14 +458,15 @@ public class PlayerManager
             //get list of enemies that are targeting this hero
             List<Grunt> tmp = getEnemyTargets(hero.getType());
             
-            int count = 0;
+            //list of enemies that are attacking hero
+            List<Grunt> tmpAttackers = new ArrayList<>();
 
             for (int i=0; i < tmp.size(); i++)
             {
                 Grunt grunt = tmp.get(i);
                 
                 //if the grunt is no longer fully on the screen
-                if (!screen.contains(grunt.getPoint()))
+                if (!screen.contains(grunt.getRectangle()))
                 {
                     //if the enemy is on the left side of the screen and is set to attack the west side
                     if (grunt.getX() <= screen.x && !grunt.hasAttackEast())
@@ -402,22 +480,52 @@ public class PlayerManager
                 //this grunt is attacking or getting close to attacking
                 if (grunt.hasStep2() || grunt.hasStep3())
                 {
-                    count++;
+                    //add grunt to list of attackers
+                    tmpAttackers.add(grunt);
+                    
+                    //remove grunt from list
                     tmp.remove(i);
+                    i--;
+                    continue;
                 }
             }
-
-            //we want at least 2 enemies attacking at any time if possible
-            while(count < 2 && tmp.size() > 0)
+            
+            //if there are more than x enemies atacking/preparing
+            if (tmpAttackers.size() > CONSECUTIVE_ATTACKERS)
             {
-                final int randomIndex = (int)(Math.random() * tmp.size());
+                //don't allow more than x enemies ready to attack hero
+                while(tmpAttackers.size() > CONSECUTIVE_ATTACKERS)
+                {
+                    //random grunt
+                    final int randomIndex = (int)(Math.random() * tmpAttackers.size());
+                    
+                    //set available grunt to retreat for now
+                    tmpAttackers.get(randomIndex).resetSteps();
+                    
+                    //remove from list
+                    tmpAttackers.remove(randomIndex);
+                }
+            }
+            else
+            {
+                //we want at least x enemies attacking at any time if possible
+                while(tmpAttackers.size() < CONSECUTIVE_ATTACKERS && tmp.size() > 0)
+                {
+                    //random grunt
+                    final int randomIndex = (int)(Math.random() * tmp.size());
 
-                tmp.get(randomIndex).setStep2(true);
-                tmp.remove(randomIndex);
-
-                count++;
+                    //set available grunt to ready for attack
+                    tmp.get(randomIndex).setStep2(true);
+                    
+                    //add grunt to list of attackers
+                    tmpAttackers.add(tmp.get(randomIndex));
+                    
+                    //remove grunt from available list
+                    tmp.remove(randomIndex);
+                }
             }
             
+            tmpAttackers.clear();
             tmp.clear();
         }
     }

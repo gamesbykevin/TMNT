@@ -8,7 +8,7 @@ import java.awt.Polygon;
  */
 public final class Level6 extends Level implements LevelRules
 {
-    public Level6()
+    public Level6() throws Exception
     {
         //this level will not have any enemies besides the boss
         super(0, 0);

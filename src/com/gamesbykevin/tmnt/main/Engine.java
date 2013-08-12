@@ -60,6 +60,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         this.resources = new ResourceManager();
     }
     
+    /**
+     * Proper house-keeping
+     */
     @Override
     public void dispose()
     {
@@ -76,6 +79,15 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             
             keyboard.dispose();
             keyboard = null;
+            
+            playerManager.dispose();
+            playerManager = null;
+            
+            levelManager.dispose();
+            levelManager = null;
+            
+            projectileManager.dispose();
+            projectileManager = null;
         }
         catch(Exception e)
         {
@@ -294,7 +306,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     if (i == x)
                         continue;
 
-                    if (levelObjects.get(i).getY() + levelObjects.get(i).getHeight() < levelObjects.get(x).getY() + levelObjects.get(x).getHeight())
+                    if (levelObjects.get(i).getY() + (levelObjects.get(i).getHeight() / 2) < levelObjects.get(x).getY() + (levelObjects.get(x).getHeight() / 2))
                     {
                         Sprite temp = levelObjects.get(i);
 
