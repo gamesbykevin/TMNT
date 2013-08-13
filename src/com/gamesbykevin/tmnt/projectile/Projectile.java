@@ -3,7 +3,8 @@ package com.gamesbykevin.tmnt.projectile;
 import com.gamesbykevin.framework.base.Sprite;
 
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
-import com.gamesbykevin.tmnt.player.PlayerManager;
+import com.gamesbykevin.tmnt.boss.BossManager;
+import com.gamesbykevin.tmnt.grunt.GruntManager;
 
 public class Projectile extends Sprite
 {
@@ -25,11 +26,20 @@ public class Projectile extends Sprite
     }
     
     /**
-     * Tells if this projectile came from an enemy or boss
+     * Tells if this projectile came from an enemy
      * @return boolean
      */
     public boolean isEnemySource()
     {
-        return PlayerManager.isEnemy(getSource());
+        return BossManager.isBoss(getSource());
+    }
+    
+    /**
+     * Tells if this projectile came from a boss
+     * @return boolean
+     */
+    public boolean isBossSource()
+    {
+        return GruntManager.isGrunt(getSource());
     }
 }

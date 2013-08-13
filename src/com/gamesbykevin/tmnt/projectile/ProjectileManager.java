@@ -119,27 +119,6 @@ public class ProjectileManager
             projectile.getSpriteSheet().update();
             projectile.update();
             
-            if (!projectile.hasVelocity())
-                continue;
-            
-            if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1)
-            {
-                boolean result = false;
-                
-                //if the projectile came from enemy
-                if (projectile.isEnemySource())
-                {
-                    result = checkPlayers(players.getHeroes(), projectile);
-                    
-                    if (result)
-                    {
-                        projectiles.remove(i);
-                        i--;
-                        continue;
-                    }
-                }
-            }
-            
             //is this projectile currently displaying the finish animation if it has one
             if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1_FINISH)
             {
@@ -159,10 +138,31 @@ public class ProjectileManager
                 i--;
                 continue;
             }
+            
+            if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1)
+            {
+                if (!projectile.hasVelocity())
+                    continue;
+                
+                boolean result = false;
+                
+                //if the projectile came from enemy or boss
+                if (projectile.isEnemySource() || projectile.isBossSource())
+                {
+                    result = checkPlayers(players.getHeroManager().getHeroes(), projectile);
+                    
+                    if (result)
+                    {
+                        projectiles.remove(i);
+                        i--;
+                        continue;
+                    }
+                }
+            }
         }
     }
     
-    private boolean checkPlayers(final List<Hero> players, final Projectile projectile)
+    private boolean checkPlayers(final List<Player> players, final Projectile projectile)
     {
         for (Player player : players)
         {

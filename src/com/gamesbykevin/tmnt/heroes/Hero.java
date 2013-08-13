@@ -2,19 +2,14 @@ package com.gamesbykevin.tmnt.heroes;
 
 import com.gamesbykevin.framework.input.Keyboard;
 
-import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.levels.Level;
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.ResourceManager;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
-import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 import java.awt.Color;
 
 import java.awt.event.KeyEvent;
 import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.util.List;
 
 public class Hero extends Player
@@ -35,9 +30,12 @@ public class Hero extends Player
      * This player is human so we need to check keyboard input
      * @param keyboard Our object that records keyboard events
      */
-    public void update(final ProjectileManager projectileManager, List<Player> enemies, final Keyboard keyboard, final Polygon boundary) throws Exception
+    public void update(final Engine engine) throws Exception
     {
-        super.update(projectileManager, enemies, boundary);
+        final List<Player> enemies = engine.getPlayerManager().getEnemies();
+        final Keyboard keyboard = engine.getKeyboard();
+        
+        super.update(engine, enemies);
         
         if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
         {

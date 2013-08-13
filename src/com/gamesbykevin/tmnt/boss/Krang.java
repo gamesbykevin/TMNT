@@ -101,7 +101,7 @@ public class Krang extends Boss implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(5,0), getNanoSeconds(450));
+        animation.add(getSpriteRectangle(5,0), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

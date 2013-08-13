@@ -173,7 +173,7 @@ public class LevelManager
             //get hero with the most width
             int mostWidth = 0;
             
-            for (Player hero : players.getHeroes())
+            for (Player hero : players.getHeroManager().getHeroes())
             {
                 if (hero.getWidth() > mostWidth)
                     mostWidth = hero.getWidth() + 1;
@@ -293,7 +293,7 @@ public class LevelManager
                     while (players.getEnemies().size() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
                     {
                         //add random enemy to player manager
-                        players.addRandomEnemy();
+                        players.getGruntManager().addRandom();
                         
                         //increase the count since we need to keep track
                         getLevel().addEnemiesCreatedAtCheckpoint();
@@ -304,8 +304,8 @@ public class LevelManager
             //no more check points so hero has reached end of level
             if (getLevel().getCheckpointCount() < 1)
             {
-                if (players.getBosses().size() < 1)
-                    players.addBoss(getLevel().getBoss());
+                if (players.getBossManager().getGrunts().size() < 1)
+                    players.getBossManager().add(getLevel().getBoss());
             }
         }
     }
@@ -328,7 +328,7 @@ public class LevelManager
         }
         
         //if scroll screen is to be displayed the image will not be null
-        if (display && !hasFinished(screen))
+        if (display && !this.hasFinished(screen))
         {
             final int x = screen.x + screen.width - image.getWidth(null);
             final int y = screen.y + (screen.height / 2) - (image.getHeight(null) / 2);

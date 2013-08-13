@@ -3,8 +3,9 @@ package com.gamesbykevin.tmnt.player;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.TimerCollection;
 
-import com.gamesbykevin.tmnt.projectile.ProjectileManager;
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.Point;
 import java.awt.Polygon;
@@ -137,7 +138,7 @@ public abstract class Player extends Sprite
         return this.healthDefault;
     }
     
-    protected void setLives(final int lives)
+    public void setLives(final int lives)
     {
         this.lives = lives;
     }
@@ -347,12 +348,13 @@ public abstract class Player extends Sprite
      * as well as the location based on the current
      * velocity set. Also updates the timers
      * 
-     * @param projectileManager Projectiles in play
+     * @param Engine Game Engine containing all elements
      * @param players List of Players we are fighting against
-     * @param boundary The area that is in bounds for the current Level
      */
-    public void update(final ProjectileManager projectileManager, final List<Player> players, final Polygon boundary) throws Exception
+    protected void update(final Engine engine, List<Player> players) throws Exception
     {
+        final ProjectileManager projectileManager = engine.getProjectileManager();
+        
         getSpriteSheet().update();
         super.update();
         
@@ -396,9 +398,7 @@ public abstract class Player extends Sprite
             //NOTE THIS MAY NEED TO CHANGE FOR THE BOSSES AS ROCKSTEADY CAN FIRE MULTIPLE BULLETS
             //if the player can throw a projectile but does not have one currently
             if (hasState(State.THROW_PROJECTILE) && !projectileManager.hasProjectile(getType()) && projectileManager.canAddProjectile())
-            {
                 canThrow = true;
-            }
         }
         
         if (isHurt())

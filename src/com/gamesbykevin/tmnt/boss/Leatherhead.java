@@ -114,7 +114,7 @@ public class Leatherhead extends Boss implements PlayerRules
         //dead animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,1), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(5,1), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(5,1), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }    
 }

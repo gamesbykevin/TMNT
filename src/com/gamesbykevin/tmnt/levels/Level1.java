@@ -13,7 +13,7 @@ public final class Level1 extends Level implements LevelRules
     public Level1() throws Exception
     {
         super(0, 0, GamePlayers.Bebop);
-        //super(10, 4);
+        //super(10, 4, GamePlayers.Bebop);
         
         setupDefaults();
     }

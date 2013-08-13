@@ -116,7 +116,7 @@ public class Rocksteady extends Boss implements PlayerRules
         //dead animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,4), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(5,4), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(5,4), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

@@ -123,7 +123,6 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                 if (menu.isMenuFinished() && menu.hasFocus())
                 {
                     //MAIN GAME LOGIC RUN HERE
-                    
                     if (getPlayerManager() != null)
                     {
                         getProjectileManager().update(getMain().getScreen(), getPlayerManager());
@@ -234,7 +233,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         this.levelManager = new LevelManager();
         this.levelManager.setLevel(level, resources, main.getScreen());
         
-        this.playerManager.addHero(heroType, livesIndex + 5);
+        this.playerManager.getHeroManager().add(heroType, livesIndex + 5);
         
         //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
         
@@ -254,9 +253,10 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public Graphics render(Graphics g) throws Exception
     {
+        //if the resources are still loading
         if (resources.isLoading())
         {
-            //if we are loading resources draw loading screen
+            //draw loading screen
             resources.draw(g, main.getScreen());
         }
         else
@@ -339,7 +339,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             levelObjects.clear();
             
             //draw hero info, etc....
-            getPlayerManager().render(g2d, getMain().getScreen(), resources);
+            getPlayerManager().render(g2d, this);
         }
         
         g2d.setFont(tmpFont);

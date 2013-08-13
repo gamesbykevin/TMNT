@@ -76,17 +76,17 @@ public class Shredder extends Boss implements PlayerRules
         
         //walk horizontal animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,1), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(2,1), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(4,1), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(3,1), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(2,1), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(4,1), getNanoSeconds(75));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.WALK_HORIZONTAL);
         
         //walk vertical animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(3,1), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(2,1), getNanoSeconds(125));
-        animation.add(getSpriteRectangle(4,1), getNanoSeconds(125));
+        animation.add(getSpriteRectangle(3,1), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(2,1), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(4,1), getNanoSeconds(75));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.WALK_VERTICAL);
         
@@ -98,8 +98,8 @@ public class Shredder extends Boss implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(2,0), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(300));
+        animation.add(getSpriteRectangle(2,0), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }    
 }

@@ -1,20 +1,11 @@
 package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.tmnt.grunt.Grunt;
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
-import com.gamesbykevin.tmnt.player.Player;
-import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
-import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.IndexColorModel;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
 
 public class Boss extends Grunt
 {
@@ -51,35 +42,34 @@ public class Boss extends Grunt
         this.original = new BufferedImage(getImage().getWidth(null), getImage().getHeight(null), BufferedImage.TYPE_INT_ARGB);
         this.original.getGraphics().drawImage(getImage(), 0, 0, null);
         
-        /*
-        byte[] r = new byte[]{(byte)0, (byte) 255};
-        byte[] g = new byte[]{(byte)0, (byte) 255};
-        byte[] b = new byte[]{(byte)0, (byte) 255};
-        byte[] a = new byte[]{(byte)255, (byte) 0};
+        //
+        BufferedImageOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        flashing = op.filter(original, flashing);
         
-        IndexColorModel bitmaskColorModel = new IndexColorModel(1, 2, r, g, b, a);
-        
-        BufferedImage tmpFlashing = new BufferedImage(bitmaskColorModel, original.getRaster(), false, null);
-        
-        //get the graphics object of the buffered image
-        Graphics2D g2d = flashing.createGraphics();
-        
-        //draw the bitmask to the buffered image
-        g2d.drawImage(tmpFlashing, 0, 0, null);
-        
-        //release system resources for good house-keeping
-        g2d.dispose();
-        */
-        
-        super.setImage(original);
+        super.setImage(flashing);
     }
     
+    /**
+     * Release all resources
+     */
+    public void dispose()
+    {
+        super.dispose();
+        
+        if (original != null)
+            original.flush();
+        if (flashing != null)
+            flashing.flush();
+        
+        original = null;
+        flashing = null;
+    }
     
     /**
      * Run the AI in Grunt class for this enemy
      */
-    public void update(final ProjectileManager projectileManager, final List<Player> heroes, final Polygon boundary) throws Exception
+    public void update(final Engine engine) throws Exception
     {
-        super.update(projectileManager, heroes, boundary);
+        super.update(engine);
     }
 }

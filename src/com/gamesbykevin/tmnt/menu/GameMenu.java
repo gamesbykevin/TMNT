@@ -8,7 +8,7 @@ import com.gamesbykevin.framework.display.FullScreen;
 import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.menu.*;
 import com.gamesbykevin.framework.util.*;
-import com.gamesbykevin.tmnt.player.PlayerManager;
+import com.gamesbykevin.tmnt.heroes.HeroManager;
 import com.gamesbykevin.tmnt.shared.Shared;
 
 import java.awt.Graphics;
@@ -61,7 +61,7 @@ public class GameMenu extends Menu
         
         for (ResourceManager.GamePlayers type : ResourceManager.GamePlayers.values())
         {
-            if (PlayerManager.isHero(type))
+            if (HeroManager.isHero(type))
                 optionHero.add(type.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
         }
         

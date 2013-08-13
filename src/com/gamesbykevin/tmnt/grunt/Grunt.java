@@ -1,5 +1,6 @@
 package com.gamesbykevin.tmnt.grunt;
 
+import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
@@ -36,10 +37,15 @@ public class Grunt extends Player
     /**
      * Run the AI here for the enemy
      */
-    public void update(final ProjectileManager projectileManager, final List<Player> heroes, final Polygon boundary) throws Exception
+    public void update(final Engine engine) throws Exception
     {
+        final ProjectileManager projectileManager = engine.getProjectileManager();
+        final List<Player> heroes = engine.getPlayerManager().getHeroManager().getHeroes();
+        final Polygon boundary = engine.getLevelManager().getLevel().getBoundary();
+        final Rectangle screen = engine.getMain().getScreen();
+        
         //call this update first as it manages the animation and player state
-        super.update(projectileManager, heroes, boundary);
+        super.update(engine, heroes);
         
         //no heroes
         if (heroes.size() < 1 || getAssignment() == null)
@@ -86,17 +92,12 @@ public class Grunt extends Player
                     if (!step1 && !step2 && step3)
                         closeGap(anchor, anchorHero, hero.getX());
 
-                    //NOTE: MAY ADD THIS IN FUTURE
-                    //if we aren't getting ready to attack we should be avoiding our targeted hero
-                    //if (!step2 && !step3)
-                    //    avoidAttack(anchor, anchorHero, hero.isJumping());
-
                     //here we check for the opportunity to attack
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
                     //if there's an opportunity, take it as long as they are on the screen
                     //if (attackState != null && screen.contains(super.getRectangle()))
-                    if (attackState != null)
+                    if (attackState != null && screen.contains(super.getPoint()))
                     {
                         //while attacking the enemy isn't moving
                         setVelocityX(VELOCITY_NONE);

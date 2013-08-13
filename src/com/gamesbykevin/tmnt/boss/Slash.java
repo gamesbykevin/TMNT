@@ -104,7 +104,7 @@ public class Slash extends Boss implements PlayerRules
         
         //dead animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(1,1), getNanoSeconds(450));
+        animation.add(getSpriteRectangle(1,1), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }
 }

@@ -117,7 +117,7 @@ public class Bebop extends Boss implements PlayerRules
         //dead animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(2,2), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(3,2), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(3,2), getNanoSeconds(2000));
         getSpriteSheet().add(animation, State.DEAD);
     }    
 }
