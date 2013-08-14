@@ -1,7 +1,7 @@
 package com.gamesbykevin.tmnt.grunt;
 
 import com.gamesbykevin.tmnt.enemymanager.EnemyManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 
 import java.util.ArrayList;
 

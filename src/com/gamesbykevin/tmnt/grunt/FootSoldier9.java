@@ -2,7 +2,7 @@ package com.gamesbykevin.tmnt.grunt;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 

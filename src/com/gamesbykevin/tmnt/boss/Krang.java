@@ -2,7 +2,7 @@ package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 
-import static com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import static com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
 public class Krang extends Boss implements PlayerRules

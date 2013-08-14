@@ -1,6 +1,6 @@
 package com.gamesbykevin.tmnt.heroes;
 
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 

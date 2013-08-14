@@ -4,7 +4,7 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.TimerCollection;
 
 import com.gamesbykevin.tmnt.main.Engine;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.Point;

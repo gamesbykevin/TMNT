@@ -1,6 +1,6 @@
 package com.gamesbykevin.tmnt.menu;
 
-import com.gamesbykevin.tmnt.main.ResourceManager;
+import com.gamesbykevin.tmnt.main.Resources;
 import com.gamesbykevin.tmnt.main.Main;
 import com.gamesbykevin.tmnt.main.Engine;
 
@@ -50,7 +50,7 @@ public class GameMenu extends Menu
     private Layer layerControl, layerInstruction1, layerOptionInGame, layerNew, layerExit;
     private Layer layerAppletFocus, layerStartGame, layerConfirmNewYes;
     
-    public GameMenu(final ResourceManager resources, final Rectangle screen) 
+    public GameMenu(final Resources resources, final Rectangle screen) 
     {
         super(screen);
         
@@ -59,40 +59,40 @@ public class GameMenu extends Menu
         
         optionHero = new Option("Hero: ");
         
-        for (ResourceManager.GamePlayers type : ResourceManager.GamePlayers.values())
+        for (Resources.GamePlayers type : Resources.GamePlayers.values())
         {
             if (HeroManager.isHero(type))
-                optionHero.add(type.toString(), resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+                optionHero.add(type.toString(), resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         }
         
         optionLevel = new Option("Level: ");
-        optionLevel.add("1", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add("2", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add("3", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add("4", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add("5", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLevel.add("6", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLevel.add("1", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLevel.add("2", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLevel.add("3", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLevel.add("4", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLevel.add("5", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLevel.add("6", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         
         optionLives = new Option("Lives: ");
-        optionLives.add("5", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("6", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("7", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("8", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("9", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("10", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("11", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("12", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("13", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("14", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionLives.add("15", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionLives.add("5", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("6", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("7", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("8", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("9", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("10", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("11", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("12", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("13", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("14", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionLives.add("15", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         
         optionFullScreen = new Option("FullScreen: ");
-        optionFullScreen.add("Off",resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionFullScreen.add("On", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionFullScreen.add("Off",resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionFullScreen.add("On", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         
         optionSound = new Option("Sound: ");
-        optionSound.add("On", resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
-        optionSound.add("Off",resources.getMenuAudio(ResourceManager.MenuAudio.MenuChange));
+        optionSound.add("On", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
+        optionSound.add("Off",resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         
         optionStartGame = new Option(LayerKey.StartGame);
         optionStartGame.add("Start Game", null);
@@ -135,14 +135,14 @@ public class GameMenu extends Menu
         
         //setup all layers below
         layerGameTitle = new Layer(Layer.Type.NONE, screen);
-        layerGameTitle.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleScreen));
+        layerGameTitle.setImage(resources.getMenuImage(Resources.MenuImage.TitleScreen));
         layerGameTitle.setForce(false);
         layerGameTitle.setPause(false);
         layerGameTitle.setNextLayerKey(LayerKey.Credits);
         layerGameTitle.setTimer(new Timer(TimerCollection.toNanoSeconds(2000L)));
         
         layerCredit = new Layer(Layer.Type.SCROLL_VERTICAL_NORTH, screen);
-        layerCredit.setImage(resources.getMenuImage(ResourceManager.MenuImage.Credits));
+        layerCredit.setImage(resources.getMenuImage(Resources.MenuImage.Credits));
         layerCredit.setForce(false);
         layerCredit.setPause(false);
         layerCredit.setNextLayerKey(LayerKey.MainTitle);
@@ -150,7 +150,7 @@ public class GameMenu extends Menu
         
         layerMainTitle = new Layer(Layer.Type.SCROLL_HORIZONTAL_WEST_REPEAT, screen);
         layerMainTitle.setTitle(Shared.GAME_NAME);
-        layerMainTitle.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleBackground));
+        layerMainTitle.setImage(resources.getMenuImage(Resources.MenuImage.TitleBackground));
         layerMainTitle.setForce(false);
         layerMainTitle.setPause(true);
         layerMainTitle.setTimer(new Timer(TimerCollection.toNanoSeconds(5000L)));
@@ -163,7 +163,7 @@ public class GameMenu extends Menu
         layerOption = new Layer(Layer.Type.SCROLL_HORIZONTAL_WEST_REPEAT, screen);
         layerOption.setTitle("Options");
         //layerOption.setSound(null);
-        layerOption.setImage(resources.getMenuImage(ResourceManager.MenuImage.TitleBackground));
+        layerOption.setImage(resources.getMenuImage(Resources.MenuImage.TitleBackground));
         layerOption.setForce(false);
         layerOption.setPause(true);
         layerOption.setTimer(new Timer(TimerCollection.toNanoSeconds(5000L)));
@@ -178,14 +178,14 @@ public class GameMenu extends Menu
         layerOption.add(OptionKey.GoBack,     this.optionGoBack);
         
         layerControl = new Layer(Layer.Type.NONE, screen);
-        layerControl.setImage(resources.getMenuImage(ResourceManager.MenuImage.Controls));
+        layerControl.setImage(resources.getMenuImage(Resources.MenuImage.Controls));
         layerControl.setForce(false);
         layerControl.setPause(true);
         layerControl.setTimer(null);
         layerControl.setNextLayerKey(LayerKey.MainTitle);
         
         layerInstruction1 = new Layer(Layer.Type.NONE, screen);
-        layerInstruction1.setImage(resources.getMenuImage(ResourceManager.MenuImage.Instructions1));
+        layerInstruction1.setImage(resources.getMenuImage(Resources.MenuImage.Instructions1));
         layerInstruction1.setForce(false);
         layerInstruction1.setPause(true);
         layerInstruction1.setTimer(null);
@@ -216,7 +216,7 @@ public class GameMenu extends Menu
         layerExit.add(OptionKey.ExitGameDeny,    this.optionExitGameDeny);
         
         layerAppletFocus = new Layer(Layer.Type.NONE, screen);
-        layerAppletFocus.setImage(resources.getMenuImage(ResourceManager.MenuImage.AppletFocus));
+        layerAppletFocus.setImage(resources.getMenuImage(Resources.MenuImage.AppletFocus));
         layerAppletFocus.setForce(false);
         layerAppletFocus.setPause(true);
         
@@ -245,7 +245,7 @@ public class GameMenu extends Menu
     public void update(final Engine engine) throws Exception
     {
         final Main main                 = engine.getMain();
-        final ResourceManager resources = engine.getResources();
+        final Resources resources = engine.getResources();
         final Keyboard ki               = engine.getKeyboard();
         final Mouse mi                  = engine.getMouse();
         
@@ -324,7 +324,7 @@ public class GameMenu extends Menu
             if (ki.hasKeyPressed(KeyEvent.VK_ESCAPE))
             {   //if in game and Esc is pressed bring in game options menu back up
                 setLayer(LayerKey.OptionsInGame);
-                ki.resetAllKeyEvents();
+                ki.reset();
             }
         }
     }

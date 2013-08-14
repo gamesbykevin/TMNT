@@ -3,8 +3,8 @@ package com.gamesbykevin.tmnt.heroes;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.main.Engine;
-import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import java.awt.Color;
 
@@ -16,6 +16,12 @@ public class Hero extends Player
 {
     private static final int HEALTH_DEFAULT = 10;
     private static final int LIVES_DEFAULT = 5;
+    
+    private int fullHealthWidth = -1;
+    private int fontHeight = -1;
+    
+    //store the color of the turtle used to draw turtle info
+    private Color color;
     
     public Hero(final GamePlayers type)
     {
@@ -143,7 +149,7 @@ public class Hero extends Player
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.resetAllKeyEvents();
+                keyboard.reset();
             }
         }
 
@@ -153,21 +159,26 @@ public class Hero extends Player
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.resetAllKeyEvents();
+                keyboard.reset();
             }
         }
     }
     
     public Graphics renderHealthInformation(final Graphics g, final int x, final int y)
     {
-        if (getType() == ResourceManager.GamePlayers.Donatello)
-            g.setColor(new Color(182, 52, 187));
-        if (getType() == ResourceManager.GamePlayers.Leonardo)
-            g.setColor(new Color(0, 191, 255));
-        if (getType() == ResourceManager.GamePlayers.Michelangelo)
-            g.setColor(new Color(255, 215, 0));
-        if (getType() == ResourceManager.GamePlayers.Raphael)
-            g.setColor(new Color(255, 0, 0));
+        if (color == null)
+        {
+            if (getType() == Resources.GamePlayers.Donatello)
+                color = new Color(182, 52, 187);
+            if (getType() == Resources.GamePlayers.Leonardo)
+                color = new Color(0, 191, 255);
+            if (getType() == Resources.GamePlayers.Michelangelo)
+                color = new Color(255, 215, 0);
+            if (getType() == Resources.GamePlayers.Raphael)
+                color = new Color(255, 0, 0);
+        }
+        
+        g.setColor(color);
         
         String result = "";
         
@@ -178,9 +189,15 @@ public class Hero extends Player
         
         g.drawString(result, x, y);
         
-        final int width = g.getFontMetrics().stringWidth("IIIIIIII");
+        result = null;
         
-        g.drawString(super.getLives() + "", x + width, y - (int)(g.getFontMetrics().getHeight() * 1.2));
+        if (fullHealthWidth < 0)
+            fullHealthWidth = g.getFontMetrics().stringWidth("IIIIIIII");
+        if (fontHeight < 0)
+            fontHeight = g.getFontMetrics().getHeight();
+        
+        
+        g.drawString(super.getLives() + "", x + fullHealthWidth, y - (int)(fontHeight * 1.2));
         
         return g;
     }

@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
  * This class will load all resources and provide ways to access them
  * @author GOD
  */
-public class ResourceManager 
+public class Resources 
 {   
     //this will contain all resources
     private LinkedHashMap everyResource = new LinkedHashMap();
@@ -71,38 +71,41 @@ public class ResourceManager
     
     public enum GameAudioMusic
     {
-        Song1
+        LevelClear, 
+        Level1, Level1Boss, Level2, Level2Boss, Level3, Level3Boss, 
+        Level4, Level4Boss, Level5, Level5Boss, Level6Boss, 
+        GameOverWin, GameOverLose
     }
     
     //indicates wether or not we are still loading resources
     private boolean loading = true;
     
-    public ResourceManager()
+    public Resources()
     {
         //load all menu images
-        add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", Resources.Type.Image);
+        add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
         
         //load all players
-        add(Type.GamePlayers, (Object[])GamePlayers.values(), RESOURCE_DIR + "images/game/players/{0}.png", "Loading Game Player Image Resources", Resources.Type.Image);
+        add(Type.GamePlayers, (Object[])GamePlayers.values(), RESOURCE_DIR + "images/game/players/{0}.png", "Loading Game Player Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
         
         //load all levels
-        add(Type.LevelMisc, (Object[])LevelMisc.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", Resources.Type.Image);
+        add(Type.LevelMisc, (Object[])LevelMisc.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
         
         //load all game fonts
-        add(Type.GameFont, (Object[])GameFont.values(), RESOURCE_DIR + "font/{0}.ttf", "Loading Game Font Resources", Resources.Type.Font);
+        add(Type.GameFont, (Object[])GameFont.values(), RESOURCE_DIR + "font/{0}.ttf", "Loading Game Font Resources", com.gamesbykevin.framework.resources.Manager.Type.Font);
         
         //load all menu audio
-        add(Type.MenuAudio, (Object[])MenuAudio.values(), RESOURCE_DIR + "audio/menu/{0}.wav", "Loading Menu Audio Resources", Resources.Type.Audio);
+        add(Type.MenuAudio, (Object[])MenuAudio.values(), RESOURCE_DIR + "audio/menu/{0}.wav", "Loading Menu Audio Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
         
         //load all game audio
-        add(Type.GameAudioEffects, (Object[])GameAudioEffects.values(), RESOURCE_DIR + "audio/game_effects/{0}.wav", "Loading Game Audio Resources", Resources.Type.Audio);
+        add(Type.GameAudioEffects, (Object[])GameAudioEffects.values(), RESOURCE_DIR + "audio/game_effects/{0}.wav", "Loading Game Audio Sound Effects Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
 
         //load all game audio
-        add(Type.GameAudioMusic,  (Object[])GameAudioMusic.values(),   RESOURCE_DIR + "audio/game_music/{0}.mp3", "Loading Game Audio Resources", Resources.Type.Audio);
+        add(Type.GameAudioMusic,  (Object[])GameAudioMusic.values(),   RESOURCE_DIR + "audio/game_music/{0}.mid", "Loading Game Audio Music Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
     }
     
     //add a collection of resources audio/image/font/text
-    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final Resources.Type resourceType)
+    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final com.gamesbykevin.framework.resources.Manager.Type resourceType)
     {
         String[] locations = new String[eachResourceKey.length];
         for (int i=0; i < locations.length; i++)
@@ -110,7 +113,7 @@ public class ResourceManager
             locations[i] = MessageFormat.format(directory, i);
         }
 
-        Resources resources = new Resources(Resources.LoadMethod.OnePerFrame, locations, eachResourceKey, resourceType);
+        com.gamesbykevin.framework.resources.Manager resources = new com.gamesbykevin.framework.resources.Manager(com.gamesbykevin.framework.resources.Manager.LoadMethod.OnePerFrame, locations, eachResourceKey, resourceType);
         resources.setDesc(loadDesc);
         
         everyResource.put(key, resources);
@@ -121,9 +124,9 @@ public class ResourceManager
         return loading;
     }
     
-    private Resources getResources(final Object key)
+    private com.gamesbykevin.framework.resources.Manager getResources(final Object key)
     {
-        return (Resources)everyResource.get(key);
+        return (com.gamesbykevin.framework.resources.Manager)everyResource.get(key);
     }
     
     public Font getGameFont(final Object key)
@@ -141,47 +144,34 @@ public class ResourceManager
         return getResources(Type.LevelMisc).getImage(key);
     }
     
-    /*
-    public Image getGameImage(Object key)
-    {
-        return getResources(Type.GameImage).getImage(key);
-    }
-    */
-    
-    /**
-     * Load an Image on the fly
-     * @param index where is the image located
-     * @return Image Puzzle Image that we want
-     */
-    public Image getImage(Class<?> source, final int index)
-    {
-        final String location = MessageFormat.format(RESOURCE_DIR + "images/game/puzzles/{0}.jpg", String.valueOf(index));
-        return ImageResource.getImageResource(source, location);
-    }
-    
     public Image getMenuImage(final Object key)
     {
         return getResources(Type.MenuImage).getImage(key);
     }
     
-    public AudioResource getMenuAudio(final Object key)
+    public Audio getMenuAudio(final Object key)
     {
         return getResources(Type.MenuAudio).getAudio(key);
     }
     
-    public void playMusic(final Object key, final boolean loop)
+    /**
+     * Play game music according to parameter key
+     * @param key The unique identifier used to play the music
+     * @param loop Do we loop play once finished
+     */
+    public void playGameMusic(final Object key, final boolean loop)
     {
         getResources(Type.GameAudioMusic).playAudio(key, loop);
     }
     
-    public void playSound(final Object key, final boolean loop)
+    public void playSoundEffect(final Object key, final boolean loop)
     {
         getResources(Type.GameAudioEffects).playAudio(key, loop);
     }
     
-    public void stopSound(final Object key)
+    public void stopSoundEffect(final Object key)
     {
-        getResources(Type.GameAudioEffects).getAudio(key).stop();
+        getResources(Type.GameAudioEffects).getAudio(key).stopSound();
     }
     
     public void stopAllSound()
@@ -196,28 +186,29 @@ public class ResourceManager
         
         for (Object key : keys)
         {
-            Resources r = getResources(key);
+            Manager resources = getResources(key);
             
-            if (!r.isLoadingComplete())
+            if (!resources.isLoadingComplete())
             {
-                r.loadResources(source);
+                //load the resources
+                resources.update(source);
                 return;
             }
         }
-
+        
         //if this line is reached we are done loading every resource
         loading = false;
     }
     
     public boolean isAudioEnabled()
     {
-        return getResources(Type.GameAudioEffects).isAudioEnabled();
+        return getResources(Type.GameAudioEffects).isAudioEnabled() || getResources(Type.GameAudioMusic).isAudioEnabled();
     }
     
     public void setAudioEnabled(boolean soundEnabled)
     {
-        Resources r1 = getResources(Type.GameAudioEffects);
-        Resources r2 = getResources(Type.GameAudioMusic);
+        com.gamesbykevin.framework.resources.Manager r1 = getResources(Type.GameAudioEffects);
+        com.gamesbykevin.framework.resources.Manager r2 = getResources(Type.GameAudioMusic);
         
         if ((r1.isAudioEnabled() && soundEnabled) || (!r1.isAudioEnabled() && !soundEnabled))
             return;
@@ -238,7 +229,7 @@ public class ResourceManager
         
         for (Object key : keys)
         {
-            Resources r = getResources(key);
+            com.gamesbykevin.framework.resources.Manager r = getResources(key);
             
             if (r != null)
                 r.dispose();
@@ -252,7 +243,7 @@ public class ResourceManager
         everyResource = null;
     }
     
-    public Graphics draw(Graphics g, final Rectangle screen)
+    public Graphics draw(final Graphics g, final Rectangle screen)
     {
         if (!loading)
             return g;
@@ -261,11 +252,11 @@ public class ResourceManager
         
         for (Object key : keys)
         {
-            Resources r = getResources(key);
+            Manager resources = getResources(key);
             
-            if (!r.isLoadingComplete())
+            if (!resources.isLoadingComplete())
             {
-                Progress.draw(g, screen, r.getProgress(), r.getDesc());
+                Progress.draw(g, screen, resources.getProgress(), resources.getDesc());
                 return g;
             }
         }

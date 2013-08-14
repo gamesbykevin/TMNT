@@ -233,6 +233,9 @@ public class Main extends Thread
 
             if (Shared.DEBUG)
                 renderCounter(g);
+            
+            //now that image is drawn free up resources
+            g.dispose();
         }
     }
     
@@ -260,15 +263,17 @@ public class Main extends Thread
      */
     private Graphics renderCounter(Graphics g)
     {
-        final String result = currentUPS + " UPS, " + currentFPS + " FPS";
-        final int width = g.getFontMetrics().stringWidth(result);
-        final int height = g.getFontMetrics().getHeight() + 1;
-        final Rectangle tmp = new Rectangle(originalSizeWindow.width - width, originalSizeWindow.height - height, width, height);
+        String result = currentUPS + " UPS, " + currentFPS + " FPS";
+        int width = g.getFontMetrics().stringWidth(result);
+        int height = g.getFontMetrics().getHeight() + 1;
+        Rectangle tmp = new Rectangle(originalSizeWindow.width - width, originalSizeWindow.height - height, width, height);
         
         g.setColor(Color.BLACK);
         g.fillRect(tmp.x, tmp.y, tmp.width, tmp.height);
         g.setColor(Color.WHITE);
         g.drawString(result, tmp.x, tmp.y + height - 2);
+        
+        result = null;
         
         return g;
     }

@@ -5,7 +5,7 @@ import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.input.Keyboard;
 
 import com.gamesbykevin.tmnt.levels.*;
-import com.gamesbykevin.tmnt.main.ResourceManager.LevelMisc;
+import com.gamesbykevin.tmnt.main.Resources.LevelMisc;
 import com.gamesbykevin.tmnt.menu.GameMenu;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
@@ -30,7 +30,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private GameMenu menu;
     
     //object that contains all image/audio resources in the game
-    private ResourceManager resources;
+    private Resources resources;
     
     //mouse object that will be recording mouse input
     private Mouse mouse;
@@ -57,7 +57,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         this.main = main;
         this.mouse = new Mouse();
         this.keyboard = new Keyboard();
-        this.resources = new ResourceManager();
+        this.resources = new Resources();
     }
     
     /**
@@ -113,8 +113,8 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             {
                 if (!menu.hasFocus())
                 {
-                    mouse.resetMouseEvents();
-                    keyboard.resetAllKeyEvents();
+                    mouse.reset();
+                    keyboard.reset();
                 }
 
                 menu.update(this);
@@ -132,7 +132,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                 }
                 
                 if (mouse.isMouseReleased())
-                    mouse.resetMouseEvents();
+                    mouse.reset();
             }
         }
         catch(Exception e)
@@ -168,61 +168,61 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void reset() throws Exception
     {
-        ResourceManager.LevelMisc level;
+        Resources.LevelMisc level;
         
         switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LevelSelect))
         {
             case 0:
-                level = ResourceManager.LevelMisc.Level1;
+                level = Resources.LevelMisc.Level1;
                 break;
                 
             case 1:
-                level = ResourceManager.LevelMisc.Level2;
+                level = Resources.LevelMisc.Level2;
                 break;
                 
             case 2:
-                level = ResourceManager.LevelMisc.Level3;
+                level = Resources.LevelMisc.Level3;
                 break;
                 
             case 3:
-                level = ResourceManager.LevelMisc.Level4;
+                level = Resources.LevelMisc.Level4;
                 break;
                 
             case 4:
-                level = ResourceManager.LevelMisc.Level5;
+                level = Resources.LevelMisc.Level5;
                 break;
                 
             case 5:
-                level = ResourceManager.LevelMisc.Level6;
+                level = Resources.LevelMisc.Level6;
                 break;
                 
             default:
-                level = ResourceManager.LevelMisc.Level1;
+                level = Resources.LevelMisc.Level1;
                 break;
         }
         
-        ResourceManager.GamePlayers heroType;
+        Resources.GamePlayers heroType;
         
         switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.HeroSelect))
         {
             case 0:
-                heroType = ResourceManager.GamePlayers.Donatello;
+                heroType = Resources.GamePlayers.Donatello;
                 break;
                 
             case 1:
-                heroType = ResourceManager.GamePlayers.Raphael;
+                heroType = Resources.GamePlayers.Raphael;
                 break;
                 
             case 2:
-                heroType = ResourceManager.GamePlayers.Leonardo;
+                heroType = Resources.GamePlayers.Leonardo;
                 break;
                 
             case 3:
-                heroType = ResourceManager.GamePlayers.Michelangelo;
+                heroType = Resources.GamePlayers.Michelangelo;
                 break;
                 
             default:
-                heroType = ResourceManager.GamePlayers.Leonardo;
+                heroType = Resources.GamePlayers.Leonardo;
                 break;
         }
         
@@ -280,7 +280,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Graphics renderGame(Graphics2D g2d) throws Exception
     {
         Font tmpFont = g2d.getFont();
-        g2d.setFont(resources.getGameFont(ResourceManager.GameFont.Dialog).deriveFont(Font.PLAIN, 8));
+        g2d.setFont(resources.getGameFont(Resources.GameFont.Dialog).deriveFont(Font.PLAIN, 8));
         
         if (getPlayerManager() != null && getLevelManager() != null && getProjectileManager() != null)
         {
@@ -364,19 +364,19 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         {
             Point p = mouse.getLocation();
 
-            if (p != null && resources.getMenuImage(ResourceManager.MenuImage.Mouse) != null && resources.getMenuImage(ResourceManager.MenuImage.MouseDrag) != null)
+            if (p != null && resources.getMenuImage(Resources.MenuImage.Mouse) != null && resources.getMenuImage(Resources.MenuImage.MouseDrag) != null)
             {
                 if (mouse.isMouseDragged())
-                    g.drawImage(resources.getMenuImage(ResourceManager.MenuImage.MouseDrag), p.x, p.y, null);
+                    g.drawImage(resources.getMenuImage(Resources.MenuImage.MouseDrag), p.x, p.y, null);
                 else
-                    g.drawImage(resources.getMenuImage(ResourceManager.MenuImage.Mouse), p.x, p.y, null);
+                    g.drawImage(resources.getMenuImage(Resources.MenuImage.Mouse), p.x, p.y, null);
             }
         }
 
         return g;
     }
     
-    public ResourceManager getResources()
+    public Resources getResources()
     {
         return resources;
     }
@@ -384,19 +384,19 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void keyReleased(KeyEvent e)
     {
-        keyboard.setKeyReleased(e.getKeyCode());
+        keyboard.addKeyReleased(e.getKeyCode());
     }
     
     @Override
     public void keyPressed(KeyEvent e)
     {
-        keyboard.setKeyPressed(e.getKeyCode());
+        keyboard.addKeyPressed(e.getKeyCode());
     }
     
     @Override
     public void keyTyped(KeyEvent e)
     {
-        keyboard.setKeyTyped(e.getKeyChar());
+        keyboard.addKeyTyped(e.getKeyChar());
     }
     
     @Override

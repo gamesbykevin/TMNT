@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gamesbykevin.tmnt.levels;
 
 /**
@@ -11,12 +7,24 @@ package com.gamesbykevin.tmnt.levels;
 public interface LevelRules 
 {
     /**
-     * Setup the level boundaries and other details
-     */
-    public void setupDefaults();
-    
-    /**
      * This is required to set the boundaries for each level
      */
     public void setLevelBounds();
+    
+    /**
+     * Set the appropriate music for the level and for the boss
+     */
+    public void setMusic();
+    
+    /**
+     * Set the number of power ups for this level
+     */
+    public void setPowerupLimit();
+    
+    /**
+     * Set the number of enemies that can be created once
+     * and the number of enemies that will spawn at each 
+     * checkpoint.
+     */
+    public void setEnemyLimits();
 }

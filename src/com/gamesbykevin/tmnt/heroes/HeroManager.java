@@ -3,8 +3,8 @@ package com.gamesbykevin.tmnt.heroes;
 import com.gamesbykevin.framework.base.Sprite;
 
 import com.gamesbykevin.tmnt.main.Engine;
-import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 
 import java.awt.Graphics;
@@ -160,7 +160,7 @@ public class HeroManager
      * @param g Graphics object we write the information to
      * @return Graphics
      */
-    public Graphics render(Graphics g, final Rectangle screen, final ResourceManager resources)
+    public Graphics render(Graphics g, final Rectangle screen, final Resources resources)
     {
         int x = (int)((screen.width  * .05) + screen.x);
         int y = (int)((screen.height * .1) + screen.y);
@@ -172,23 +172,23 @@ public class HeroManager
             switch (hero.getType())
             {
                 case Donatello:
-                    image = resources.getLevelObject(ResourceManager.LevelMisc.DonInfo);
+                    image = resources.getLevelObject(Resources.LevelMisc.DonInfo);
                     break;
                     
                 case Leonardo: 
-                    image = resources.getLevelObject(ResourceManager.LevelMisc.LeoInfo);
+                    image = resources.getLevelObject(Resources.LevelMisc.LeoInfo);
                     break;
                     
                 case Raphael: 
-                    image = resources.getLevelObject(ResourceManager.LevelMisc.RaphInfo);
+                    image = resources.getLevelObject(Resources.LevelMisc.RaphInfo);
                     break;
                     
                 case Michelangelo: 
-                    image = resources.getLevelObject(ResourceManager.LevelMisc.MikeInfo);
+                    image = resources.getLevelObject(Resources.LevelMisc.MikeInfo);
                     break;
                     
                 default:
-                    image = resources.getLevelObject(ResourceManager.LevelMisc.LeoInfo);
+                    image = resources.getLevelObject(Resources.LevelMisc.LeoInfo);
                     break;
             }
             

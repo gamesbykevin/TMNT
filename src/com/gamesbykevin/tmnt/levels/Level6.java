@@ -1,6 +1,7 @@
 package com.gamesbykevin.tmnt.levels;
 
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GameAudioMusic;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 
 import java.awt.Polygon;
 
@@ -12,22 +13,25 @@ public final class Level6 extends Level implements LevelRules
 {
     public Level6() throws Exception
     {
-        //this level will not have any enemies besides the boss
-        super(0, 0, GamePlayers.Shredder);
+        super(GamePlayers.Shredder);
         
-        //this level will only have 1 power up
-        super.setPowerUpLimit(1);
+        setLevelBounds();
         
-        setupDefaults();
+        setMusic();
+        
+        setPowerupLimit();
+        
+        setEnemyLimits();
+        
+        //are using a separate background
+        super.setAutoScrollBackground(false);
     }
     
     @Override
-    public void setupDefaults()
+    public void setEnemyLimits()
     {
-        setLevelBounds();
-        
-        //set true or false if we are using a separate background
-        super.setAutoScrollBackground(false);
+        super.setEnemiesAtOnce(0);
+        super.setEnemiesPerCheckpoint(0);
     }
     
     @Override
@@ -38,5 +42,19 @@ public final class Level6 extends Level implements LevelRules
         
         //set the area that is in bounds
         super.setBoundary(new Polygon(x, y, x.length));
+    }
+    
+    @Override
+    public void setPowerupLimit()
+    {
+        //this level will have x power ups
+        super.setPowerUpLimit(1);
+    }
+    
+    @Override
+    public void setMusic()
+    {
+        super.setMusic(GameAudioMusic.Level6Boss);
+        super.setMusicBoss(GameAudioMusic.Level6Boss);
     }
 }

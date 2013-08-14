@@ -1,22 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.player.Player;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GameAudioMusic;
 
 import java.awt.geom.Area;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * All levels will 
- * @author GOD
- */
 public abstract class Level extends Sprite
 {
     //what is considered in bounds
@@ -34,13 +27,13 @@ public abstract class Level extends Sprite
     private List<Integer> checkpoints;
     
     //total number of enemies to spawn for each check point
-    private int enemiesPerCheckpoint;
+    private int enemiesPerCheckpoint = 0;
     
     //the current number of enemies we have added so far at the current checkpoint
-    private int enemiesCreatedAtCheckpoint;
+    private int enemiesCreatedAtCheckpoint = 0;
     
     //total number of enemies that can be on the screen at the same time
-    private int enemiesAtOnce;
+    private int enemiesAtOnce = 0;
     
     //how many powerups will the level have by default
     private static final int POWERUP_LIMIT_DEFAULT = 2;
@@ -59,21 +52,69 @@ public abstract class Level extends Sprite
     //this will be the boss the player will face at the end of the level
     private GamePlayers type;
     
+    //the music for this level
+    private GameAudioMusic music;
+    
+    //the boss music for this level
+    private GameAudioMusic musicBoss;
+    
     /**
      * Create new Level
      * 
-     * @param enemiesPerCheckpoint How many enemies to spawn per check point
-     * @param enemiesAtOnce  How many enemies can be on the screen at once
      * @param type The boss the hero will face at the end of the level
      */
-    public Level(final int enemiesPerCheckpoint, final int enemiesAtOnce, final GamePlayers type) throws Exception
+    public Level(final GamePlayers type) throws Exception
     {
-        this.enemiesPerCheckpoint = enemiesPerCheckpoint;
-        this.enemiesAtOnce        = enemiesAtOnce;
-        this.type                 = type;
+        this.type = type;
         
         if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
             throw new Exception("Can't have more than 6 enemies at once");
+    }
+    
+    /**
+     * Set the limit of enemies that can spawn for each check point
+     * @param enemiesPerCheckpoint 
+     */
+    protected void setEnemiesPerCheckpoint(final int enemiesPerCheckpoint)
+    {
+        this.enemiesPerCheckpoint = enemiesPerCheckpoint;
+    }
+    
+    /**
+     * Set the limit of enemies that can be created at 1 time
+     * @param enemiesAtOnce 
+     */
+    protected void setEnemiesAtOnce(final int enemiesAtOnce)
+    {
+        this.enemiesAtOnce = enemiesAtOnce;
+    }
+    
+    /**
+     * Set the main music for this level
+     * @param music 
+     */
+    protected void setMusic(final GameAudioMusic music)
+    {
+        this.music = music;
+    }
+    
+    public GameAudioMusic getMusic()
+    {
+        return this.music;
+    }
+    
+    /**
+     * Set the boss music for this level
+     * @param musicBoss 
+     */
+    protected void setMusicBoss(final GameAudioMusic musicBoss)
+    {
+        this.musicBoss = musicBoss;
+    }
+    
+    public GameAudioMusic getMusicBoss()
+    {
+        return this.musicBoss;
     }
     
     /**

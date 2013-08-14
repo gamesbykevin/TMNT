@@ -6,7 +6,7 @@ import com.gamesbykevin.tmnt.grunt.Grunt;
 import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 
 import java.awt.Rectangle;

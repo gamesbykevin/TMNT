@@ -1,15 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gamesbykevin.tmnt.enemymanager;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.Engine;
-import com.gamesbykevin.tmnt.main.ResourceManager;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -78,7 +73,7 @@ public class EnemyManager
      * Get a list of enemies that are targeting the specific hero of type
      * @param Type List of grunts
      */
-    private List<Grunt> getAttackers(ResourceManager.GamePlayers assigned)
+    private List<Grunt> getAttackers(Resources.GamePlayers assigned)
     {
         List<Grunt> attackers = new ArrayList<>();
         

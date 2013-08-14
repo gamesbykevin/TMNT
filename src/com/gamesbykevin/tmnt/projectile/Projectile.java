@@ -2,7 +2,7 @@ package com.gamesbykevin.tmnt.projectile;
 
 import com.gamesbykevin.framework.base.Sprite;
 
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.boss.BossManager;
 import com.gamesbykevin.tmnt.grunt.GruntManager;
 

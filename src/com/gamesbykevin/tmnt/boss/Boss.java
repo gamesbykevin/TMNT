@@ -2,7 +2,7 @@ package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.tmnt.grunt.Grunt;
 import com.gamesbykevin.tmnt.main.Engine;
-import com.gamesbykevin.tmnt.main.ResourceManager.GamePlayers;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
