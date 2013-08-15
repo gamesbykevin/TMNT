@@ -1,21 +1,13 @@
 package com.gamesbykevin.tmnt.boss;
 
 import com.gamesbykevin.tmnt.enemymanager.EnemyManager;
-import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
-import java.awt.Point;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BossManager extends EnemyManager
 {
-    
-    
     public BossManager()
     {
-        
+        super();
     }
     
     public static boolean isBoss(final GamePlayers type)

@@ -46,7 +46,7 @@ public class Boss extends Grunt
         BufferedImageOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         flashing = op.filter(original, flashing);
         
-        super.setImage(flashing);
+        //super.setImage(flashing);
     }
     
     /**

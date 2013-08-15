@@ -1,13 +1,11 @@
 package com.gamesbykevin.tmnt.heroes;
 
-import com.gamesbykevin.framework.input.Keyboard;
-
 import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
-import java.awt.Color;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.Graphics;
 import java.util.List;
@@ -23,6 +21,15 @@ public class Hero extends Player
     //store the color of the turtle used to draw turtle info
     private Color color;
     
+    //we will cache the health string until there is a changes
+    private String healthDisplay = null;
+    
+    //we will cache the lives String until there is a change
+    private String livesDisplay = null;
+    
+    //temp List for the current existing enemies
+    private List<Player> enemies;
+    
     public Hero(final GamePlayers type)
     {
         super(type);
@@ -30,6 +37,9 @@ public class Hero extends Player
         //all heroes will have the same health and lives
         super.setHealthDefault(HEALTH_DEFAULT);
         super.setLives(LIVES_DEFAULT);
+        
+        setHealthDisplay();
+        setLivesDisplay();
     }
     
     /**
@@ -38,12 +48,21 @@ public class Hero extends Player
      */
     public void update(final Engine engine) throws Exception
     {
-        final List<Player> enemies = engine.getPlayerManager().getEnemies();
-        final Keyboard keyboard = engine.getKeyboard();
+        enemies = engine.getPlayerManager().getEnemies();
+        
+        int previousHealth = super.getHealth();
+        int previousLives = super.getLives();
         
         super.update(engine, enemies);
         
-        if (keyboard.hasKeyPressed(KeyEvent.VK_RIGHT))
+        enemies.clear();
+        
+        if (previousHealth != super.getHealth())
+            setHealthDisplay();
+        if (previousLives != super.getLives())
+            setLivesDisplay();
+        
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_RIGHT))
         {
             if (canWalk())
             {
@@ -53,7 +72,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_LEFT))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_LEFT))
         {
             if (canWalk())
             {
@@ -63,7 +82,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_UP))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_UP))
         {
             if (canWalk())
             {
@@ -72,7 +91,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_DOWN))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_DOWN))
         {
             if (canWalk())
             {
@@ -81,7 +100,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_A))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_A))
         {
             if (canJump())
             {
@@ -92,7 +111,7 @@ public class Hero extends Player
             }
         }
 
-        if (keyboard.hasKeyPressed(KeyEvent.VK_S))
+        if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_S))
         {
             if (canAttack())
             {
@@ -107,7 +126,7 @@ public class Hero extends Player
                 {
                     setNewState(State.ATTACK1);
                     setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                    keyboard.removeKeyPressed(KeyEvent.VK_S);
+                    engine.getKeyboard().removeKeyPressed(KeyEvent.VK_S);
                 }
             }
             else
@@ -138,30 +157,45 @@ public class Hero extends Player
                             break;
                     }
                     
-                    keyboard.removeKeyPressed(KeyEvent.VK_S);
+                    engine.getKeyboard().removeKeyPressed(KeyEvent.VK_S);
                 }
             }
         }
 
-        if (keyboard.hasKeyReleased(KeyEvent.VK_LEFT) || keyboard.hasKeyReleased(KeyEvent.VK_RIGHT))
+        if (engine.getKeyboard().hasKeyReleased(KeyEvent.VK_LEFT) || engine.getKeyboard().hasKeyReleased(KeyEvent.VK_RIGHT))
         {
             if (isWalking() || isIdle())
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.reset();
+                engine.getKeyboard().reset();
             }
         }
 
-        if (keyboard.hasKeyReleased(KeyEvent.VK_UP) || keyboard.hasKeyReleased(KeyEvent.VK_DOWN))
+        if (engine.getKeyboard().hasKeyReleased(KeyEvent.VK_UP) || engine.getKeyboard().hasKeyReleased(KeyEvent.VK_DOWN))
         {
             if (isWalking() || isIdle())
             {
                 setState(State.IDLE);
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
-                keyboard.reset();
+                engine.getKeyboard().reset();
             }
         }
+    }
+    
+    public void setHealthDisplay()
+    {
+        healthDisplay = "";
+
+        for (int i=0; i < super.getHealth(); i++)
+        {
+            healthDisplay += "|";
+        }
+    }
+    
+    private void setLivesDisplay()
+    {
+        livesDisplay = super.getLives() + "";
     }
     
     public Graphics renderHealthInformation(final Graphics g, final int x, final int y)
@@ -180,24 +214,15 @@ public class Hero extends Player
         
         g.setColor(color);
         
-        String result = "";
-        
-        for (int i=0; i < super.getHealth(); i++)
-        {
-            result += "|";
-        }
-        
-        g.drawString(result, x, y);
-        
-        result = null;
-        
+        //these width and height values will be cached as well
         if (fullHealthWidth < 0)
             fullHealthWidth = g.getFontMetrics().stringWidth("IIIIIIII");
         if (fontHeight < 0)
             fontHeight = g.getFontMetrics().getHeight();
         
+        g.drawString(healthDisplay, x, y);
         
-        g.drawString(super.getLives() + "", x + fullHealthWidth, y - (int)(fontHeight * 1.2));
+        g.drawString(livesDisplay, x + fullHealthWidth, y - (int)(fontHeight * 1.2));
         
         return g;
     }

@@ -11,11 +11,7 @@ import com.gamesbykevin.tmnt.player.PlayerManager;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +34,20 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     //keyboard object that will be recording key input
     private Keyboard keyboard;
     
+    //original font
+    private Font font;
+    
+    //this player manager will contain all of our heroes, enemies, bosses
     private PlayerManager playerManager;
     
+    //this will contain all information for each level
     private LevelManager levelManager;
     
+    //this will contain/manage the projectiles in play
     private ProjectileManager projectileManager;
+    
+    //all objects will be contained in this list and sorted so the lowest y value is drawn first
+    private List<Sprite> levelObjects;
     
     /**
      * The Engine that contains the game/menu objects
@@ -52,8 +57,6 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
      */
     public Engine(final Main main) 
     {
-        //System.out.println("Debug Mode = " + Main.DEBUG_MODE);
-        
         this.main = main;
         this.mouse = new Mouse();
         this.keyboard = new Keyboard();
@@ -88,6 +91,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             
             projectileManager.dispose();
             projectileManager = null;
+            
+            levelObjects.clear();
+            levelObjects = null;
         }
         catch(Exception e)
         {
@@ -111,12 +117,15 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             }
             else
             {
+                //does the menu have focus
                 if (!menu.hasFocus())
                 {
+                    //reset mouse and keyboard input
                     mouse.reset();
                     keyboard.reset();
                 }
 
+                //update the menu
                 menu.update(this);
 
                 //if the menu is on the last layer and the window has focus
@@ -279,16 +288,22 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
      */
     private Graphics renderGame(Graphics2D g2d) throws Exception
     {
-        Font tmpFont = g2d.getFont();
+        //store the original font if we haven't already
+        if (font == null)
+            font = g2d.getFont();
+        
         g2d.setFont(resources.getGameFont(Resources.GameFont.Dialog).deriveFont(Font.PLAIN, 8));
         
         if (getPlayerManager() != null && getLevelManager() != null && getProjectileManager() != null)
         {
             //draw the level first
-            getLevelManager().render(g2d, getPlayerManager().getEnemies().size() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
+            getLevelManager().render(g2d, getPlayerManager().getEnemyCount() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
             
-            //all objects will be contained in this list and sorted so the lowest y value is drawn first
-            List<Sprite> levelObjects = new ArrayList<>();
+            if (levelObjects == null)
+                levelObjects = new ArrayList<>();
+            
+            //clear level objects list
+            levelObjects.clear();
         
             //add all level related objects to List
             getLevelManager().addAllStageObjects(levelObjects);
@@ -336,13 +351,16 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                 levelObject.setY(levelObject.getY() + halfHeight);
             }
             
+            //remove all objects in List
             levelObjects.clear();
             
             //draw hero info, etc....
             getPlayerManager().render(g2d, this);
         }
         
-        g2d.setFont(tmpFont);
+        //set the original font back so the menu will be rendered correctly
+        g2d.setFont(font);
+        
         return g2d;
     }
     

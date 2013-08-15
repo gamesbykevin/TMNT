@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 public class Resources 
 {   
     //this will contain all resources
-    private LinkedHashMap everyResource = new LinkedHashMap();
+    private LinkedHashMap<Object, Manager> everyResource;
     
     //collections of resources
     private enum Type
@@ -82,6 +82,8 @@ public class Resources
     
     public Resources()
     {
+        everyResource = new LinkedHashMap<>();
+        
         //load all menu images
         add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
         
@@ -113,7 +115,7 @@ public class Resources
             locations[i] = MessageFormat.format(directory, i);
         }
 
-        com.gamesbykevin.framework.resources.Manager resources = new com.gamesbykevin.framework.resources.Manager(com.gamesbykevin.framework.resources.Manager.LoadMethod.OnePerFrame, locations, eachResourceKey, resourceType);
+        Manager resources = new Manager(Manager.LoadMethod.OnePerFrame, locations, eachResourceKey, resourceType);
         resources.setDesc(loadDesc);
         
         everyResource.put(key, resources);
@@ -124,9 +126,9 @@ public class Resources
         return loading;
     }
     
-    private com.gamesbykevin.framework.resources.Manager getResources(final Object key)
+    private Manager getResources(final Object key)
     {
-        return (com.gamesbykevin.framework.resources.Manager)everyResource.get(key);
+        return everyResource.get(key);
     }
     
     public Font getGameFont(final Object key)
@@ -207,36 +209,36 @@ public class Resources
     
     public void setAudioEnabled(boolean soundEnabled)
     {
-        com.gamesbykevin.framework.resources.Manager r1 = getResources(Type.GameAudioEffects);
-        com.gamesbykevin.framework.resources.Manager r2 = getResources(Type.GameAudioMusic);
+        Manager audioEffectResources = getResources(Type.GameAudioEffects);
+        Manager audioMusicResources = getResources(Type.GameAudioMusic);
         
-        if ((r1.isAudioEnabled() && soundEnabled) || (!r1.isAudioEnabled() && !soundEnabled))
+        if ((audioEffectResources.isAudioEnabled() && soundEnabled) || (!audioEffectResources.isAudioEnabled() && !soundEnabled))
             return;
         
-        r1.setAudioEnabled(soundEnabled);
-        r2.setAudioEnabled(soundEnabled);
+        audioEffectResources.setAudioEnabled(soundEnabled);
+        audioMusicResources.setAudioEnabled(soundEnabled);
         
+        //if the sound is not enabled
         if (!soundEnabled)
         {
-            r1.stopAllAudio();
-            r2.stopAllAudio();
+            //stop sound effects and music
+            audioEffectResources.stopAllAudio();
+            audioMusicResources.stopAllAudio();
         }
     }
     
     public void dispose()
     {
-        Object[] keys = everyResource.keySet().toArray();
-        
-        for (Object key : keys)
+        for (Object key : everyResource.keySet().toArray())
         {
-            com.gamesbykevin.framework.resources.Manager r = getResources(key);
+            Manager resources = getResources(key);
             
-            if (r != null)
-                r.dispose();
+            if (resources != null)
+                resources.dispose();
             
-            r = null;
+            resources = null;
             
-            everyResource.put(key, r);
+            everyResource.put(key, null);
         }
         
         everyResource.clear();

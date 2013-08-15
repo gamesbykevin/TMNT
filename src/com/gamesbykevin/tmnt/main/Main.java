@@ -10,21 +10,29 @@ public class Main extends Thread
     //image where all game/menu elements will be written to
     private Image bufferedImage;
     
-    //our dimensions for the regular and full screen window
+    //Graphics object used to draw buffered image
+    private Graphics bufferedImageGraphics;
+    
+    //our dimensions for the original screen window
     private Rectangle originalSizeWindow;
+    
+    //our dimensions for the full screen window
     private Rectangle fullSizeWindow;
+    
+    //our dimensions for keeping track of the size of the current window
+    private Rectangle currentWindow;
     
     //our main game engine
     private Engine engine;
     
-    //determine if debug mode is enabled
-    //public static final boolean DEBUG_MODE = !System.getProperty("java.vm.info", "").contains("sharing");
-    
     //do we hide mouse when the menu is not visible and actual gameplay started
-    public static boolean hideMouse = true;//(DEBUG_MODE);//true;
+    public static boolean hideMouse = true;
     
     //how many nanoseconds bewteen each engine update
     private double nanoSecondsPerUpdate;
+    
+    //how many nanoseconds between each frame render
+    private double nanoSecondsPerFrame;
     
     //frames per second
     private int frames = 0;
@@ -47,20 +55,32 @@ public class Main extends Thread
     //reference to our panel
     private JPanel panel;
     
-    public Main(final int ups)
+    //cache this graphics object so we aren't constantly creating it
+    private Graphics graphics;
+    
+    /**
+     * Main class that runs the game engine
+     * 
+     * @param ups Engine updates per second
+     * @param fps Frame renders per second
+     */
+    public Main(final int ups, final int fps)
     {
-        //the dimensions used for original and full screen
+        //the dimensions used for original/full screen
         originalSizeWindow = new Rectangle(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
-        fullSizeWindow     = new Rectangle(this.originalSizeWindow);
+        fullSizeWindow     = new Rectangle(originalSizeWindow);
 
-        //duration of nanoSeconds per update
+        //duration per each engine update in nanoseconds
         nanoSecondsPerUpdate = NANO_SECONDS_PER_SECOND / ups;
+        
+        //duration per each frame render in nanoseconds
+        nanoSecondsPerFrame = NANO_SECONDS_PER_SECOND / fps;
     }
     
     /**
      * Create our main game engine and apply input listeners
      */
-    public void createGameEngine() throws Exception
+    public void create() throws Exception
     {
         engine = new Engine(this);
         
@@ -87,27 +107,40 @@ public class Main extends Thread
         //this will reset ups/fps count every second
         long timer = System.nanoTime();
         
-        double delta = 0;
+        //this variables will keep track of the time passed
+        double deltaUpdate = 0;
+        double deltaFrame = 0;
         
         while(true)
         {
             try
             {
+                //get current system nano time
                 long now = System.nanoTime();
-                delta += ((now - lastRun) / nanoSecondsPerUpdate);
+                
+                //update these variables
+                deltaUpdate += ((now - lastRun) / nanoSecondsPerUpdate);
+                deltaFrame += ((now - lastRun) / nanoSecondsPerFrame);
+                
+                //set the current time as the last run
                 lastRun = now;
                 
-                while(delta >= 1)
+                while(deltaUpdate >= 1)
                 {
                     engine.update(this);
 
                     updates++;
-                    delta--;
+                    deltaUpdate--;
                 }
                 
-                renderImage();
-                drawScreen();
-                frames++;
+                while(deltaFrame >= 1)
+                {
+                    renderImage();
+                    drawScreen();
+                    frames++;
+                    
+                    deltaFrame--;
+                }
                 
                 //if 1 second has passed
                 if (System.nanoTime() - timer > NANO_SECONDS_PER_SECOND)
@@ -163,21 +196,19 @@ public class Main extends Thread
         }
     }
     
-    private Image getBufferedImage()
+    /**
+     * Create buffered Image
+     */
+    private void createBufferedImage()
     {
-        if (bufferedImage == null)
+        if (applet != null)
         {
-            if (applet != null)
-            {
-                bufferedImage = applet.createImage(originalSizeWindow.width, originalSizeWindow.height);
-            }
-            else
-            {
-                bufferedImage = panel.createImage(originalSizeWindow.width, originalSizeWindow.height);
-            }
+            bufferedImage = applet.createImage(originalSizeWindow.width, originalSizeWindow.height);
         }
-        
-        return bufferedImage;
+        else
+        {
+            bufferedImage = panel.createImage(originalSizeWindow.width, originalSizeWindow.height);
+        }
     }
     
     public Rectangle getScreen()
@@ -190,6 +221,9 @@ public class Main extends Thread
         return this.fullSizeWindow;
     }
     
+    /**
+     * This method will be called whenever the user turns full-screen on/off
+     */
     public void setFullScreen()
     {
         if (applet != null)
@@ -200,6 +234,9 @@ public class Main extends Thread
         {
             fullSizeWindow = new Rectangle(0, 0, panel.getWidth(), panel.getHeight());
         }
+        
+        //set the current window size
+        currentWindow = new Rectangle(fullSizeWindow);
     }
     
     /**
@@ -213,29 +250,31 @@ public class Main extends Thread
     }
     
     /**
-     * Writes all game/menu elements in our engine to our bufferedImage.
-     * If set true also write our ups/fps counter
+     * Writes all game/menu elements in our 
+     * engine to our single bufferedImage.
      * 
      * @throws Exception 
      */
     private void renderImage() throws Exception
     {
-        Image tmp = getBufferedImage();
-        
-        if (tmp != null)
+        if (bufferedImage != null)
         {
-            Graphics g = tmp.getGraphics();
+            if (bufferedImageGraphics == null)
+                bufferedImageGraphics = bufferedImage.getGraphics();
+            
+            //background by itself will be a black rectangle
+            bufferedImageGraphics.setColor(Color.BLACK);
+            bufferedImageGraphics.fillRect(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
 
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
-
-            engine.render(g);
+            engine.render(bufferedImageGraphics);
 
             if (Shared.DEBUG)
-                renderCounter(g);
-            
-            //now that image is drawn free up resources
-            g.dispose();
+                renderCounter(bufferedImageGraphics);
+        }
+        else
+        {
+            //create the image that will be displayed to the user
+            createBufferedImage();
         }
     }
     
@@ -257,7 +296,8 @@ public class Main extends Thread
     }
     
     /**
-     * Draw frame counter onto Image
+     * Draw frame counter onto Image.
+     * This method should only be called when testing
      * @param g Graphics
      * @return Graphics
      */
@@ -273,8 +313,6 @@ public class Main extends Thread
         g.setColor(Color.WHITE);
         g.drawString(result, tmp.x, tmp.y + height - 2);
         
-        result = null;
-        
         return g;
     }
     
@@ -283,46 +321,45 @@ public class Main extends Thread
      */
     private void drawScreen()
     {
+        //if no image has been rendered return
         if (bufferedImage == null)
             return;
         
-        Graphics g;
-        
-        //create the rectangle on the fly for full screen
-        Rectangle r;
-        
-        if (applet != null)
+        //cache graphics object to save resources
+        if (graphics == null)
         {
-            g = applet.getGraphics();
-            r = new Rectangle(0, 0, applet.getWidth(), applet.getHeight());
+            if (applet != null)
+            {
+                graphics = applet.getGraphics();
+            }
+            else
+            {
+                graphics = panel.getGraphics();
+            }
         }
-        else
-        {
-            g = panel.getGraphics();
-            r = new Rectangle(0, 0, panel.getWidth(), panel.getHeight());
-        }
+        
+        //make sure current window dimensions are set
+        if (currentWindow == null)
+            setFullScreen();
         
         try
         {
-            int dx1 = r.x;
-            int dy1 = r.y;
-            int dx2 = r.x + r.width;
-            int dy2 = r.y + r.height;
+            int dx1 = currentWindow.x;
+            int dy1 = currentWindow.y;
+            int dx2 = currentWindow.x + currentWindow.width;
+            int dy2 = currentWindow.y + currentWindow.height;
 
             int sx1 = 0;
             int sy1 = 0;
             int sx2 = bufferedImage.getWidth(null);
             int sy2 = bufferedImage.getHeight(null);
 
-            g.drawImage(bufferedImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+            graphics.drawImage(bufferedImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
 
-            Toolkit.getDefaultToolkit().sync();
+            //Toolkit.getDefaultToolkit().sync();
 
+            //release pixel data
             bufferedImage.flush();
-            bufferedImage = null;
-
-            g.dispose();
-            g = null;
         }
         catch(Exception e)
         {
@@ -333,8 +370,7 @@ public class Main extends Thread
     /**
      * Set all objects null for garbage collection
      */
-    @Override
-    public void destroy()
+    public void dispose()
     {
         engine.dispose();
         engine = null;
@@ -343,5 +379,9 @@ public class Main extends Thread
         
         originalSizeWindow = null;
         fullSizeWindow = null;
+        currentWindow = null;
+        
+        applet = null;
+        panel = null;
     }
 }

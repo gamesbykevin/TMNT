@@ -13,8 +13,22 @@ import java.util.List;
 
 public class EnemyManager 
 {
+    //list of enemies
     private List<Grunt> grunts;
     
+    //list of enemies that are not assigned a target
+    private List<Grunt> unassigned;
+    
+    //list of enemies that have been assigned a target
+    private List<Grunt> attackers;
+    
+    //a temporary list of enemies attacking a specific target
+    private List<Grunt> tmpAttackers;
+    
+    //our temporary list containing the heroes
+    private List<Player> heroes;
+    
+    //the number of attackers per target are limited
     private static final int CONSECUTIVE_ATTACKERS = 2;
     
     public EnemyManager()
@@ -22,11 +36,16 @@ public class EnemyManager
         grunts = new ArrayList<>();
     }
     
+    /**
+     * Free up resources
+     */
     public void dispose()
     {
         for (Grunt grunt : grunts)
         {
-            grunt.dispose();
+            if (grunt != null)
+                grunt.dispose();
+            
             grunt = null;
         }
         
@@ -34,7 +53,7 @@ public class EnemyManager
         grunts = null;
     }
     
-    public void addAllPlayerObjects(List<Sprite> levelObjects)
+    public void addAllPlayerObjects(final List<Sprite> levelObjects)
     {
         for (Player grunt : grunts)
         {
@@ -58,7 +77,10 @@ public class EnemyManager
      */
     private List<Grunt> getUnassigned()
     {
-        List<Grunt> unassigned = new ArrayList<>();
+        if (unassigned == null)
+            unassigned = new ArrayList<>();
+        
+        unassigned.clear();
         
         for (Grunt grunt : grunts)
         {
@@ -70,12 +92,17 @@ public class EnemyManager
     }
     
     /**
-     * Get a list of enemies that are targeting the specific hero of type
+     * Populate a list of enemies that are targeting 
+     * a hero of a specific type.
+     * 
      * @param Type List of grunts
      */
-    private List<Grunt> getAttackers(Resources.GamePlayers assigned)
+    private void setAttackers(Resources.GamePlayers assigned)
     {
-        List<Grunt> attackers = new ArrayList<>();
+        if (attackers == null)
+            attackers = new ArrayList<>();
+        
+        attackers.clear();
         
         for (Grunt grunt : grunts)
         {
@@ -84,8 +111,6 @@ public class EnemyManager
             if (grunt.getAssignment() == assigned)
                 attackers.add(grunt);
         }
-        
-        return attackers;
     }
     
     public void update(final Engine engine) throws Exception
@@ -133,12 +158,13 @@ public class EnemyManager
      */
     private void updateStrategy(final Engine engine)
     {
-        final Rectangle screen = engine.getMain().getScreen();
+        final int screenLeftSide = engine.getMain().getScreen().x;
+        final int screenRightSide = engine.getMain().getScreen().x + engine.getMain().getScreen().width;
         
-        final List<Player> heroes = engine.getPlayerManager().getHeroManager().getHeroes();
+        heroes = engine.getPlayerManager().getHeroManager().getPlayerHeroes();
         
         //enemies that are not assigned a target
-        List<Grunt> unassigned = getUnassigned();
+        unassigned = getUnassigned();
         
         //assign a target to every enemy
         for (Grunt grunt : unassigned)
@@ -146,30 +172,33 @@ public class EnemyManager
             grunt.setAssignment((heroes.get((int)(Math.random() * heroes.size()))).getType());
         }
         
+        //clear list since we are now done
         unassigned.clear();
         
         //check every hero and make sure a certain number of enemies are trying to attack each one
         for (Player hero : heroes)
         {
-            //get list of enemies that are targeting this hero
-            List<Grunt> tmp = getAttackers(hero.getType());
+            //set the current list of enemies based on the hero that they are targeting
+            setAttackers(hero.getType());
             
-            //list of enemies that are attacking hero
-            List<Grunt> tmpAttackers = new ArrayList<>();
-
-            for (int i=0; i < tmp.size(); i++)
+            if (tmpAttackers == null)
+                tmpAttackers = new ArrayList<>();
+            
+            tmpAttackers.clear();
+            
+            for (int i=0; i < attackers.size(); i++)
             {
-                Grunt grunt = tmp.get(i);
+                Grunt grunt = attackers.get(i);
                 
                 //if the grunt is no longer fully on the screen
-                if (!screen.contains(grunt.getRectangle()))
+                if (!engine.getMain().getScreen().contains(grunt.getRectangle()))
                 {
                     //if the enemy is on the left side of the screen and is set to attack the west side
-                    if (grunt.getX() <= screen.x && !grunt.hasAttackEast())
+                    if (grunt.getX() <= screenLeftSide && !grunt.hasAttackEast())
                         grunt.setAttackEast(!grunt.hasAttackEast());
                     
                     //if the enemy is on the right side of the screen and is set to attack the east side
-                    if (grunt.getX() >= screen.x + screen.width && grunt.hasAttackEast())
+                    if (grunt.getX() >= screenRightSide && grunt.hasAttackEast())
                         grunt.setAttackEast(!grunt.hasAttackEast());
                 }
                 
@@ -180,7 +209,7 @@ public class EnemyManager
                     tmpAttackers.add(grunt);
                     
                     //remove grunt from list
-                    tmp.remove(i);
+                    attackers.remove(i);
                     i--;
                     continue;
                 }
@@ -205,24 +234,24 @@ public class EnemyManager
             else
             {
                 //we want at least x enemies attacking at any time if possible
-                while(tmpAttackers.size() < CONSECUTIVE_ATTACKERS && tmp.size() > 0)
+                while(tmpAttackers.size() < CONSECUTIVE_ATTACKERS && attackers.size() > 0)
                 {
                     //random grunt
-                    final int randomIndex = (int)(Math.random() * tmp.size());
+                    final int randomIndex = (int)(Math.random() * attackers.size());
 
                     //set available grunt to ready for attack
-                    tmp.get(randomIndex).setStep2(true);
+                    attackers.get(randomIndex).setStep2(true);
                     
                     //add grunt to list of attackers
-                    tmpAttackers.add(tmp.get(randomIndex));
+                    tmpAttackers.add(attackers.get(randomIndex));
                     
                     //remove grunt from available list
-                    tmp.remove(randomIndex);
+                    attackers.remove(randomIndex);
                 }
             }
             
             tmpAttackers.clear();
-            tmp.clear();
+            attackers.clear();
         }
     }
     

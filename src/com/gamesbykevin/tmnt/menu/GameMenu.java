@@ -249,24 +249,28 @@ public class GameMenu extends Menu
         final Keyboard ki               = engine.getKeyboard();
         final Mouse mi                  = engine.getMouse();
         
+        //if the menu is not on the last layer we need to check for changes made in the menu
         if (!isMenuFinished())
-        {   //if the menu is not on the last layer we need to check for changes made in the menu
+        {   
+            //if on MainTitle layer recycle gameEngine, but not resources just turn audio off
             if (isCurrentLayer(LayerKey.MainTitle) && !resetGame)
-            {   //if on MainTitle layer recycle gameEngine, but not resources just turn audio off
+            {   
                 resetGame = true;
                 resources.stopAllSound();
             }
             
             int valueSound = -1, valueFullScreen = -1;
             
+            //if on the options screen check if sound/fullScreen enabled
             if (isCurrentLayer(LayerKey.Options))
-            {   //if on the options screen check if sound/fullScreen enabled
+            {
                 valueSound      = getOptionSelectionIndex(LayerKey.Options, OptionKey.Sound);
                 valueFullScreen = getOptionSelectionIndex(LayerKey.Options, OptionKey.FullScreen);
             }
             
+            //if on the in-game options screen check if sound/fullScreen enabled
             if (isCurrentLayer(LayerKey.OptionsInGame))
-            {   //if on the in-game options screen check if sound/fullScreen enabled
+            {   
                 valueSound      = getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.Sound);
                 valueFullScreen = getOptionSelectionIndex(LayerKey.OptionsInGame, OptionKey.FullScreen);
             }
@@ -281,7 +285,8 @@ public class GameMenu extends Menu
             
             if (valueSound > -1)
             {
-                resources.setAudioEnabled(valueSound == 0); //0 is enabled
+                //0 = enabled
+                resources.setAudioEnabled(valueSound == 0);
             }
             
             if (valueFullScreen > -1)
@@ -289,7 +294,8 @@ public class GameMenu extends Menu
                 if (fullScreen == null)
                     fullScreen = new FullScreen();
                 
-                if (valueFullScreen == 1 && !fullScreenOn || valueFullScreen == 0 && fullScreenOn) //1 is enabled
+                //1 = full screen enabled, 0 = no full screen
+                if (valueFullScreen == 1 && !fullScreenOn || valueFullScreen == 0 && fullScreenOn) 
                 {
                     fullScreen.switchFullScreen(main.getApplet(), main.getPanel());
                     fullScreenOn = !fullScreenOn;
@@ -297,8 +303,9 @@ public class GameMenu extends Menu
                 }
             }
             
+            //if the applet has focus and did not previously set menu layer back to cached value
             if (!windowHasFocus && main.hasFocus() && previousLayerKey != null)
-            {   //if the applet has focus and did not previously set menu layer back to cached value
+            {
                 setLayer(previousLayerKey);
                 previousLayerKey = null;
             }
@@ -314,9 +321,10 @@ public class GameMenu extends Menu
             super.update(mi, ki, main.getTimeDeductionPerFrame());
         }
         else
-        {   //menu is finished
+        {
+            //if resetGame is enabled and the menu is finished create new instance of Engine
             if (resetGame)
-            {   //if resetGame is enabled and the menu is finished create new instance of GameEngine
+            {
                 resetGame = false;
                 engine.reset();
             }

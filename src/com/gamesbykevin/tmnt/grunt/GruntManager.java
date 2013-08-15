@@ -4,12 +4,13 @@ import com.gamesbykevin.tmnt.enemymanager.EnemyManager;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GruntManager extends EnemyManager
 {
     public GruntManager()
     {
-        
+        super();
     }
     
     public static boolean isGrunt(final GamePlayers type)
@@ -41,7 +42,7 @@ public class GruntManager extends EnemyManager
      */
     public void addRandom() throws Exception
     {
-        ArrayList possibleEnemies = new ArrayList();
+        List<GamePlayers> possibleEnemies = new ArrayList<>();
         
         for (GamePlayers type : GamePlayers.values())
         {

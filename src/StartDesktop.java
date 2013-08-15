@@ -22,9 +22,16 @@ public class StartDesktop extends JPanel
         
         try
         {
-            main = new Main(Shared.DEFAULT_UPS);
+            //create a new instance of main with the specified ups/fps
+            main = new Main(Shared.DEFAULT_UPS, Shared.DEFAULT_FPS);
+            
+            //add JPanel instance to Main instance because some features like "full-screen" need this
             main.setPanel(this);
-            main.createGameEngine();
+            
+            //new instance of our main engine
+            main.create();
+            
+            //start the thread
             main.start();
         }
         catch(Exception e)
@@ -37,16 +44,28 @@ public class StartDesktop extends JPanel
     {
         try
         {
+            //create a new jframe that will contain our application
             JFrame window = new JFrame(Shared.GAME_NAME);
 
             //use cursor from Shared class
             window.setCursor(Shared.CURSOR);
+            
+            //add component to window
             window.add(new StartDesktop());
+            
+            //do not allow user to resize window
             window.setResizable(false);
+            
+            //resize window based on dimensions set by JPanel StartDesktop
             window.pack();
 
+            //set this null to place the panel in the center of the screen
             window.setLocationRelativeTo(null);
+            
+            //set visible to true so we can see panel
             window.setVisible(true);
+            
+            //dispose on close to free up resources
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
         catch(Exception e)

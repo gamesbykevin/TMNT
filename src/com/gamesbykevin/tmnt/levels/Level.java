@@ -58,6 +58,9 @@ public abstract class Level extends Sprite
     //the boss music for this level
     private GameAudioMusic musicBoss;
     
+    //calculate the west/east most x coordinates
+    private int eastBoundX = -1, westBoundX = 1;
+    
     /**
      * Create new Level
      * 
@@ -412,7 +415,7 @@ public abstract class Level extends Sprite
      */
     private int getWestBoundsX()
     {
-        return bounds.getBounds().x;
+        return westBoundX;
     }
     
     /**
@@ -421,7 +424,7 @@ public abstract class Level extends Sprite
      */
     public int getEastBoundsX()
     {
-        return (bounds.getBounds().x + bounds.getBounds().width);
+        return eastBoundX;
     }
     
     /**
@@ -474,6 +477,13 @@ public abstract class Level extends Sprite
     protected void setBoundary(final Polygon bounds)
     {
         this.bounds = bounds;
+        
+        //get west most x coordinate
+        westBoundX = bounds.getBounds().x;
+        
+        //get east most x coordinate
+        eastBoundX = bounds.getBounds().x + bounds.getBounds().width;
+        
     }
     
     /**
@@ -562,6 +572,10 @@ public abstract class Level extends Sprite
         {
             //update level position and bounds
             bounds.translate(super.getVelocityX(), Player.VELOCITY_NONE);
+            
+            //keep updating the coordiantes
+            eastBoundX += super.getVelocityX();
+            westBoundX += super.getVelocityX();
         }
         
         //we also need to set the scroll speed for the power ups as well so they move with the level

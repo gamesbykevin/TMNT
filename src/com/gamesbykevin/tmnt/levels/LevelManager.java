@@ -1,7 +1,7 @@
 package com.gamesbykevin.tmnt.levels;
 
 import com.gamesbykevin.framework.base.Sprite;
-
+import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.main.Resources;
 import com.gamesbykevin.tmnt.player.*;
 
@@ -20,6 +20,12 @@ public class LevelManager
     
     //scroll speed when auto scroll is enabled
     private static final int SCROLL_SPEED = 10;
+    
+    //temporary anchor for player
+    private Rectangle tmpAnchor;
+    
+    //list of the power ups
+    private List<Sprite> powerUps;
     
     public LevelManager()
     {
@@ -171,12 +177,12 @@ public class LevelManager
             getLevel().update(screen);
             
             //doesn't matter if enemy is dead
-            boolean hasEnemies = (players.getEnemies().size() > 0);
+            boolean hasEnemies = (players.getEnemyCount()> 0);
             
             //get hero with the most width
             int mostWidth = 0;
             
-            for (Player hero : players.getHeroManager().getHeroes())
+            for (Hero hero : players.getHeroManager().getHeroes())
             {
                 if (hero.getWidth() > mostWidth)
                     mostWidth = hero.getWidth() + 1;
@@ -188,8 +194,9 @@ public class LevelManager
                 final int rightSide = screen.x + (int)(screen.width * .8);
 
                 //get temp anchor and make sure the hero doesn't go out of bounds
-                Rectangle tmpAnchor = hero.getAnchorLocation();
+                tmpAnchor = hero.getAnchorLocation();
 
+                //the hero can't collect a power up if they are jumping
                 if (hero.isJumping())
                 {
                     //tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
@@ -197,17 +204,16 @@ public class LevelManager
                 }
                 else
                 {
-                    //the hero can't collect a power up if they are jumping
-                    
                     //get the list of power ups
-                    List<Sprite> powerUps = getLevel().getPowerUps();
+                    powerUps = getLevel().getPowerUps();
 
                     //check each power up for collision
                     for (int i=0; i < powerUps.size(); i++)
                     {
-                        if (tmpAnchor.intersects(powerUps.get(i).getRectangle()))
+                        if (tmpAnchor.contains(powerUps.get(i).getCenter()))
                         {
                             hero.resetHealth();
+                            hero.setHealthDisplay();
                             powerUps.remove(i);
                             i--;
                         }
@@ -259,7 +265,7 @@ public class LevelManager
             for (Player grunt : players.getEnemies())
             {
                 //get temp anchor and make sure the hero doesn't go out of bounds
-                Rectangle tmpAnchor = grunt.getAnchorLocation();
+                tmpAnchor = grunt.getAnchorLocation();
 
                 //calculate future position and stop velocity if no longer in boundary
                 if (grunt.getVelocityX() != VELOCITY_NONE)
@@ -293,7 +299,7 @@ public class LevelManager
                 if (getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
                 {
                     //if the current enemy count is less than the amount allowed on the screen at one time, add enemies
-                    while (players.getEnemies().size() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
+                    while (players.getEnemyCount() < getLevel().getEnemiesAtOnce() && getLevel().getEnemiesCreatedAtCheckpoint() < getLevel().getEnemiesPerCheckpoint())
                     {
                         //add random enemy to player manager
                         players.getGruntManager().addRandom();

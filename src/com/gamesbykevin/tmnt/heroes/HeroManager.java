@@ -15,7 +15,11 @@ import java.util.List;
 
 public class HeroManager 
 {
+    //list of all heroes
     private List<Hero> heroes;
+    
+    //list of all heores
+    private List<Player> allHeroes;
     
     public HeroManager()
     {
@@ -78,14 +82,26 @@ public class HeroManager
         hero.setLives(lives);
         heroes.add(hero);
     }
+
+    /**
+     * Get a list of all heroes
+     * @return List<Hero>
+     */
+    public List<Hero> getHeroes()
+    {
+        return heroes;
+    }
     
     /**
      * Get a list of all heroes
      * @return List<Player>
      */
-    public List<Player> getHeroes()
+    public List<Player> getPlayerHeroes()
     {
-        List<Player> allHeroes = new ArrayList<>();
+        if (allHeroes == null)
+            allHeroes = new ArrayList<>();
+        
+        allHeroes.clear();
         
         for (Hero hero : heroes)
         {

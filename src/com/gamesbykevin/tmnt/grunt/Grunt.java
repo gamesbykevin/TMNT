@@ -3,10 +3,8 @@ package com.gamesbykevin.tmnt.grunt;
 import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
-import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +22,8 @@ public class Grunt extends Player
     //each enemy will start at 0 extra lives
     private static final int LIVES_DEFAULT = 0;
     
+    private List<Player> heroes;
+    
     public Grunt(GamePlayers type)
     {
         super(type);
@@ -39,9 +39,7 @@ public class Grunt extends Player
      */
     public void update(final Engine engine) throws Exception
     {
-        final ProjectileManager projectileManager = engine.getProjectileManager();
-        final List<Player> heroes = engine.getPlayerManager().getHeroManager().getHeroes();
-        final Polygon boundary = engine.getLevelManager().getLevel().getBoundary();
+        heroes = engine.getPlayerManager().getHeroManager().getPlayerHeroes();
         final Rectangle screen = engine.getMain().getScreen();
         
         //call this update first as it manages the animation and player state

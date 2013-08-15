@@ -21,6 +21,9 @@ public class PlayerManager
     private GruntManager gruntManager;
     private BossManager bossManager;
     
+    //list of all enemies combined Grunt/Boss
+    private List<Player> allEnemies;
+    
     public PlayerManager()
     {
         heroManager = new HeroManager();
@@ -49,7 +52,10 @@ public class PlayerManager
      */
     public List<Player> getEnemies()
     {
-        List<Player> allEnemies = new ArrayList<>();
+        if (allEnemies == null)
+            allEnemies = new ArrayList<>();
+        
+        allEnemies.clear();
         
         for (Grunt grunt : gruntManager.getGrunts())
         {
@@ -62,6 +68,11 @@ public class PlayerManager
         }
         
         return allEnemies;
+    }
+    
+    public int getEnemyCount()
+    {
+        return (gruntManager.getGrunts().size() + bossManager.getGrunts().size());
     }
     
     /**

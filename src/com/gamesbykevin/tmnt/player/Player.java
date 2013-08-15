@@ -64,6 +64,7 @@ public abstract class Player extends Sprite
     //number of frames to execute jump
     public static final int NUM_FRAMES_JUMP = 30;
     
+    //height of anchor will be 10% of player height
     public static final double ANCHOR_HEIGHT_RATIO = .1;
     
     //this is the hero the enemy has targeted
@@ -108,7 +109,7 @@ public abstract class Player extends Sprite
         return this.health;
     }
     
-    public void deductHealth()
+    private void deductHealth()
     {
         setHealth(getHealth() - 1);
     }
@@ -403,10 +404,13 @@ public abstract class Player extends Sprite
         
         if (isHurt())
         {
+            //when a player is hurt they can't move
             super.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
             
+            //when the animation is finished we deduct health and go back to idle state
             if (getSpriteSheet().hasFinished())
             {
+                deductHealth();
                 setNewState(State.IDLE);
             }
         }
@@ -450,7 +454,6 @@ public abstract class Player extends Sprite
                     {
                         target.setHorizontalFlip(!hasHorizontalFlip());
                         target.setNewState(State.HURT);
-                        target.deductHealth();
                         target.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     }
                 }

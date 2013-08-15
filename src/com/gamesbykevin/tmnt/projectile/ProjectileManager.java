@@ -2,8 +2,6 @@ package com.gamesbykevin.tmnt.projectile;
 
 import com.gamesbykevin.framework.base.Sprite;
 
-import com.gamesbykevin.tmnt.grunt.Grunt;
-import com.gamesbykevin.tmnt.heroes.Hero;
 import com.gamesbykevin.tmnt.player.Player;
 import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
@@ -149,7 +147,7 @@ public class ProjectileManager
                 //if the projectile came from enemy or boss
                 if (projectile.isEnemySource() || projectile.isBossSource())
                 {
-                    result = checkPlayers(players.getHeroManager().getHeroes(), projectile);
+                    result = checkPlayers(players.getHeroManager().getPlayerHeroes(), projectile);
                     
                     if (result)
                     {
@@ -199,7 +197,6 @@ public class ProjectileManager
         if (anchorProjectile.intersects(anchor) && projectile.getRectangle().contains(target.getCenter()))
         {
             target.setNewState(Player.State.HURT);
-            target.deductHealth();
 
             //check if there is an additional animation now that the projectile has hit
             if (projectile.getSpriteSheet().hasAnimation(Player.State.PROJECTILE1_FINISH))

@@ -25,20 +25,26 @@ public class StartApplet extends JApplet
         
         //use cursor from Shared class
         setCursor(Shared.CURSOR);
-            
+        
+        //set default values in case no parameters have been passed
         int ups = Shared.DEFAULT_UPS;
-
+        int fps = Shared.DEFAULT_FPS;
+        
         try
         {
-            //parameters here
+            //get parameters here
             ups = Integer.parseInt(getParameter("ups"));
+            fps = Integer.parseInt(getParameter("fps"));
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
         
-        main = new Main(ups);
+        //create new instance of Main with specified ups/fps
+        main = new Main(ups, fps);
+        
+        //add applet to instance so  we can perform certain features like "full-screen"
         main.setApplet(this);
     }
     
@@ -47,7 +53,10 @@ public class StartApplet extends JApplet
     {
         try
         {
-            main.createGameEngine();
+            //create a new instance of our engine
+            main.create();
+            
+            //start the thread
             main.start();
         }
         catch(Exception e)
@@ -65,7 +74,8 @@ public class StartApplet extends JApplet
     @Override
     public void destroy()
     {
-        main.destroy();
+        //free up resources
+        main.dispose();
         main = null;
     }
 }

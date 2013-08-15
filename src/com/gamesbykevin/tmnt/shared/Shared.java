@@ -28,6 +28,9 @@ public class Shared
     //how many updates per second, controls speed of game
     public static final int DEFAULT_UPS = 60;
     
+    //how many frames per second, controls how many images are rendered
+    public static final int DEFAULT_FPS = 90;
+    
     //what is the name of our game
     public static final String GAME_NAME = "TMNT";
     
