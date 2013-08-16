@@ -100,7 +100,7 @@ public final class Raphael extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(3,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(4,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(5,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(6,5), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(6,5), getNanoSeconds(450));
         getSpriteSheet().add(animation, State.ATTACK5);
         
         //jump animation

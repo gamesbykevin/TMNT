@@ -37,8 +37,8 @@ public final class Level6 extends Level implements LevelRules
     @Override
     public void setLevelBounds()
     {
-        int x[] = {0,   505, 505, 0};
-        int y[] = {142, 142, 219, 219};
+        int x[] = {0,   1010, 1010, 0};
+        int y[] = {142, 142,  222,  222};
         
         //set the area that is in bounds
         super.setBoundary(new Polygon(x, y, x.length));

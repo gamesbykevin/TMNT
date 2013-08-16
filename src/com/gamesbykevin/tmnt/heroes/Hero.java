@@ -104,6 +104,9 @@ public class Hero extends Player
         {
             if (canJump())
             {
+                //play sound effect
+                engine.getResources().playSoundEffect(Resources.GameAudioEffects.Jump);
+                
                 setVelocity(getVelocityX(), -getVelocityJump());
                 setNewState(State.JUMP);
                 setJumpPhase1(getX(), getY() - (getVelocityJump() * Player.NUM_FRAMES_JUMP));
@@ -117,6 +120,9 @@ public class Hero extends Player
             {
                 if (isJumping())
                 {
+                    //play sound effect
+                    engine.getResources().playSoundEffect(Resources.GameAudioEffects.JumpKick);
+                    
                     setState(State.JUMP_ATTACK);
                     
                     if (getVelocityY() < 0)
@@ -124,6 +130,9 @@ public class Hero extends Player
                 }
                 else
                 {
+                    //play sound effect
+                    engine.getResources().playSoundEffectRandomAttack();
+                    
                     setNewState(State.ATTACK1);
                     setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     engine.getKeyboard().removeKeyPressed(KeyEvent.VK_S);

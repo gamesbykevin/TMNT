@@ -95,7 +95,7 @@ public class Grunt extends Player
 
                     //if there's an opportunity, take it as long as they are on the screen
                     //if (attackState != null && screen.contains(super.getRectangle()))
-                    if (attackState != null && screen.contains(super.getPoint()))
+                    if (attackState != null && screen.contains(super.getCenter()))
                     {
                         //while attacking the enemy isn't moving
                         setVelocityX(VELOCITY_NONE);

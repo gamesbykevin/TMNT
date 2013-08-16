@@ -30,7 +30,7 @@ public final class Level1 extends Level implements LevelRules
     public void setEnemyLimits()
     {
         super.setEnemiesAtOnce(4);
-        super.setEnemiesPerCheckpoint(10);
+        super.setEnemiesPerCheckpoint(0);
     }
     
     @Override

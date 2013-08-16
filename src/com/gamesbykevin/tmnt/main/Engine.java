@@ -3,6 +3,7 @@ package com.gamesbykevin.tmnt.main;
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.input.*;
 import com.gamesbykevin.framework.input.Keyboard;
+import com.gamesbykevin.framework.util.TimerCollection;
 
 import com.gamesbykevin.tmnt.levels.*;
 import com.gamesbykevin.tmnt.main.Resources.LevelMisc;
@@ -12,6 +13,7 @@ import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +50,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     
     //all objects will be contained in this list and sorted so the lowest y value is drawn first
     private List<Sprite> levelObjects;
+    
+    //image for game over screen
+    private BufferedImage gameover;
     
     /**
      * The Engine that contains the game/menu objects
@@ -134,9 +139,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     //MAIN GAME LOGIC RUN HERE
                     if (getPlayerManager() != null)
                     {
-                        getProjectileManager().update(getMain().getScreen(), getPlayerManager());
+                        getProjectileManager().update(this);
                         getPlayerManager().update(this);
-                        getLevelManager().update(getPlayerManager(), main.getScreen());
+                        getLevelManager().update(this);
                     }
                 }
                 
@@ -238,7 +243,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         final int livesIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LivesSelect);
         
         this.projectileManager = new ProjectileManager();
-        this.playerManager = new PlayerManager();
+        this.playerManager = new PlayerManager(getMain().getTimeDeductionPerUpdate());
         this.levelManager = new LevelManager();
         this.levelManager.setLevel(level, resources, main.getScreen());
         
@@ -296,66 +301,104 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         
         if (getPlayerManager() != null && getLevelManager() != null && getProjectileManager() != null)
         {
-            //draw the level first
-            getLevelManager().render(g2d, getPlayerManager().getEnemyCount() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
-            
-            if (levelObjects == null)
-                levelObjects = new ArrayList<>();
-            
-            //clear level objects list
-            levelObjects.clear();
-        
-            //add all level related objects to List
-            getLevelManager().addAllStageObjects(levelObjects);
-            
-            //add all player related objects to List
-            getPlayerManager().addAllPlayerObjects(levelObjects);
-        
-            //add all of the projectiles to List
-            getProjectileManager().addAllProjectiles(levelObjects);
-            
-            for (int i=0; i < levelObjects.size(); i++)
+            //if we beat the game or died trying
+            if (getLevelManager().hasGameOver() || getPlayerManager().getHeroManager().hasGameOver())
             {
-                for (int x=0; x < levelObjects.size(); x++)
+                if (gameover == null)
                 {
-                    if (i == x)
-                        continue;
+                    final String result;
 
-                    if (levelObjects.get(i).getY() + (levelObjects.get(i).getHeight() / 2) < levelObjects.get(x).getY() + (levelObjects.get(x).getHeight() / 2))
-                    {
-                        Sprite temp = levelObjects.get(i);
+                    if (getLevelManager().hasGameOver())
+                        result = "Game Over You Win";
+                    else
+                        result = "Game Over You Lose";
 
-                        levelObjects.set(i, levelObjects.get(x));
-                        levelObjects.set(x, temp);
-                    }
+                    final int defeated = getPlayerManager().getEnemiesDefeatedCount();
+                    final String timeDesc = getPlayerManager().getTimer(PlayerManager.Keys.GamePlay).getDescPassed(TimerCollection.FORMAT_4);
+                    
+                    gameover = new BufferedImage(getMain().getScreen().width, getMain().getScreen().height, BufferedImage.TYPE_INT_ARGB);
+                    
+                    Graphics tmp = gameover.getGraphics();
+                    tmp.setFont(font.deriveFont(Font.BOLD, 16));
+                    
+                    int x = getMain().getScreen().x + (int)(getMain().getScreen().width  * .1);
+                    int y = getMain().getScreen().y + (int)(getMain().getScreen().height * .1);
+                    
+                    tmp.drawString(result, x, y);
+                    y += (tmp.getFontMetrics().getHeight() * 2);
+                    tmp.drawString("Defeated: " + defeated, x, y);
+                    y += (tmp.getFontMetrics().getHeight() * 2);
+                    tmp.drawString("Time: " + timeDesc, x, y);
+                }
+                else
+                {
+                    //draw game over screen
+                    g2d.drawImage(gameover, 0, 0, null);
                 }
             }
-        
-            for (Sprite levelObject : levelObjects)
+            else
             {
-                if (levelObject.getImage() == null)
-                    continue;
-                
-                //get half the dimensions so we can offset/reset the coordinates
-                int halfWidth = (levelObject.getWidth() / 2);
-                int halfHeight = (levelObject.getHeight() / 2);
+                //draw the level first
+                getLevelManager().render(g2d, getPlayerManager().getEnemyCount() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
 
-                //we need to offset the object location before drawing
-                levelObject.setX(levelObject.getX() - halfWidth);
-                levelObject.setY(levelObject.getY() - halfHeight);
+                if (levelObjects == null)
+                    levelObjects = new ArrayList<>();
 
-                levelObject.draw(g2d);
+                //clear level objects list
+                levelObjects.clear();
 
-                //now that the object is drawn we need to reset the location
-                levelObject.setX(levelObject.getX() + halfWidth);
-                levelObject.setY(levelObject.getY() + halfHeight);
+                //add all level related objects to List
+                getLevelManager().addAllStageObjects(levelObjects);
+
+                //add all player related objects to List
+                getPlayerManager().addAllPlayerObjects(levelObjects);
+
+                //add all of the projectiles to List
+                getProjectileManager().addAllProjectiles(levelObjects);
+
+                for (int i=0; i < levelObjects.size(); i++)
+                {
+                    for (int x=0; x < levelObjects.size(); x++)
+                    {
+                        if (i == x)
+                            continue;
+
+                        if (levelObjects.get(i).getY() + (levelObjects.get(i).getHeight() / 2) < levelObjects.get(x).getY() + (levelObjects.get(x).getHeight() / 2))
+                        {
+                            Sprite temp = levelObjects.get(i);
+
+                            levelObjects.set(i, levelObjects.get(x));
+                            levelObjects.set(x, temp);
+                        }
+                    }
+                }
+
+                for (Sprite levelObject : levelObjects)
+                {
+                    if (levelObject.getImage() == null)
+                        continue;
+
+                    //get half the dimensions so we can offset/reset the coordinates
+                    int halfWidth = (levelObject.getWidth() / 2);
+                    int halfHeight = (levelObject.getHeight() / 2);
+
+                    //we need to offset the object location before drawing
+                    levelObject.setX(levelObject.getX() - halfWidth);
+                    levelObject.setY(levelObject.getY() - halfHeight);
+
+                    levelObject.draw(g2d);
+
+                    //now that the object is drawn we need to reset the location
+                    levelObject.setX(levelObject.getX() + halfWidth);
+                    levelObject.setY(levelObject.getY() + halfHeight);
+                }
+
+                //remove all objects in List
+                levelObjects.clear();
+
+                //draw hero info, etc....
+                getPlayerManager().render(g2d, this);
             }
-            
-            //remove all objects in List
-            levelObjects.clear();
-            
-            //draw hero info, etc....
-            getPlayerManager().render(g2d, this);
         }
         
         //set the original font back so the menu will be rendered correctly

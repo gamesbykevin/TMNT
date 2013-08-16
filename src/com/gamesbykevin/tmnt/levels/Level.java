@@ -61,6 +61,9 @@ public abstract class Level extends Sprite
     //calculate the west/east most x coordinates
     private int eastBoundX = -1, westBoundX = 1;
     
+    //this variable will be used to determine if boss Player has been added for this level yet
+    private boolean addedBoss = false;
+    
     /**
      * Create new Level
      * 
@@ -72,6 +75,19 @@ public abstract class Level extends Sprite
         
         if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
             throw new Exception("Can't have more than 6 enemies at once");
+    }
+    
+    /**
+     * Record that boss has been added to this level
+     */
+    public void setAddedBoss()
+    {
+        this.addedBoss = true;
+    }
+    
+    public boolean hasAddedBoss()
+    {
+        return this.addedBoss;
     }
     
     /**
@@ -279,87 +295,84 @@ public abstract class Level extends Sprite
     public void createPowerUps(final Image image, final Rectangle screen) throws Exception
     {
         if (getWidth() <= 0)
-        {
             throw new Exception("Dimensions have to be set first before calling this function");
-        }
-        else
+        if (getBoundary() == null)
+            throw new Exception("Level Bounds has to be set first before calling this function");
+        
+        powerUps = new ArrayList<>();
+
+        //each powerup will be placed in a different area
+        final int eachSectionWidth = (int)((getWidth() / getPowerUpLimit()) * .9);
+
+        //continue to loop until we have reached our limit
+        while (powerUps.size() < getPowerUpLimit())
         {
-            if (getBoundary() == null)
+            Sprite powerUp = new Sprite();
+
+            //set the powerup image
+            powerUp.setImage(image);
+            powerUp.setDimensions(image);
+
+            //now choose a random location
+            final int randomX;
+
+            //if the first power up make adjustment so it doesn't appear on initial screen
+            if (powerUps.size() < 1)
             {
-                throw new Exception("Level Bounds has to be set first before calling this function");
+                randomX = (int)(Math.random() * (eachSectionWidth - screen.width)) + screen.width;
             }
             else
             {
-                powerUps = new ArrayList<>();
-                
-                //each powerup will be placed in a different area
-                final int eachSectionWidth = (int)((getWidth() / getPowerUpLimit()) * .9);
-                
-                //continue to loop until we have reached our limit
-                while (powerUps.size() < getPowerUpLimit())
-                {
-                    Sprite powerUp = new Sprite();
-                    
-                    //set the powerup image
-                    powerUp.setImage(image);
-                    powerUp.setDimensions(image);
-                    
-                    //now choose a random location
-                    final int randomX;
-                    
-                    //if the first power up make adjustment so it doesn't appear on initial screen
-                    if (powerUps.size() < 1)
-                    {
-                        randomX = (int)(Math.random() * (eachSectionWidth - screen.width)) + screen.width;
-                    }
-                    else
-                    {
-                        randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
-                    }
-
-                    List<Integer> possibilities = new ArrayList<>();
-                    
-                    for (int y = screen.y; y < screen.y + screen.height; y++)
-                    {
-                        if (getBoundary().contains(new Rectangle(randomX, y, powerUp.getWidth(), powerUp.getHeight())))
-                            possibilities.add(y);
-                    }
-                    
-                    //get random y coordinate
-                    final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
-                    
-                    //set random location
-                    powerUp.setLocation(randomX, randomY);
-                    
-                    //add powerup to list
-                    powerUps.add(powerUp);
-                }
+                randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
             }
+
+            List<Integer> possibilities = new ArrayList<>();
+
+            for (int y = screen.y; y < screen.y + screen.height; y++)
+            {
+                if (getBoundary().contains(new Rectangle(randomX, y, powerUp.getWidth(), powerUp.getHeight())))
+                    possibilities.add(y);
+            }
+
+            //get random y coordinate
+            final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
+
+            possibilities.clear();
+            possibilities = null;
+            
+            //set random location
+            powerUp.setLocation(randomX, randomY);
+
+            //add powerup to list
+            powerUps.add(powerUp);
         }
     }
     
     /**
-     * Creates a number of check points when the hero hits the check point the enemies come
+     * Creates a number of check points. As the hero hits
+     * the checkpoints scrolling will stop and the enemies 
+     * will come.
+     * 
+     * @param total Number of checkpoints to create for the level
+     * @throws Exception 
      */
     public void createCheckPoints(final int total) throws Exception
     {
         if (getWidth() <= 0)
-        {
             throw new Exception("Dimensions have to be set first before calling this function");
-        }
-        else
-        {
-            checkpoints = new ArrayList<>();
-            
-            if (total > 0)
-            {
-                final int eachCheckpointLength = (int)((getWidth() / total) * .75);
+        
+        checkpoints = new ArrayList<>();
 
-                while (checkpoints.size() < total)
-                {
-                    //checkpoints.add(checkpoints.size() * eachCheckpointLength);
-                    checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
-                }
+        //only create checkpoints if needed
+        if (total > 0)
+        {
+            final int eachCheckpointLength = (int)((getWidth() / total) * .75);
+
+            //continue adding checkpoints until we have reached our total
+            while (checkpoints.size() < total)
+            {
+                //first check point will start at a distance so the hero doesn't have enemies until they scroll
+                checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
             }
         }
     }

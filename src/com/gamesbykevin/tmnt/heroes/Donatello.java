@@ -95,17 +95,15 @@ public final class Donatello extends Hero implements PlayerRules
         getSpriteSheet().add(animation, State.ATTACK4);
 
         //attack5 animation
-        /*
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(2,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(3,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(4,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(5,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(6,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(7,5), getNanoSeconds(75));
-        animation.add(getSpriteRectangle(8,5), getNanoSeconds(75));
+        animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(3,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(4,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(5,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(6,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(7,5), getNanoSeconds(50));
+        animation.add(getSpriteRectangle(8,5), getNanoSeconds(450));
         getSpriteSheet().add(animation, State.ATTACK5);
-        */
         
         //jump animation
         animation = new SpriteSheetAnimation();

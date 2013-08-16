@@ -80,11 +80,6 @@ public class GameMenu extends Menu
         optionLives.add("8", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         optionLives.add("9", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         optionLives.add("10", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
-        optionLives.add("11", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
-        optionLives.add("12", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
-        optionLives.add("13", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
-        optionLives.add("14", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
-        optionLives.add("15", resources.getMenuAudio(Resources.MenuAudio.MenuChange));
         
         optionFullScreen = new Option("FullScreen: ");
         optionFullScreen.add("Off",resources.getMenuAudio(Resources.MenuAudio.MenuChange));
@@ -244,19 +239,14 @@ public class GameMenu extends Menu
     
     public void update(final Engine engine) throws Exception
     {
-        final Main main                 = engine.getMain();
-        final Resources resources = engine.getResources();
-        final Keyboard ki               = engine.getKeyboard();
-        final Mouse mi                  = engine.getMouse();
-        
         //if the menu is not on the last layer we need to check for changes made in the menu
         if (!isMenuFinished())
         {   
             //if on MainTitle layer recycle gameEngine, but not resources just turn audio off
             if (isCurrentLayer(LayerKey.MainTitle) && !resetGame)
-            {   
+            {
                 resetGame = true;
-                resources.stopAllSound();
+                engine.getResources().stopAllSound();
             }
             
             int valueSound = -1, valueFullScreen = -1;
@@ -280,13 +270,13 @@ public class GameMenu extends Menu
             {
                 setLayer(LayerKey.StartGame);
                 resetGame = true;
-                resources.stopAllSound();
+                engine.getResources().stopAllSound();
             }
             
             if (valueSound > -1)
             {
                 //0 = enabled
-                resources.setAudioEnabled(valueSound == 0);
+                engine.getResources().setAudioEnabled(valueSound == 0);
             }
             
             if (valueFullScreen > -1)
@@ -297,20 +287,20 @@ public class GameMenu extends Menu
                 //1 = full screen enabled, 0 = no full screen
                 if (valueFullScreen == 1 && !fullScreenOn || valueFullScreen == 0 && fullScreenOn) 
                 {
-                    fullScreen.switchFullScreen(main.getApplet(), main.getPanel());
+                    fullScreen.switchFullScreen(engine.getMain().getApplet(), engine.getMain().getPanel());
                     fullScreenOn = !fullScreenOn;
-                    main.setFullScreen();
+                    engine.getMain().setFullScreen();
                 }
             }
             
             //if the applet has focus and did not previously set menu layer back to cached value
-            if (!windowHasFocus && main.hasFocus() && previousLayerKey != null)
+            if (!windowHasFocus && engine.getMain().hasFocus() && previousLayerKey != null)
             {
                 setLayer(previousLayerKey);
                 previousLayerKey = null;
             }
 
-            windowHasFocus = main.hasFocus();
+            windowHasFocus = engine.getMain().hasFocus();
 
             if (!windowHasFocus && previousLayerKey == null)
             {   //if applet does not have focus and the previous menu layer is not set, set it and send the menu layer to applet focus
@@ -318,7 +308,7 @@ public class GameMenu extends Menu
                 setLayer(LayerKey.AppletFocus);
             }
             
-            super.update(mi, ki, main.getTimeDeductionPerFrame());
+            super.update(engine.getMouse(), engine.getKeyboard(), engine.getMain().getTimeDeductionPerUpdate());
         }
         else
         {
@@ -329,10 +319,10 @@ public class GameMenu extends Menu
                 engine.reset();
             }
             
-            if (ki.hasKeyPressed(KeyEvent.VK_ESCAPE))
+            if (engine.getKeyboard().hasKeyPressed(KeyEvent.VK_ESCAPE))
             {   //if in game and Esc is pressed bring in game options menu back up
                 setLayer(LayerKey.OptionsInGame);
-                ki.reset();
+                engine.getKeyboard().reset();
             }
         }
     }

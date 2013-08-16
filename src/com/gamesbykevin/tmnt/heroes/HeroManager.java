@@ -4,8 +4,10 @@ import com.gamesbykevin.framework.base.Sprite;
 
 import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources;
+import com.gamesbykevin.tmnt.main.Resources.GameAudioMusic;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
+import com.gamesbykevin.tmnt.player.PlayerManager.Keys;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -21,6 +23,9 @@ public class HeroManager
     //list of all heores
     private List<Player> allHeroes;
     
+    //is the game over
+    private boolean gameover = false;
+    
     public HeroManager()
     {
         heroes = new ArrayList<>();
@@ -30,7 +35,9 @@ public class HeroManager
     {
         for (Hero hero : heroes)
         {
-            hero.dispose();
+            if (hero != null)
+                hero.dispose();
+            
             hero = null;
         }
         
@@ -135,26 +142,27 @@ public class HeroManager
             if (hero.getImage() == null)
             {
                 hero.setImage(engine.getResources().getGamePlayer(hero.getType()));
-                hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                hero.setDelay(engine.getMain().getTimeDeductionPerUpdate());
                 hero.setDimensions();
                 
+                //set start location
                 final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
-                
                 hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
             }
             
+            //every hero should have the time deduction set in their spritesheet to avoid Exception
             if (hero.getDelay() < 0)
-                hero.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                hero.setDelay(engine.getMain().getTimeDeductionPerUpdate());
             
             hero.update(engine);
             
-            //if the death animation is complete and no more lives
+            //if the death animation is complete
             if (hero.isDeadComplete())
             {
                 //if the hero does not have any more lives
                 if (!hero.hasLives())
                 {
-                    //if there are more than 1 hero remove the dead hero because once all heroes are dead we want to leave the last one on the screen
+                    //if there is more than 1 hero remove the dead because we want to leave the last one on the screen
                     if (heroes.size() > 1)
                     {
                         hero.dispose();
@@ -162,13 +170,43 @@ public class HeroManager
                         heroes.remove(i);
                         i--;
                     }
+                    else
+                    {
+                        //make sure gameover isn't set yet before we set it
+                        if (!gameover)
+                        {
+                            //since all lives lost game over stop timer
+                            engine.getPlayerManager().getTimer(Keys.GamePlay).setPause(true);
+
+                            //If all heroes are dead and no lives then the game will be over
+                            gameover = true;
+
+                            //stop all existing sound and play game over win sound
+                            engine.getResources().stopAllSound();
+                            engine.getResources().playGameMusic(GameAudioMusic.GameOverLose, false);
+                        }
+                    }
                 }
                 else
                 {
+                    //now that death is over set the state back to idle
                     hero.setNewState(Player.State.IDLE);
+                    
+                    //reset location so not cornered
+                    final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
+                    hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
                 }
             }
         }
+    }
+    
+    /**
+     * If all heroes are dead and no lives then the game will be over LOSE
+     * @return boolean
+     */
+    public boolean hasGameOver()
+    {
+        return this.gameover;
     }
     
     /**

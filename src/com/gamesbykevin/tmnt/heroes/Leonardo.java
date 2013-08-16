@@ -102,7 +102,7 @@ public final class Leonardo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(1,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(3,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(4,5), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(4,5), getNanoSeconds(450));
         getSpriteSheet().add(animation, State.ATTACK5);
         
         //jump animation

@@ -7,7 +7,9 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * This class will load all resources and provide ways to access them
@@ -66,7 +68,15 @@ public class Resources
     
     public enum GameAudioEffects
     {
-        Connection
+        Attack1, Attack2, Attack3,
+        Cowabunga, 
+        Explosion, 
+        Hit1, Hit2, 
+        ProjectileHit1, ProjectileHit2, ProjectileHit3, ProjectileHit4, 
+        Jump, JumpKick,
+        LetsKickShell,
+        PizzaTime, 
+        ShellShock
     }
     
     public enum GameAudioMusic
@@ -74,7 +84,7 @@ public class Resources
         LevelClear, 
         Level1, Level1Boss, Level2, Level2Boss, Level3, Level3Boss, 
         Level4, Level4Boss, Level5, Level5Boss, Level6Boss, 
-        GameOverWin, GameOverLose
+        GameOverWin, GameOverLose 
     }
     
     //indicates wether or not we are still loading resources
@@ -85,29 +95,29 @@ public class Resources
         everyResource = new LinkedHashMap<>();
         
         //load all menu images
-        add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
+        add(Type.MenuImage, (Object[])MenuImage.values(), RESOURCE_DIR + "images/menu/{0}.gif", "Loading Menu Image Resources", Manager.Type.Image);
         
         //load all players
-        add(Type.GamePlayers, (Object[])GamePlayers.values(), RESOURCE_DIR + "images/game/players/{0}.png", "Loading Game Player Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
+        add(Type.GamePlayers, (Object[])GamePlayers.values(), RESOURCE_DIR + "images/game/players/{0}.png", "Loading Game Player Image Resources", Manager.Type.Image);
         
         //load all levels
-        add(Type.LevelMisc, (Object[])LevelMisc.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", com.gamesbykevin.framework.resources.Manager.Type.Image);
+        add(Type.LevelMisc, (Object[])LevelMisc.values(), RESOURCE_DIR + "images/game/level/{0}.gif", "Loading Game Level Image Resources", Manager.Type.Image);
         
         //load all game fonts
-        add(Type.GameFont, (Object[])GameFont.values(), RESOURCE_DIR + "font/{0}.ttf", "Loading Game Font Resources", com.gamesbykevin.framework.resources.Manager.Type.Font);
+        add(Type.GameFont, (Object[])GameFont.values(), RESOURCE_DIR + "font/{0}.ttf", "Loading Game Font Resources", Manager.Type.Font);
         
         //load all menu audio
-        add(Type.MenuAudio, (Object[])MenuAudio.values(), RESOURCE_DIR + "audio/menu/{0}.wav", "Loading Menu Audio Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
+        add(Type.MenuAudio, (Object[])MenuAudio.values(), RESOURCE_DIR + "audio/menu/{0}.wav", "Loading Menu Audio Resources", Manager.Type.Audio);
         
         //load all game audio
-        add(Type.GameAudioEffects, (Object[])GameAudioEffects.values(), RESOURCE_DIR + "audio/game_effects/{0}.wav", "Loading Game Audio Sound Effects Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
+        add(Type.GameAudioEffects, (Object[])GameAudioEffects.values(), RESOURCE_DIR + "audio/game_effects/{0}.wav", "Loading Game Audio Sound Effects Resources", Manager.Type.Audio);
 
         //load all game audio
-        add(Type.GameAudioMusic,  (Object[])GameAudioMusic.values(),   RESOURCE_DIR + "audio/game_music/{0}.mid", "Loading Game Audio Music Resources", com.gamesbykevin.framework.resources.Manager.Type.Audio);
+        add(Type.GameAudioMusic,  (Object[])GameAudioMusic.values(),   RESOURCE_DIR + "audio/game_music/{0}.mid", "Loading Game Audio Music Resources", Manager.Type.Audio);
     }
     
     //add a collection of resources audio/image/font/text
-    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final com.gamesbykevin.framework.resources.Manager.Type resourceType)
+    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final Manager.Type resourceType)
     {
         String[] locations = new String[eachResourceKey.length];
         for (int i=0; i < locations.length; i++)
@@ -166,12 +176,69 @@ public class Resources
         getResources(Type.GameAudioMusic).playAudio(key, loop);
     }
     
+    /**
+     * Plays a random attack sound effect with no loop
+     */
+    public void playSoundEffectRandomAttack()
+    {
+        List<GameAudioEffects> sounds = new ArrayList<>();
+        sounds.add(GameAudioEffects.Attack1);
+        sounds.add(GameAudioEffects.Attack2);
+        sounds.add(GameAudioEffects.Attack3);
+        
+        final int randomIndex = (int)(Math.random() * sounds.size());
+        
+        playSoundEffect(sounds.get(randomIndex), false);
+    }
+    
+    /**
+     * Plays a random hit sound effect with no loop
+     */
+    public void playSoundEffectRandomHit()
+    {
+        List<GameAudioEffects> sounds = new ArrayList<>();
+        sounds.add(GameAudioEffects.Hit1);
+        sounds.add(GameAudioEffects.Hit2);
+        
+        final int randomIndex = (int)(Math.random() * sounds.size());
+        
+        playSoundEffect(sounds.get(randomIndex), false);
+    }
+    
+    /**
+     * Plays a random hit sound effect
+     * @param loop 
+     */
+    public void playSoundEffectRandomProjectileHit()
+    {
+        List<GameAudioEffects> sounds = new ArrayList<>();
+        sounds.add(GameAudioEffects.ProjectileHit1);
+        sounds.add(GameAudioEffects.ProjectileHit2);
+        sounds.add(GameAudioEffects.ProjectileHit3);
+        sounds.add(GameAudioEffects.ProjectileHit4);
+        
+        final int randomIndex = (int)(Math.random() * sounds.size());
+        
+        playSoundEffect(sounds.get(randomIndex), false);
+    }
+    
     public void playSoundEffect(final Object key, final boolean loop)
     {
         getResources(Type.GameAudioEffects).playAudio(key, loop);
     }
     
-    public void stopSoundEffect(final Object key)
+    public void playSoundEffect(final Object key)
+    {
+        playSoundEffect(key, false);
+    }
+    
+    public void stopGameAudioMusic(final Object key)
+    {
+        getResources(Type.GameAudioMusic).getAudio(key).stopSound();
+    }
+    
+    
+    public void stopGameAudioEffect(final Object key)
     {
         getResources(Type.GameAudioEffects).getAudio(key).stopSound();
     }

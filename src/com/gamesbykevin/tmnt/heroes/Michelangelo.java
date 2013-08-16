@@ -96,21 +96,11 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(0,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(1,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,5), getNanoSeconds(100));
+        animation.add(getSpriteRectangle(3,5), getNanoSeconds(450));
         getSpriteSheet().add(animation, State.ATTACK4);
 
         /*
          * HE DOESN'T HAVE ATTACK 5 IN THE SPRITE SHEET
-        //attack5 animation
-        animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(8,4), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(9,4), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(0,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(1,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(4,5), getNanoSeconds(200));
-        getSpriteSheet().add(animation, State.ATTACK5);
         */
         
         //jump animation

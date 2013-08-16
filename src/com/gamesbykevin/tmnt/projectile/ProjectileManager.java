@@ -2,13 +2,13 @@ package com.gamesbykevin.tmnt.projectile;
 
 import com.gamesbykevin.framework.base.Sprite;
 
+import com.gamesbykevin.tmnt.main.Engine;
+import com.gamesbykevin.tmnt.main.Resources.GameAudioEffects;
+import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
 import static com.gamesbykevin.tmnt.player.Player.VELOCITY_NONE;
-import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
-import com.gamesbykevin.tmnt.player.PlayerManager;
 
 import java.awt.Rectangle;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,16 +108,31 @@ public class ProjectileManager
         projectiles.add(projectile);
     }
     
-    public void update(final Rectangle screen, PlayerManager players) throws Exception
+    /**
+     * Update every projectile we have in play.
+     * 
+     * @param engine
+     * @throws Exception 
+     */
+    public void update(final Engine engine) throws Exception
     {
+        //if there are no projectiles then there is no need to update
+        if (projectiles.isEmpty())
+            return;
+        
+        //update every projectile
         for (int i=0; i < projectiles.size(); i++)
         {
+            //get the current projectile
             Projectile projectile = projectiles.get(i);
             
+            //update animation
             projectile.getSpriteSheet().update();
+            
+            //update location
             projectile.update();
             
-            //is this projectile currently displaying the finish animation if it has one
+            //does this projectile have a finish animation
             if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1_FINISH)
             {
                 //if the animation has finished remove projectile
@@ -130,40 +145,66 @@ public class ProjectileManager
             }
                 
             //if the projectile is no longer in the current game window remove it
-            if (!screen.intersects(projectile.getRectangle()))
+            if (!engine.getMain().getScreen().intersects(projectile.getRectangle()))
             {
                 projectiles.remove(i);
                 i--;
                 continue;
             }
             
+            //only check active projectiles here
             if (projectile.getSpriteSheet().getCurrent() == Player.State.PROJECTILE1)
             {
+                //the projectile has to be moving before we check collision
                 if (!projectile.hasVelocity())
                     continue;
-                
-                boolean result = false;
                 
                 //if the projectile came from enemy or boss
                 if (projectile.isEnemySource() || projectile.isBossSource())
                 {
-                    result = checkPlayers(players.getHeroManager().getPlayerHeroes(), projectile);
+                    boolean result = checkPlayers(engine.getPlayerManager().getHeroManager().getPlayerHeroes(), projectile);
                     
+                    //projectile has hit player
                     if (result)
                     {
-                        projectiles.remove(i);
-                        i--;
-                        continue;
+                        //if projectile has finish animation there will be a different sound effect played
+                        if (projectile.getSpriteSheet().hasAnimation(Player.State.PROJECTILE1_FINISH))
+                        {
+                            //play sound effect
+                            engine.getResources().playSoundEffect(GameAudioEffects.Explosion);
+                        }
+                        else
+                        {
+                            //play any other hit sound effect
+                            engine.getResources().playSoundEffectRandomProjectileHit();
+                            
+                            //if projectile does not have a finish animation remove it from List
+                            projectiles.remove(i);
+                            i--;
+                            continue;
+                        }
                     }
                 }
             }
         }
     }
     
+    /**
+     * Check the list of players to see if the projectile has collision.
+     * Will return true if the projectile hit
+     * 
+     * @param players
+     * @param projectile
+     * @return boolean
+     */
     private boolean checkPlayers(final List<Player> players, final Projectile projectile)
     {
         for (Player player : players)
         {
+            //the target has to be vulnerable
+            if (!player.canHurt())
+                continue;
+            
             boolean result = checkPlayer(player, projectile);
             
             if (result)
@@ -175,9 +216,7 @@ public class ProjectileManager
     
     /**
      * Check the player and return true
-     * if they have hit and do not have 
-     * a finish animation so we can remove 
-     * them from the list of projectiles.
+     * if they have hit.
      * 
      * @param target List of player we want to check for collision
      * @param projectile Projectile we are testing
@@ -185,17 +224,14 @@ public class ProjectileManager
      */
     private boolean checkPlayer(final Player target, final Projectile projectile)
     {
-        //the target has to be vulnerable
-        if (!target.canHurt())
-            return false;
-
-        //get anchor location of target and projectile to determine if they y-coordinate is level
+        //get anchor location of target and projectile to determine if the y-coordinate is level
         Rectangle anchorProjectile = Player.getAnchorLocation(projectile);
         Rectangle anchor = target.getAnchorLocation();
 
         //projectile has hit target
         if (anchorProjectile.intersects(anchor) && projectile.getRectangle().contains(target.getCenter()))
         {
+            //the tarhet has been hurt
             target.setNewState(Player.State.HURT);
 
             //check if there is an additional animation now that the projectile has hit
@@ -206,14 +242,11 @@ public class ProjectileManager
                     projectile.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     projectile.getSpriteSheet().setCurrent(Player.State.PROJECTILE1_FINISH);
                     projectile.getSpriteSheet().reset();
-                    return false;
                 }
             }
-            else
-            {
-                //if another animation does not exist then remove the projectile
-                return true;
-            }
+            
+            //there has been collision return true
+            return true;
         }
         
         return false;

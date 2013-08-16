@@ -61,9 +61,22 @@ public class EnemyManager
         }
     }
     
-    public List<Grunt> getGrunts()
+    /**
+     * Get the List of Grunt
+     * @return List<Grunt>
+     */
+    public List<Grunt> get()
     {
         return this.grunts;
+    }
+    
+    /**
+     * Return the number of enemy's in List
+     * @return int
+     */
+    public int getCount()
+    {
+        return this.grunts.size();
     }
     
     public void add(final Grunt grunt)
@@ -125,7 +138,7 @@ public class EnemyManager
             if (grunt.getImage() == null)
             {
                 grunt.setImage(engine.getResources().getGamePlayer(grunt.getType()));
-                grunt.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                grunt.setDelay(engine.getMain().getTimeDeductionPerUpdate());
                 grunt.setDimensions();
                 
                 final Point start = engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt.getWidth(), grunt.getHeight());
@@ -138,13 +151,16 @@ public class EnemyManager
             }
             
             if (grunt.getDelay() < 0)
-                grunt.setDelay(engine.getMain().getTimeDeductionPerFrame());
+                grunt.setDelay(engine.getMain().getTimeDeductionPerUpdate());
             
             grunt.update(engine);
             
             //if the death animation is complete and no more lives remove the grunt
             if (grunt.isDeadComplete() && !grunt.hasLives())
             {
+                //keep track of enemies defeated
+                engine.getPlayerManager().addEnemiesDefeated();
+                
                 grunt.dispose();
                 grunt = null;
                 grunts.remove(i);

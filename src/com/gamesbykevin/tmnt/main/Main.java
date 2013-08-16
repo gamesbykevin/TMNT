@@ -237,6 +237,9 @@ public class Main extends Thread
         
         //set the current window size
         currentWindow = new Rectangle(fullSizeWindow);
+        
+        //since full screen switched on/off create a new graphics object
+        createGraphicsObject();
     }
     
     /**
@@ -244,7 +247,7 @@ public class Main extends Thread
      * 
      * @return long The nanosecond duration between each update
      */
-    public long getTimeDeductionPerFrame()
+    public long getTimeDeductionPerUpdate()
     {
         return (long)nanoSecondsPerUpdate;
     }
@@ -317,26 +320,32 @@ public class Main extends Thread
     }
     
     /**
+     * Set the graphic object for drawing the rendered image
+     */
+    private void createGraphicsObject()
+    {
+        if (applet != null)
+        {
+            graphics = applet.getGraphics();
+        }
+        else
+        {
+            graphics = panel.getGraphics();
+        }
+    }
+    
+    /**
      * Draw Image onto screen
      */
     private void drawScreen()
     {
-        //if no image has been rendered return
+        //if no image has been rendered yet return
         if (bufferedImage == null)
             return;
         
         //cache graphics object to save resources
         if (graphics == null)
-        {
-            if (applet != null)
-            {
-                graphics = applet.getGraphics();
-            }
-            else
-            {
-                graphics = panel.getGraphics();
-            }
-        }
+            createGraphicsObject();
         
         //make sure current window dimensions are set
         if (currentWindow == null)
@@ -344,19 +353,20 @@ public class Main extends Thread
         
         try
         {
+            //the destination will be the size of the window
             int dx1 = currentWindow.x;
             int dy1 = currentWindow.y;
             int dx2 = currentWindow.x + currentWindow.width;
             int dy2 = currentWindow.y + currentWindow.height;
 
+            //the source will be the entire image
             int sx1 = 0;
             int sy1 = 0;
             int sx2 = bufferedImage.getWidth(null);
             int sy2 = bufferedImage.getHeight(null);
-
+            
+            //draw our rendered image at the specified location
             graphics.drawImage(bufferedImage, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
-
-            //Toolkit.getDefaultToolkit().sync();
 
             //release pixel data
             bufferedImage.flush();
@@ -374,14 +384,26 @@ public class Main extends Thread
     {
         engine.dispose();
         engine = null;
-        
-        bufferedImage = null;
-        
         originalSizeWindow = null;
         fullSizeWindow = null;
         currentWindow = null;
         
         applet = null;
         panel = null;
+        
+        if (bufferedImage != null)
+            bufferedImage.flush();
+        
+        bufferedImage = null;
+        
+        if (bufferedImageGraphics != null)
+            bufferedImageGraphics.dispose();
+        
+        bufferedImageGraphics = null;
+        
+        if (graphics != null)
+            graphics.dispose();
+        
+        graphics = null;
     }
 }

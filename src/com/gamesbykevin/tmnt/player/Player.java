@@ -2,13 +2,14 @@ package com.gamesbykevin.tmnt.player;
 
 import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.TimerCollection;
+import com.gamesbykevin.tmnt.heroes.HeroManager;
 
 import com.gamesbykevin.tmnt.main.Engine;
+import com.gamesbykevin.tmnt.main.Resources.GameAudioEffects;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.util.List;
 
@@ -392,7 +393,7 @@ public abstract class Player extends Sprite
                 }
             }
             
-            checkAttack(players);
+            checkAttack(engine, players);
         }
         else
         {
@@ -419,6 +420,10 @@ public abstract class Player extends Sprite
         {
             if (getState() != State.DEAD)
             {
+                //if hero dies play "shell shock" sound effect
+                if (HeroManager.isHero(getType()))
+                    engine.getResources().playSoundEffect(GameAudioEffects.ShellShock);
+                
                 deductLife();
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 setNewState(State.DEAD);
@@ -433,7 +438,7 @@ public abstract class Player extends Sprite
      * Check if the player has hit any targets
      * @param targets The enemies the player is targeting 
      */
-    private void checkAttack(List<Player> targets)
+    private void checkAttack(final Engine engine, final List<Player> targets)
     {
         //if the attacking animation is finished check for collision and reset animation
         if (getSpriteSheet().hasFinished())
@@ -452,6 +457,9 @@ public abstract class Player extends Sprite
                     //make sure hero is facing the enemy, NOTE: even though we hit the enemy do not exit loop because we may damage multiple
                     if (target.getCenter().x >= getCenter().x && !hasHorizontalFlip() || target.getCenter().x <= getCenter().x && hasHorizontalFlip())
                     {
+                        //play hurt sound effect
+                        engine.getResources().playSoundEffectRandomHit();
+                        
                         target.setHorizontalFlip(!hasHorizontalFlip());
                         target.setNewState(State.HURT);
                         target.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
@@ -459,15 +467,21 @@ public abstract class Player extends Sprite
                 }
             }
 
-            //since the attack animation is finished reset it, but not if the hero is jumping
+            //the attack animation is finished so make sure the player is not jumping before we reset it
             if (!isJumping())
             {
                 //once we are complete jumping we go back to idle
                 setNewState(State.IDLE);
                 
-                //if there is another state
-                if (getNextState() != null)
+                //if there is another state and this player is the hero
+                if (getNextState() != null && HeroManager.isHero(getType()))
+                {
+                    //play sound effect
+                    engine.getResources().playSoundEffectRandomAttack();
+                    
+                    //only heroes will have a NextState
                     applyNextState();
+                }
             }
         }
     }
