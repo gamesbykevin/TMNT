@@ -11,6 +11,7 @@ import com.gamesbykevin.tmnt.player.PlayerManager.Keys;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,8 @@ public class HeroManager
     
     //is the game over
     private boolean gameover = false;
+    
+    private Point startPosition;
     
     public HeroManager()
     {
@@ -87,6 +90,11 @@ public class HeroManager
         }
         
         hero.setLives(lives);
+        
+        //call this to set the cache value
+        hero.setHealthDisplay();
+        hero.setLivesDisplay();
+        
         heroes.add(hero);
     }
 
@@ -131,6 +139,16 @@ public class HeroManager
         }
     }
     
+    public void setStartLocation(final Rectangle r, final int width, final int height)
+    {
+        startPosition = new Point(r.x + width + 1, r.y + r.height - height);
+    }
+    
+    public Point getStartLocation()
+    {
+        return this.startPosition;
+    }
+    
     public void update(final Engine engine) throws Exception
     {
         //NOTE: all heroes are human for now, we may have AI friends
@@ -146,8 +164,10 @@ public class HeroManager
                 hero.setDimensions();
                 
                 //set start location
-                final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
-                hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
+                setStartLocation(engine.getLevelManager().getLevel().getBoundary().getBounds(), hero.getWidth(), hero.getHeight());
+                
+                //place hero at start location
+                hero.setLocation(getStartLocation());
             }
             
             //every hero should have the time deduction set in their spritesheet to avoid Exception
@@ -192,9 +212,11 @@ public class HeroManager
                     //now that death is over set the state back to idle
                     hero.setNewState(Player.State.IDLE);
                     
-                    //reset location so not cornered
-                    final Rectangle r = engine.getLevelManager().getLevel().getBoundary().getBounds();
-                    hero.setLocation(r.x + hero.getWidth() + 1, r.y + r.height - (hero.getHeight()));
+                    //make the hero face east as well
+                    hero.setHorizontalFlip(false);
+                    
+                    //reset location to start so not cornered
+                    hero.setLocation(getStartLocation());
                 }
             }
         }

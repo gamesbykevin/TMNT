@@ -4,16 +4,10 @@ import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.framework.base.SpriteSheetAnimation;
 import com.gamesbykevin.tmnt.player.PlayerRules;
 
-/**
- *
- * @author GOD
- */
 public final class FootSoldier3 extends Grunt implements PlayerRules
 {
     private static final int SPRITE_WIDTH  = 60;
     private static final int SPRITE_HEIGHT = 60;
-    
-    private static final int VELOCITY_WALK = 1;
     
     /**
      * In this constructor we want to setup all of the animations for this Player
@@ -22,13 +16,6 @@ public final class FootSoldier3 extends Grunt implements PlayerRules
     {
         super(GamePlayers.FootSoldier3);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         

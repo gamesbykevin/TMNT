@@ -27,7 +27,7 @@ public final class Level4 extends Level implements LevelRules
     }
     
     @Override
-    public void setEnemyLimits()
+    public void setEnemyLimits() throws Exception
     {
         super.setEnemiesAtOnce(6);
         super.setEnemiesPerCheckpoint(10);

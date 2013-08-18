@@ -19,13 +19,6 @@ public final class Michelangelo extends Hero implements PlayerRules
     {
         super(GamePlayers.Michelangelo);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -96,7 +89,7 @@ public final class Michelangelo extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(0,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(1,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(2,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(3,5), getNanoSeconds(450));
+        animation.add(getSpriteRectangle(3,5), getNanoSeconds(250));
         getSpriteSheet().add(animation, State.ATTACK4);
 
         /*

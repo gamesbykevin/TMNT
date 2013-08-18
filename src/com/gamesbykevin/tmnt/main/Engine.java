@@ -14,7 +14,6 @@ import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 
 //TODO here we need to have the resources object and the menu object
@@ -182,86 +181,68 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     @Override
     public void reset() throws Exception
     {
-        Resources.LevelMisc level;
+        //stop all sound before starting game
+        getResources().stopAllSound();
         
-        switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LevelSelect))
-        {
-            case 0:
-                level = Resources.LevelMisc.Level1;
-                break;
-                
-            case 1:
-                level = Resources.LevelMisc.Level2;
-                break;
-                
-            case 2:
-                level = Resources.LevelMisc.Level3;
-                break;
-                
-            case 3:
-                level = Resources.LevelMisc.Level4;
-                break;
-                
-            case 4:
-                level = Resources.LevelMisc.Level5;
-                break;
-                
-            case 5:
-                level = Resources.LevelMisc.Level6;
-                break;
-                
-            default:
-                level = Resources.LevelMisc.Level1;
-                break;
-        }
+        //the level the user selected
+        Resources.LevelMisc level = Resources.LevelMisc.Level1;
+        final int levelIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LevelSelect);
         
-        Resources.GamePlayers heroType;
+        if (levelIndex == 0)
+            level = Resources.LevelMisc.Level1;
+        if (levelIndex == 1)
+            level = Resources.LevelMisc.Level2;
+        if (levelIndex == 2)
+            level = Resources.LevelMisc.Level3;
+        if (levelIndex == 3)
+            level = Resources.LevelMisc.Level4;
+        if (levelIndex == 4)
+            level = Resources.LevelMisc.Level5;
+        if (levelIndex == 5)
+            level = Resources.LevelMisc.Level6;
         
-        switch (menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.HeroSelect))
-        {
-            case 0:
-                heroType = Resources.GamePlayers.Donatello;
-                break;
-                
-            case 1:
-                heroType = Resources.GamePlayers.Raphael;
-                break;
-                
-            case 2:
-                heroType = Resources.GamePlayers.Leonardo;
-                break;
-                
-            case 3:
-                heroType = Resources.GamePlayers.Michelangelo;
-                break;
-                
-            default:
-                heroType = Resources.GamePlayers.Leonardo;
-                break;
-        }
+        //the hero the user chose
+        Resources.GamePlayers heroType = Resources.GamePlayers.Michelangelo;
+        final int heroIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.HeroSelect);
+        
+        if (heroIndex == 0)
+            heroType = Resources.GamePlayers.Donatello;
+        if (heroIndex == 1)
+            heroType = Resources.GamePlayers.Raphael;
+        if (heroIndex == 2)
+            heroType = Resources.GamePlayers.Leonardo;
+        if (heroIndex == 3)
+            heroType = Resources.GamePlayers.Michelangelo;
         
         final int livesIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LivesSelect);
         
+        if (projectileManager != null)
+            projectileManager.dispose();
+        
         this.projectileManager = new ProjectileManager();
+        
+        if (playerManager != null)
+            playerManager.dispose();
+        
         this.playerManager = new PlayerManager(getMain().getTimeDeductionPerUpdate());
+        this.playerManager.getHeroManager().add(heroType, livesIndex + 5);
+        
+        if (levelManager != null)
+            levelManager.dispose();
+        
         this.levelManager = new LevelManager();
         this.levelManager.setLevel(level, resources, main.getScreen());
         
-        this.playerManager.getHeroManager().add(heroType, livesIndex + 5);
+        if (gameover != null)
+            gameover.flush();
         
-        //final int wordPreferenceIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.WordPreference);
-        
-        /*
-        final int randomIndex = (int)(Math.random() * ResourceManager.GameAudioMusic.values().length);
-        getResources().stopAllSound();
-        getResources().playMusic(ResourceManager.GameAudioMusic.values()[randomIndex], true);
-        */
+        gameover = null;
     }
     
     /**
      * Draw our game to the Graphics object whether resources are still loading or the game is intact
      * @param g
-     * @return
+     * @return Graphics
      * @throws Exception 
      */
     @Override
@@ -314,7 +295,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                         result = "Game Over You Lose";
 
                     final int defeated = getPlayerManager().getEnemiesDefeatedCount();
-                    final String timeDesc = getPlayerManager().getTimer(PlayerManager.Keys.GamePlay).getDescPassed(TimerCollection.FORMAT_4);
+                    final String timeDesc = getPlayerManager().getTimer(PlayerManager.Keys.GamePlay).getDescPassed(TimerCollection.FORMAT_6);
                     
                     gameover = new BufferedImage(getMain().getScreen().width, getMain().getScreen().height, BufferedImage.TYPE_INT_ARGB);
                     
@@ -328,10 +309,15 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                     y += (tmp.getFontMetrics().getHeight() * 2);
                     tmp.drawString("Defeated: " + defeated, x, y);
                     y += (tmp.getFontMetrics().getHeight() * 2);
-                    tmp.drawString("Time: " + timeDesc, x, y);
+                    tmp.drawString("Play Time: " + timeDesc, x, y);
+                    y += (tmp.getFontMetrics().getHeight() * 2);
+                    tmp.drawString("Hit \"Esc\" to access menu.", x, y);
                 }
                 else
                 {
+                    //draw all player objects, projectiles, and level power ups
+                    getPlayerManager().render(g2d, this);
+                    
                     //draw game over screen
                     g2d.drawImage(gameover, 0, 0, null);
                 }
@@ -339,64 +325,9 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
             else
             {
                 //draw the level first
-                getLevelManager().render(g2d, getPlayerManager().getEnemyCount() < 1, getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
+                getLevelManager().render(g2d, !getPlayerManager().hasEnemies(), getResources().getLevelObject(LevelMisc.April), getMain().getScreen());
 
-                if (levelObjects == null)
-                    levelObjects = new ArrayList<>();
-
-                //clear level objects list
-                levelObjects.clear();
-
-                //add all level related objects to List
-                getLevelManager().addAllStageObjects(levelObjects);
-
-                //add all player related objects to List
-                getPlayerManager().addAllPlayerObjects(levelObjects);
-
-                //add all of the projectiles to List
-                getProjectileManager().addAllProjectiles(levelObjects);
-
-                for (int i=0; i < levelObjects.size(); i++)
-                {
-                    for (int x=0; x < levelObjects.size(); x++)
-                    {
-                        if (i == x)
-                            continue;
-
-                        if (levelObjects.get(i).getY() + (levelObjects.get(i).getHeight() / 2) < levelObjects.get(x).getY() + (levelObjects.get(x).getHeight() / 2))
-                        {
-                            Sprite temp = levelObjects.get(i);
-
-                            levelObjects.set(i, levelObjects.get(x));
-                            levelObjects.set(x, temp);
-                        }
-                    }
-                }
-
-                for (Sprite levelObject : levelObjects)
-                {
-                    if (levelObject.getImage() == null)
-                        continue;
-
-                    //get half the dimensions so we can offset/reset the coordinates
-                    int halfWidth = (levelObject.getWidth() / 2);
-                    int halfHeight = (levelObject.getHeight() / 2);
-
-                    //we need to offset the object location before drawing
-                    levelObject.setX(levelObject.getX() - halfWidth);
-                    levelObject.setY(levelObject.getY() - halfHeight);
-
-                    levelObject.draw(g2d);
-
-                    //now that the object is drawn we need to reset the location
-                    levelObject.setX(levelObject.getX() + halfWidth);
-                    levelObject.setY(levelObject.getY() + halfHeight);
-                }
-
-                //remove all objects in List
-                levelObjects.clear();
-
-                //draw hero info, etc....
+                //draw all player objects, projectiles, and level power ups
                 getPlayerManager().render(g2d, this);
             }
         }

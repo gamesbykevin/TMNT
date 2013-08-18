@@ -28,7 +28,7 @@ public final class Level6 extends Level implements LevelRules
     }
     
     @Override
-    public void setEnemyLimits()
+    public void setEnemyLimits() throws Exception
     {
         super.setEnemiesAtOnce(0);
         super.setEnemiesPerCheckpoint(0);
@@ -54,7 +54,9 @@ public final class Level6 extends Level implements LevelRules
     @Override
     public void setMusic()
     {
-        super.setMusic(GameAudioMusic.Level6Boss);
+        //no level music
+        super.setMusic(null);
+        
         super.setMusicBoss(GameAudioMusic.Level6Boss);
     }
 }

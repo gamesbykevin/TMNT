@@ -10,8 +10,6 @@ public class Bebop extends Boss implements PlayerRules
     private static final int SPRITE_WIDTH  = 90;
     private static final int SPRITE_HEIGHT = 95;
     
-    private static final int VELOCITY_WALK = 3;
-    
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
@@ -19,13 +17,6 @@ public class Bebop extends Boss implements PlayerRules
     {
         super(GamePlayers.Bebop);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -34,6 +25,9 @@ public class Bebop extends Boss implements PlayerRules
         
         //setup all velocity for this player
         setupVelocity();
+        
+        //set projectile limit
+        super.setProjectileLimit(Boss.PROJECTILE_LIMIT_DEFAULT);
     }
     
     @Override
@@ -64,6 +58,7 @@ public class Bebop extends Boss implements PlayerRules
         animation.add(getSpriteRectangle(0,1), getNanoSeconds(125));
         getSpriteSheet().add(animation, State.ATTACK1);
         
+        /*
         //attack2 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,1), getNanoSeconds(125));
@@ -71,6 +66,7 @@ public class Bebop extends Boss implements PlayerRules
         animation.add(getSpriteRectangle(1,0), getNanoSeconds(125));
         animation.add(getSpriteRectangle(2,0), getNanoSeconds(125));
         getSpriteSheet().add(animation, State.ATTACK2);
+        */
         
         //throwing projectile animation
         animation = new SpriteSheetAnimation();

@@ -10,8 +10,6 @@ public class Krang extends Boss implements PlayerRules
     private static final int SPRITE_WIDTH  = 115;
     private static final int SPRITE_HEIGHT = 115;
     
-    private static final int VELOCITY_WALK = 3;
-    
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
@@ -19,13 +17,6 @@ public class Krang extends Boss implements PlayerRules
     {
         super(GamePlayers.Krang);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -34,6 +25,9 @@ public class Krang extends Boss implements PlayerRules
         
         //setup all velocity for this player
         setupVelocity();
+        
+        //set projectile limit
+        super.setProjectileLimit(Boss.PROJECTILE_LIMIT_DEFAULT);
     }
     
     @Override

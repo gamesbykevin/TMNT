@@ -11,8 +11,6 @@ public final class FootSoldier8 extends Grunt implements PlayerRules
     private static final int SPRITE_WIDTH  = 60;
     private static final int SPRITE_HEIGHT = 60;
     
-    private static final int VELOCITY_WALK = 1;
-    
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
@@ -20,13 +18,6 @@ public final class FootSoldier8 extends Grunt implements PlayerRules
     {
         super(GamePlayers.FootSoldier8);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -35,6 +26,9 @@ public final class FootSoldier8 extends Grunt implements PlayerRules
         
         //setup all velocity for this player
         setupVelocity();
+        
+        //set projectile limit
+        super.setProjectileLimit(Grunt.PROJECTILE_LIMIT_DEFAULT);
     }
     
     @Override

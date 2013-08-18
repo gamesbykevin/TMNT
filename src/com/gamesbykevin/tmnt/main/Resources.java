@@ -72,7 +72,7 @@ public class Resources
         Cowabunga, 
         Explosion, 
         Hit1, Hit2, 
-        ProjectileHit1, ProjectileHit2, ProjectileHit3, ProjectileHit4, 
+        ProjectileHit, 
         Jump, JumpKick,
         LetsKickShell,
         PizzaTime, 
@@ -173,6 +173,9 @@ public class Resources
      */
     public void playGameMusic(final Object key, final boolean loop)
     {
+        if (key == null)
+            return;
+        
         getResources(Type.GameAudioMusic).playAudio(key, loop);
     }
     
@@ -206,27 +209,19 @@ public class Resources
     }
     
     /**
-     * Plays a random hit sound effect
+     * Play specified sound effect and loop parameter
+     * @param key
      * @param loop 
      */
-    public void playSoundEffectRandomProjectileHit()
-    {
-        List<GameAudioEffects> sounds = new ArrayList<>();
-        sounds.add(GameAudioEffects.ProjectileHit1);
-        sounds.add(GameAudioEffects.ProjectileHit2);
-        sounds.add(GameAudioEffects.ProjectileHit3);
-        sounds.add(GameAudioEffects.ProjectileHit4);
-        
-        final int randomIndex = (int)(Math.random() * sounds.size());
-        
-        playSoundEffect(sounds.get(randomIndex), false);
-    }
-    
     public void playSoundEffect(final Object key, final boolean loop)
     {
         getResources(Type.GameAudioEffects).playAudio(key, loop);
     }
     
+    /**
+     * Play specified sound effect with no loop
+     * @param key 
+     */
     public void playSoundEffect(final Object key)
     {
         playSoundEffect(key, false);
@@ -237,12 +232,14 @@ public class Resources
         getResources(Type.GameAudioMusic).getAudio(key).stopSound();
     }
     
-    
     public void stopGameAudioEffect(final Object key)
     {
         getResources(Type.GameAudioEffects).getAudio(key).stopSound();
     }
     
+    /**
+     * Stop all audio effects and all audio music
+     */
     public void stopAllSound()
     {
         getResources(Type.GameAudioEffects).stopAllAudio();

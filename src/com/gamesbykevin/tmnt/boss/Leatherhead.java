@@ -10,8 +10,6 @@ public class Leatherhead extends Boss implements PlayerRules
     private static final int SPRITE_WIDTH  = 130;
     private static final int SPRITE_HEIGHT = 100;
     
-    private static final int VELOCITY_WALK = 3;
-    
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
@@ -19,13 +17,6 @@ public class Leatherhead extends Boss implements PlayerRules
     {
         super(GamePlayers.Leatherhead);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -34,6 +25,9 @@ public class Leatherhead extends Boss implements PlayerRules
         
         //setup all velocity for this player
         setupVelocity();
+        
+        //set projectile limit
+        super.setProjectileLimit(Boss.PROJECTILE_LIMIT_DEFAULT);
     }
     
     @Override
@@ -58,14 +52,16 @@ public class Leatherhead extends Boss implements PlayerRules
         //attack1 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(2,0), getNanoSeconds(350));
-        animation.add(getSpriteRectangle(1,0), getNanoSeconds(350));
+        animation.add(getSpriteRectangle(1,0), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK1);
 
         //attack2 animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,0), getNanoSeconds(200));
+        animation.add(getSpriteRectangle(0,2), getNanoSeconds(150));
+        animation.add(getSpriteRectangle(0,0), getNanoSeconds(50));
         getSpriteSheet().add(animation, State.ATTACK2);
 
+        /*
         //attack3 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(4,0), getNanoSeconds(100));
@@ -75,6 +71,7 @@ public class Leatherhead extends Boss implements PlayerRules
         animation.add(getSpriteRectangle(2,1), getNanoSeconds(100));
         animation.add(getSpriteRectangle(3,1), getNanoSeconds(100));
         getSpriteSheet().add(animation, State.ATTACK3);
+        */
         
         //throw projectile animation
         animation = new SpriteSheetAnimation();

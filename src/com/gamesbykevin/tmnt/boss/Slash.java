@@ -10,8 +10,6 @@ public class Slash extends Boss implements PlayerRules
     private static final int SPRITE_WIDTH  = 100;
     private static final int SPRITE_HEIGHT = 75;
     
-    private static final int VELOCITY_WALK = 3;
-    
     /**
      * In this constructor we want to setup all of the animations for this Player
      */
@@ -19,13 +17,6 @@ public class Slash extends Boss implements PlayerRules
     {
         super(GamePlayers.Slash);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -49,8 +40,8 @@ public class Slash extends Boss implements PlayerRules
         
         //idle animation
         animation = new SpriteSheetAnimation();
-        animation.add(getSpriteRectangle(0,2), getNanoSeconds(250));
-        animation.add(getSpriteRectangle(5,1), getNanoSeconds(250));
+        animation.add(getSpriteRectangle(0,2), getNanoSeconds(350));
+        animation.add(getSpriteRectangle(5,1), getNanoSeconds(150));
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.IDLE);
         
@@ -68,6 +59,7 @@ public class Slash extends Boss implements PlayerRules
         animation.add(getSpriteRectangle(3,0), getNanoSeconds(150));
         getSpriteSheet().add(animation, State.ATTACK2);
         
+        /*
         //attack3 animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(1,2), getNanoSeconds(75));
@@ -75,6 +67,7 @@ public class Slash extends Boss implements PlayerRules
         animation.add(getSpriteRectangle(3,2), getNanoSeconds(75));
         animation.add(getSpriteRectangle(4,2), getNanoSeconds(75));
         getSpriteSheet().add(animation, State.ATTACK3);
+        */
         
         //walk horizontal animation
         animation = new SpriteSheetAnimation();
@@ -92,10 +85,12 @@ public class Slash extends Boss implements PlayerRules
         animation.setLoop(true);
         getSpriteSheet().add(animation, State.WALK_VERTICAL);
         
+        /*
         //defense animation
         animation = new SpriteSheetAnimation();
         animation.add(getSpriteRectangle(0,1), getNanoSeconds(250));
         getSpriteSheet().add(animation, State.DEFENSE);
+        */
         
         //hurt animation
         animation = new SpriteSheetAnimation();

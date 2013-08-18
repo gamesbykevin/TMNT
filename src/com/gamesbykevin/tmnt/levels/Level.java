@@ -47,8 +47,6 @@ public abstract class Level extends Sprite
     //the different rate to scroll the background
     private int BACKGROUND_SCROLL_OFFSET = 2;
     
-    private static final double EXTRA_WIDTH_SPAWN_RATIO = .2;
-    
     //this will be the boss the player will face at the end of the level
     private GamePlayers type;
     
@@ -69,12 +67,9 @@ public abstract class Level extends Sprite
      * 
      * @param type The boss the hero will face at the end of the level
      */
-    public Level(final GamePlayers type) throws Exception
+    public Level(final GamePlayers type)
     {
         this.type = type;
-        
-        if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
-            throw new Exception("Can't have more than 6 enemies at once");
     }
     
     /**
@@ -85,13 +80,17 @@ public abstract class Level extends Sprite
         this.addedBoss = true;
     }
     
+    /**
+     * Has boss been added to this level yet
+     * @return boolean
+     */
     public boolean hasAddedBoss()
     {
         return this.addedBoss;
     }
     
     /**
-     * Set the limit of enemies that can spawn for each check point
+     * Set the limit of enemies that can spawn for each check point 
      * @param enemiesPerCheckpoint 
      */
     protected void setEnemiesPerCheckpoint(final int enemiesPerCheckpoint)
@@ -103,8 +102,11 @@ public abstract class Level extends Sprite
      * Set the limit of enemies that can be created at 1 time
      * @param enemiesAtOnce 
      */
-    protected void setEnemiesAtOnce(final int enemiesAtOnce)
+    protected void setEnemiesAtOnce(final int enemiesAtOnce) throws Exception
     {
+        if (enemiesAtOnce > ENEMIES_AT_ONCE_LIMIT)
+            throw new Exception("Can't have more than 6 enemies at once");
+        
         this.enemiesAtOnce = enemiesAtOnce;
     }
     
@@ -149,16 +151,43 @@ public abstract class Level extends Sprite
     /**
      * Proper house keeping
      */
+    @Override
     public void dispose()
     {
+        super.dispose();
+        
         bounds = null;
         
-        backgrounds.clear();
-        backgrounds = null;
+        if (backgrounds != null)
+        {
+            for (Sprite background : backgrounds)
+            {
+                if (background != null)
+                {
+                    background.dispose();
+                    background = null;
+                }
+            }
+            
+            backgrounds.clear();
+            backgrounds = null;
+        }
         
-        powerUps.clear();
-        powerUps = null;
-    
+        if (powerUps != null)
+        {
+            for (Sprite powerUp : powerUps)
+            {
+                if (powerUp != null)
+                {
+                    powerUp.dispose();
+                    powerUp = null;
+                }
+            }
+            
+            powerUps.clear();
+            powerUps = null;
+        }
+        
         checkpoints.clear();
         checkpoints = null;
     }
@@ -190,15 +219,16 @@ public abstract class Level extends Sprite
      * @param playerHeight We need the height to aid picking a random location
      * @return 
      */
-    public Point getStart(final Rectangle screen, final int playerWidth, final int playerHeight)
+    public Point getStart(final Rectangle screen, final Sprite sprite)
     {
         //the extra part we will check on each side
-        final int extraWidth = (int)(screen.getWidth() * EXTRA_WIDTH_SPAWN_RATIO);
+        final int extraWidth = sprite.getWidth() * 2;
         
         //the edges on both sides
         Rectangle west = new Rectangle(screen.x - extraWidth, screen.y, extraWidth, screen.height);
         Rectangle east = new Rectangle(screen.x + screen.width + extraWidth, screen.y, extraWidth, screen.height);
         
+        //create new areas for the boundary, east and west side
         Area westSide = new Area(west);
         Area eastSide = new Area(east);
         Area levelBounds = new Area(getBoundary());
@@ -218,27 +248,43 @@ public abstract class Level extends Sprite
             tmp = eastSide.getBounds();
         
         //if the west side in not a possibility then they have to spawn from the east side
-        if (westSide.getBounds().getWidth() < 1 || westSide.getBounds().x - playerWidth <= getWestBoundsX())
+        if (westSide.getBounds().getWidth() < extraWidth || westSide.getBounds().x - sprite.getWidth() <= getWestBoundsX())
             tmp = eastSide.getBounds();
         
         //if the east side in not a possibility then they have to spawn from the west side
-        if (eastSide.getBounds().getWidth() < 1)
+        if (eastSide.getBounds().getWidth() < extraWidth)
             tmp = westSide.getBounds();
         
         //random coordinates inside Rectangle
         final int randomX = (int)(Math.random() * tmp.getWidth()) + tmp.x;
         
+        //this list will contain a list of all the possible valid y coordinates for a start position
         List<Integer> possibilities = new ArrayList<>();
 
-        for (int y = screen.y; y < screen.y + screen.height - (playerHeight / 2); y++)
+        //save original point so we can revert back to it
+        final Point original = sprite.getPoint();
+        
+        for (int y = tmp.y; y < tmp.y + tmp.height; y++)
         {
-            if (getBoundary().contains(randomX, y))
+            //set the temp location
+            sprite.setX(randomX);
+            sprite.setY(y);
+            
+            //get anchor location of sprite
+            Rectangle tmpAnchor = Player.getAnchorLocation(sprite);
+            
+            //only a valid location if the anchor is within the level boundary
+            if (getBoundary().contains(tmpAnchor))
                 possibilities.add(y);
         }
+        
+        //reset the original location
+        sprite.setLocation(original);
 
         //get random y coordinate
         final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
         
+        //return new valid location
         return new Point(randomX, randomY);
     }
     
@@ -304,6 +350,15 @@ public abstract class Level extends Sprite
         //each powerup will be placed in a different area
         final int eachSectionWidth = (int)((getWidth() / getPowerUpLimit()) * .9);
 
+        Area screenArea = new Area(screen);
+        Area levelBoundary = new Area(getBoundary());
+        
+        //create shape based on the intersection of the 2 Area's
+        levelBoundary.intersect(screenArea);
+        
+        //area where power up can spawn (just use this to get the y-coordinate)
+        Rectangle spawnArea = levelBoundary.getBounds();
+        
         //continue to loop until we have reached our limit
         while (powerUps.size() < getPowerUpLimit())
         {
@@ -326,9 +381,11 @@ public abstract class Level extends Sprite
                 randomX = (int)(Math.random() * eachSectionWidth) + (powerUps.size() * eachSectionWidth);
             }
 
-            List<Integer> possibilities = new ArrayList<>();
-
-            for (int y = screen.y; y < screen.y + screen.height; y++)
+            final List<Integer> possibilities = new ArrayList<>();
+            final int startY = spawnArea.y + (powerUp.getHeight() / 2);
+            final int finishY = screen.y + screen.height - (powerUp.getHeight() / 2);
+            
+            for (int y = startY; y < finishY; y++)
             {
                 if (getBoundary().contains(new Rectangle(randomX, y, powerUp.getWidth(), powerUp.getHeight())))
                     possibilities.add(y);
@@ -338,7 +395,6 @@ public abstract class Level extends Sprite
             final int randomY = possibilities.get((int)(Math.random() * possibilities.size()));
 
             possibilities.clear();
-            possibilities = null;
             
             //set random location
             powerUp.setLocation(randomX, randomY);
@@ -356,24 +412,37 @@ public abstract class Level extends Sprite
      * @param total Number of checkpoints to create for the level
      * @throws Exception 
      */
-    public void createCheckPoints(final int total) throws Exception
+    public void createCheckPoints(final int total, final Rectangle screen) throws Exception
     {
         if (getWidth() <= 0)
             throw new Exception("Dimensions have to be set first before calling this function");
         
+        //start with a new check point list
         checkpoints = new ArrayList<>();
 
         //only create checkpoints if needed
         if (total > 0)
         {
-            final int eachCheckpointLength = (int)((getWidth() / total) * .75);
+            //the spacing between each checkpoint
+            final int eachCheckpointLength = (int)( ( (getWidth() - screen.width) / total) * .75 );
 
-            //continue adding checkpoints until we have reached our total
-            while (checkpoints.size() < total)
+            final int startX = screen.x + screen.width;
+            
+            //this will be the boss checkpoint
+            checkpoints.add(startX);
+            
+            //continue adding checkpoints until we have reached our total + 1
+            while (checkpoints.size() < total + 1)
             {
-                //first check point will start at a distance so the hero doesn't have enemies until they scroll
-                checkpoints.add((checkpoints.size() * eachCheckpointLength) + eachCheckpointLength);
+                checkpoints.add((checkpoints.size() * eachCheckpointLength) + startX);
             }
+        }
+        else
+        {
+            final int startX = screen.x + screen.width;
+            
+            //this will be the boss checkpoint
+            checkpoints.add(startX);
         }
     }
     
@@ -387,12 +456,10 @@ public abstract class Level extends Sprite
      */
     public boolean hasCheckpoint(final int playerWidth)
     {
-        Rectangle r = getBoundary().getBounds();
-        
         for (int i=0; i < checkpoints.size(); i++)
         {
-            //if the scroll x coordinate has past a check point 
-            if (r.x + r.width < checkpoints.get(i) + playerWidth)
+            //if the east-most x coordinate is greater than a check point 
+            if (getEastBoundsX() < checkpoints.get(i) + playerWidth)
             {
                 //reset counter
                 resetEnemiesCreatedAtCheckpoint();
@@ -415,7 +482,7 @@ public abstract class Level extends Sprite
     
     /**
      * gets the list of power ups
-     * @return List Sprtie
+     * @return List Sprite
      */
     public List<Sprite> getPowerUps()
     {
@@ -423,7 +490,7 @@ public abstract class Level extends Sprite
     }
 
     /**
-     * Get the west most x coordinagte
+     * Get the west most x coordinate
      * @return int x-coordinate
      */
     private int getWestBoundsX()

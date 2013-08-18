@@ -19,13 +19,6 @@ public final class Donatello extends Hero implements PlayerRules
     {
         super(GamePlayers.Donatello);
         
-        //all default settings for this player
-        setupDefaults();
-    }
-    
-    @Override
-    public void setupDefaults()
-    {
         //setup dimensions
         super.setDimensions(SPRITE_WIDTH, SPRITE_HEIGHT);
         
@@ -102,7 +95,7 @@ public final class Donatello extends Hero implements PlayerRules
         animation.add(getSpriteRectangle(5,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(6,5), getNanoSeconds(50));
         animation.add(getSpriteRectangle(7,5), getNanoSeconds(50));
-        animation.add(getSpriteRectangle(8,5), getNanoSeconds(450));
+        animation.add(getSpriteRectangle(8,5), getNanoSeconds(250));
         getSpriteSheet().add(animation, State.ATTACK5);
         
         //jump animation

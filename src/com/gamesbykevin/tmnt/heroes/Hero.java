@@ -13,7 +13,7 @@ import java.util.List;
 public class Hero extends Player
 {
     private static final int HEALTH_DEFAULT = 10;
-    private static final int LIVES_DEFAULT = 5;
+    private static final int LIVES_DEFAULT = 1;
     
     private int fullHealthWidth = -1;
     private int fontHeight = -1;
@@ -37,9 +37,6 @@ public class Hero extends Player
         //all heroes will have the same health and lives
         super.setHealthDefault(HEALTH_DEFAULT);
         super.setLives(LIVES_DEFAULT);
-        
-        setHealthDisplay();
-        setLivesDisplay();
     }
     
     /**
@@ -202,7 +199,7 @@ public class Hero extends Player
         }
     }
     
-    private void setLivesDisplay()
+    public void setLivesDisplay()
     {
         livesDisplay = super.getLives() + "";
     }
@@ -221,6 +218,7 @@ public class Hero extends Player
                 color = new Color(255, 0, 0);
         }
         
+        //set the color according to the turtle
         g.setColor(color);
         
         //these width and height values will be cached as well
@@ -229,8 +227,10 @@ public class Hero extends Player
         if (fontHeight < 0)
             fontHeight = g.getFontMetrics().getHeight();
         
+        //draw health bar
         g.drawString(healthDisplay, x, y);
         
+        //draw lives remaining
         g.drawString(livesDisplay, x + fullHealthWidth, y - (int)(fontHeight * 1.2));
         
         return g;

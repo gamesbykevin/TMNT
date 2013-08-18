@@ -1,11 +1,16 @@
 package com.gamesbykevin.tmnt.grunt;
 
+import com.gamesbykevin.tmnt.boss.Boss;
+import com.gamesbykevin.tmnt.boss.BossManager;
 import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
+import com.gamesbykevin.tmnt.player.PlayerManager.Keys;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +19,7 @@ public class Grunt extends Player
     //the direction the player will attempt to attack from if not east then west
     private boolean attackEast;
     
+    //the steps the enemy will take to attack hero
     private boolean step1 = true, step2 = false, step3 = false;
     
     //each enemy will die after 4 hits
@@ -22,8 +28,25 @@ public class Grunt extends Player
     //each enemy will start at 0 extra lives
     private static final int LIVES_DEFAULT = 0;
     
+    //heroes we are targeting
     private List<Player> heroes;
     
+    //the flashing image of the enemy boss
+    private BufferedImage flashing;
+    
+    //keep track if we are displaying flashing image or not
+    private boolean flash;
+    
+    //the original image
+    private Image original;
+    
+    //the hero the enemy is targeting
+    private Player hero;
+    
+    public static final int PROJECTILE_LIMIT_DEFAULT = 1;
+    
+    protected static final int VELOCITY_WALK = 1;
+
     public Grunt(GamePlayers type)
     {
         super(type);
@@ -32,6 +55,20 @@ public class Grunt extends Player
         super.setLives(LIVES_DEFAULT);
         
         this.resetSteps();
+    }
+    
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        
+        if (original != null)
+            original.flush();
+        if (flashing != null)
+            flashing.flush();
+        
+        original = null;
+        flashing = null;
     }
     
     /**
@@ -45,12 +82,16 @@ public class Grunt extends Player
         //call this update first as it manages the animation and player state
         super.update(engine, heroes);
         
+        //if this grunt is a boss check if we need to apply the flashing image
+        if (BossManager.isBoss(getType()))
+            checkFlash(engine);
+        
         //no heroes
         if (heroes.size() < 1 || getAssignment() == null)
             return;
         
         //get the hero that the enemy is targeting
-        Player hero = getAssignment(heroes);
+        hero = getAssignment(heroes);
         
         //no assigned target
         if (hero == null)
@@ -94,7 +135,6 @@ public class Grunt extends Player
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());
 
                     //if there's an opportunity, take it as long as they are on the screen
-                    //if (attackState != null && screen.contains(super.getRectangle()))
                     if (attackState != null && screen.contains(super.getCenter()))
                     {
                         //while attacking the enemy isn't moving
@@ -139,6 +179,46 @@ public class Grunt extends Player
                     setVelocity(Player.VELOCITY_NONE, Player.VELOCITY_NONE);
                 }
             }
+        }
+    }
+    
+    /**
+     * Alternate between images as the boss health declines.
+     * 
+     * @param engine 
+     */
+    private void checkFlash(final Engine engine)
+    {
+        //if the health is below the first warning, we don't want to pause animation
+        if (super.getHealth() <= Boss.HEALTH_WARNING_1)
+            engine.getPlayerManager().getTimer(Keys.BossFlash).setPause(false);
+        
+        //set the appropriate remaining time
+        if (super.getHealth() <= Boss.HEALTH_WARNING_1)
+            engine.getPlayerManager().getTimer(Keys.BossFlash).setReset(Boss.BOSS_FLASH_DELAY_1);
+        if (super.getHealth() <= Boss.HEALTH_WARNING_2)
+            engine.getPlayerManager().getTimer(Keys.BossFlash).setReset(Boss.BOSS_FLASH_DELAY_2);
+        if (super.getHealth() <= Boss.HEALTH_WARNING_3)
+            engine.getPlayerManager().getTimer(Keys.BossFlash).setReset(Boss.BOSS_FLASH_DELAY_3);
+        if (super.getHealth() <= Boss.HEALTH_WARNING_4)
+            engine.getPlayerManager().getTimer(Keys.BossFlash).setReset(Boss.BOSS_FLASH_DELAY_4);
+        
+        if (engine.getPlayerManager().getTimer(Keys.BossFlash).hasTimePassed())
+        {
+            if (!flash)
+            {
+                super.setImage(flashing);
+            }
+            else
+            {
+                super.setImage(original);
+            }
+            
+            //alter flash
+            flash = !flash;
+            
+            //reset time
+            engine.getPlayerManager().getTimer(Keys.BossFlash).reset();
         }
     }
     
@@ -300,7 +380,7 @@ public class Grunt extends Player
             }
             else
             {
-                if (getX() > hero.getX() + hero.getWidth())
+                if (getX() > hero.getX() + hero.getWidth() * 2)
                 {
                     setState(State.WALK_HORIZONTAL);
                     setVelocityX(-getVelocityWalk());
@@ -439,5 +519,50 @@ public class Grunt extends Player
             possible.add(State.THROW_PROJECTILE);
         
         return possible;
+    }
+    
+    /**
+     * This method will take the original image
+     * and apply a bit mask to create a new image. 
+     * The purpose of this is to have a copy of the 
+     * original sprite sheet as well a copy with 
+     * every animation appearing to have a flash color 
+     * applied. Then when the boss is low on health 
+     * we can apply a flashing effect.
+     * 
+     * @throws Exception 
+     */
+    public void createImages() throws Exception
+    {
+        if (getImage() == null)
+            throw new Exception("Image has not been set yet");
+        
+        //store original image because we will be alternating images
+        this.original = super.getImage();
+        
+        //get the dimensions of the image
+        final int width = getImage().getWidth(null);
+        final int height = getImage().getHeight(null);
+        
+        //create a copy of image to this buffered image
+        BufferedImage testImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        testImage.getGraphics().drawImage(getImage(), 0, 0, null);
+        
+        //create the flashing image with the same dimensions
+        this.flashing = new BufferedImage(getImage().getWidth(null), getImage().getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        
+        int[] imagePixels = flashing.getRGB( 0, 0, width, height, null, 0, width);
+        int[] maskPixels  = testImage.getRGB(0, 0, width, height, null, 0, width);
+
+        for (int i = 0; i < imagePixels.length; i++)
+        {
+            //take the current pixel data and apply the following modifications 
+            int color = (imagePixels[i] & 0xff0000); 
+            int alpha = maskPixels[i] >> 16; 
+            imagePixels[i] = color | alpha; 
+        }
+
+        //now that the pixel data has been altered apply it to our flashing image
+        flashing.setRGB(0, 0, width, height, imagePixels, 0, width);
     }
 }

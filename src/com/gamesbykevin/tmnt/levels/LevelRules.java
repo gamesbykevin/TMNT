@@ -25,6 +25,8 @@ public interface LevelRules
      * Set the number of enemies that can be created once
      * and the number of enemies that will spawn at each 
      * checkpoint.
+     * 
+     * @throws Exception 
      */
-    public void setEnemyLimits();
+    public void setEnemyLimits() throws Exception;
 }

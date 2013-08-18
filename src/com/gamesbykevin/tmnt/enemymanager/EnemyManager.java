@@ -1,13 +1,15 @@
 package com.gamesbykevin.tmnt.enemymanager;
 
 import com.gamesbykevin.framework.base.Sprite;
+
+import com.gamesbykevin.tmnt.boss.BossManager;
 import com.gamesbykevin.tmnt.grunt.Grunt;
 import com.gamesbykevin.tmnt.main.Engine;
 import com.gamesbykevin.tmnt.main.Resources;
 import com.gamesbykevin.tmnt.main.Resources.GamePlayers;
 import com.gamesbykevin.tmnt.player.Player;
-import java.awt.Point;
-import java.awt.Rectangle;
+import com.gamesbykevin.tmnt.player.PlayerManager.Keys;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,22 +139,40 @@ public class EnemyManager
             //if the grunt assets are not loaded yet
             if (grunt.getImage() == null)
             {
+                //set the enemy image
                 grunt.setImage(engine.getResources().getGamePlayer(grunt.getType()));
+                
+                //if enemy is boss we need to create the flashing image
+                if (BossManager.isBoss(grunt.getType()))
+                {
+                    grunt.createImages();
+                    
+                    //reset timer and pause it
+                    engine.getPlayerManager().getTimer(Keys.BossFlash).reset();
+                    engine.getPlayerManager().getTimer(Keys.BossFlash).setPause(true);
+                }
+                
+                //set the time delay needed for the sprite sheet
                 grunt.setDelay(engine.getMain().getTimeDeductionPerUpdate());
+                
+                //set the width-height based on the current sprite sheet animation dimensions
                 grunt.setDimensions();
                 
-                final Point start = engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt.getWidth(), grunt.getHeight());
-                grunt.setLocation(start);
+                //set the start location
+                grunt.setLocation(engine.getLevelManager().getLevel().getStart(engine.getMain().getScreen(), grunt));
                 
-                final Rectangle screen = engine.getMain().getScreen();
-                final boolean rightSide = start.x >= screen.x + screen.width;
+                //is this grunt starting on the right side
+                final boolean rightSide = grunt.getX() >= engine.getMain().getScreen().x + engine.getMain().getScreen().width;
                 
+                //if starting on the right side then we attack the left side, and vice versa
                 grunt.setAttackEast(!rightSide);
             }
             
+            //set sprite sheet delay in case not set yet
             if (grunt.getDelay() < 0)
                 grunt.setDelay(engine.getMain().getTimeDeductionPerUpdate());
             
+            //update location/animation etc...
             grunt.update(engine);
             
             //if the death animation is complete and no more lives remove the grunt
@@ -161,6 +181,7 @@ public class EnemyManager
                 //keep track of enemies defeated
                 engine.getPlayerManager().addEnemiesDefeated();
                 
+                //house cleaning
                 grunt.dispose();
                 grunt = null;
                 grunts.remove(i);
@@ -177,6 +198,7 @@ public class EnemyManager
         final int screenLeftSide = engine.getMain().getScreen().x;
         final int screenRightSide = engine.getMain().getScreen().x + engine.getMain().getScreen().width;
         
+        //the heroes we want to target
         heroes = engine.getPlayerManager().getHeroManager().getPlayerHeroes();
         
         //enemies that are not assigned a target

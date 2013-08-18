@@ -28,8 +28,7 @@ public abstract class Player extends Sprite
         PROJECTILE1, PROJECTILE1_FINISH, 
         PROJECTILE2, 
         HURT, 
-        DEAD,
-        DEFENSE
+        DEAD
     }
     
     //we want to know what player this is so we can assign the appropriate assets
@@ -44,7 +43,7 @@ public abstract class Player extends Sprite
     private Point jumpPhase1;
     private Point jumpPhase2;
     
-    //if the player can throw a projectile we want to make sure other projectiles don't exist
+    //if the player can throw a projectile we want to make sure they are within the limit
     private boolean canThrow = false;
     
     //this is to check if we are to chain attack states together
@@ -71,6 +70,14 @@ public abstract class Player extends Sprite
     //this is the hero the enemy has targeted
     private GamePlayers assigned;
     
+    //the number of projectiles allowed for this player
+    private int projectileLimit = 1;
+    
+    //this flag will shake the player when they are hurt
+    private boolean stun = false;
+    
+    private static final int STUN_RATIO = 5;
+    
     public Player(final GamePlayers type)
     {
         setType(type);
@@ -80,6 +87,20 @@ public abstract class Player extends Sprite
         
         //assign default state of idle
         super.getSpriteSheet().setCurrent(State.IDLE);
+    }
+    
+    /**
+     * Set the number of projectiles allowed for this player
+     * @param projectileLimit 
+     */
+    protected void setProjectileLimit(final int projectileLimit)
+    {
+        this.projectileLimit = projectileLimit;
+    }
+    
+    private int getProjectileLimit()
+    {
+        return this.projectileLimit;
     }
     
     /**
@@ -108,6 +129,11 @@ public abstract class Player extends Sprite
     protected int getHealth()
     {
         return this.health;
+    }
+    
+    public void removeHealth()
+    {
+        setHealth(0);
     }
     
     private void deductHealth()
@@ -397,9 +423,8 @@ public abstract class Player extends Sprite
         }
         else
         {
-            //NOTE THIS MAY NEED TO CHANGE FOR THE BOSSES AS ROCKSTEADY CAN FIRE MULTIPLE BULLETS
-            //if the player can throw a projectile but does not have one currently
-            if (hasState(State.THROW_PROJECTILE) && !projectileManager.hasProjectile(getType()) && projectileManager.canAddProjectile())
+            //if the player can throw a projectile and hasn't reached the projectile limit
+            if (hasState(State.THROW_PROJECTILE) && projectileManager.getCount() < getProjectileLimit())
                 canThrow = true;
         }
         
@@ -413,6 +438,16 @@ public abstract class Player extends Sprite
             {
                 deductHealth();
                 setNewState(State.IDLE);
+            }
+            else
+            {
+                //the stun below will make the player appear to shake when they are hit
+                if (stun)
+                    setVelocityX( getVelocityWalk() * STUN_RATIO);
+                else
+                    setVelocityX(-getVelocityWalk() * STUN_RATIO);
+                
+                stun = !stun;
             }
         }
         
@@ -428,8 +463,9 @@ public abstract class Player extends Sprite
                 setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                 setNewState(State.DEAD);
                 
+                //reset health if the player still has lives
                 if (hasLives())
-                    setHealth(getHealthDefault());
+                    resetHealth();
             }
         }
     }
@@ -448,11 +484,31 @@ public abstract class Player extends Sprite
                 if (!target.canHurt())
                     continue;
 
-                Rectangle anchorHero = getAnchorLocation();
-                Rectangle anchorEnemy = target.getAnchorLocation();
+                Rectangle anchorAttacker;
+                
+                if (getState() == State.JUMP_ATTACK)
+                {
+                    //store y
+                    final int y = super.getY();
+                    
+                    //pretend we are at our landing spot
+                    setY(getJumpPhase2().y);
+                    
+                    //get the correct anchor
+                    anchorAttacker = getAnchorLocation();
+                    
+                    //reset y back
+                    setY(y);
+                }
+                else
+                {
+                    anchorAttacker = getAnchorLocation();
+                }
+                
+                Rectangle anchorTarget = target.getAnchorLocation();
 
                 //we have made collision with the enemy
-                if (anchorHero.intersects(anchorEnemy) && getRectangle().contains(target.getCenter()) && !hasState(State.THROW_PROJECTILE))
+                if (anchorAttacker.intersects(anchorTarget) && getRectangle().contains(target.getCenter()) && !hasState(State.THROW_PROJECTILE))
                 {
                     //make sure hero is facing the enemy, NOTE: even though we hit the enemy do not exit loop because we may damage multiple
                     if (target.getCenter().x >= getCenter().x && !hasHorizontalFlip() || target.getCenter().x <= getCenter().x && hasHorizontalFlip())
@@ -460,7 +516,10 @@ public abstract class Player extends Sprite
                         //play hurt sound effect
                         engine.getResources().playSoundEffectRandomHit();
                         
+                        //once player is hurt they will face their attacker
                         target.setHorizontalFlip(!hasHorizontalFlip());
+                        
+                        //when hurt, can't move and set the correct animation
                         target.setNewState(State.HURT);
                         target.setVelocity(VELOCITY_NONE, VELOCITY_NONE);
                     }
@@ -625,7 +684,7 @@ public abstract class Player extends Sprite
             //any of these can't hurt the player
             case HURT:
             case DEAD:
-            case DEFENSE:
+            //case DEFENSE:
             case JUMP:
             case JUMP_ATTACK:
                 return false;
@@ -700,7 +759,7 @@ public abstract class Player extends Sprite
      * @param sprite The object we want the anchor location from
      * @return Rectangle The rectangle containing the players feet
      */
-    public static Rectangle getAnchorLocation(Sprite sprite)
+    public static Rectangle getAnchorLocation(final Sprite sprite)
     {
         final int halfWidth  = (sprite.getWidth()  / 2);
         final int halfHeight = (sprite.getHeight() / 2);
