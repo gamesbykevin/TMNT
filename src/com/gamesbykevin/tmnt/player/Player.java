@@ -441,13 +441,16 @@ public abstract class Player extends Sprite
             }
             else
             {
-                //the stun below will make the player appear to shake when they are hit
-                if (stun)
-                    setVelocityX( getVelocityWalk() * STUN_RATIO);
-                else
-                    setVelocityX(-getVelocityWalk() * STUN_RATIO);
-                
-                stun = !stun;
+                if (!HeroManager.isHero(getType()))
+                {
+                    //the stun below will make the player appear to shake when they are hit
+                    if (stun)
+                        setVelocityX( getVelocityWalk() * STUN_RATIO);
+                    else
+                        setVelocityX(-getVelocityWalk() * STUN_RATIO);
+
+                    stun = !stun;
+                }
             }
         }
         
