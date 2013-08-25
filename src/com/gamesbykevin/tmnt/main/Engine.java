@@ -7,7 +7,7 @@ import com.gamesbykevin.framework.util.TimerCollection;
 
 import com.gamesbykevin.tmnt.levels.*;
 import com.gamesbykevin.tmnt.main.Resources.LevelMisc;
-import com.gamesbykevin.tmnt.menu.GameMenu;
+import com.gamesbykevin.tmnt.menu.Game;
 import com.gamesbykevin.tmnt.player.PlayerManager;
 import com.gamesbykevin.tmnt.projectile.ProjectileManager;
 
@@ -24,7 +24,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Main main;
     
     //access this menu here
-    private GameMenu menu;
+    private Game menu;
     
     //object that contains all image/audio resources in the game
     private Resources resources;
@@ -59,7 +59,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
      * @param main Main object that contains important information so we need a reference to it
      * @throws CustomException 
      */
-    public Engine(final Main main) 
+    public Engine(final Main main) throws Exception
     {
         this.main = main;
         this.mouse = new Mouse();
@@ -117,7 +117,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
 
                 //resources are now loaded so create the menu
                 if (!resources.isLoading())
-                    menu = new GameMenu(resources, main.getScreen());
+                    menu = new Game(this);
             }
             else
             {
@@ -133,7 +133,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
                 menu.update(this);
 
                 //if the menu is on the last layer and the window has focus
-                if (menu.isMenuFinished() && menu.hasFocus())
+                if (menu.hasFinished() && menu.hasFocus())
                 {
                     //MAIN GAME LOGIC RUN HERE
                     if (getPlayerManager() != null)
@@ -186,7 +186,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         
         //the level the user selected
         Resources.LevelMisc level = Resources.LevelMisc.Level1;
-        final int levelIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LevelSelect);
+        final int levelIndex = menu.getOptionSelectionIndex(Game.LayerKey.Options, Game.OptionKey.Level);
         
         if (levelIndex == 0)
             level = Resources.LevelMisc.Level1;
@@ -203,7 +203,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         
         //the hero the user chose
         Resources.GamePlayers heroType = Resources.GamePlayers.Michelangelo;
-        final int heroIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.HeroSelect);
+        final int heroIndex = menu.getOptionSelectionIndex(Game.LayerKey.Options, Game.OptionKey.Hero);
         
         if (heroIndex == 0)
             heroType = Resources.GamePlayers.Donatello;
@@ -214,7 +214,7 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
         if (heroIndex == 3)
             heroType = Resources.GamePlayers.Michelangelo;
         
-        final int livesIndex = menu.getOptionSelectionIndex(GameMenu.LayerKey.Options, GameMenu.OptionKey.LivesSelect);
+        final int livesIndex = menu.getOptionSelectionIndex(Game.LayerKey.Options, Game.OptionKey.Lives);
         
         if (projectileManager != null)
             projectileManager.dispose();
@@ -348,11 +348,11 @@ public class Engine implements KeyListener, MouseMotionListener, MouseListener, 
     private Graphics renderMenu(Graphics g) throws Exception
     {
         //if menu is setup draw menu
-        if (menu.isMenuSetup())
+        if (menu.isSetup())
             menu.render(g);
 
         //is menu is finished and we dont want to hide mouse cursor then draw it, or if the menu is not finished show mouse
-        if (menu.isMenuFinished() && !Main.hideMouse || !menu.isMenuFinished())
+        if (menu.hasFinished() && !Main.hideMouse || !menu.hasFinished())
         {
             Point p = mouse.getLocation();
 

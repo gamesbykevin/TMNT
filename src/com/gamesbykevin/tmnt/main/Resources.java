@@ -90,7 +90,7 @@ public class Resources
     //indicates wether or not we are still loading resources
     private boolean loading = true;
     
-    public Resources()
+    public Resources() throws Exception
     {
         everyResource = new LinkedHashMap<>();
         
@@ -117,7 +117,7 @@ public class Resources
     }
     
     //add a collection of resources audio/image/font/text
-    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final Manager.Type resourceType)
+    private void add(final Object key, final Object[] eachResourceKey, final String directory, final String loadDesc, final Manager.Type resourceType) throws Exception
     {
         String[] locations = new String[eachResourceKey.length];
         for (int i=0; i < locations.length; i++)
@@ -126,7 +126,7 @@ public class Resources
         }
 
         Manager resources = new Manager(Manager.LoadMethod.OnePerFrame, locations, eachResourceKey, resourceType);
-        resources.setDesc(loadDesc);
+        resources.setDescription(loadDesc);
         
         everyResource.put(key, resources);
     }
@@ -254,7 +254,7 @@ public class Resources
         {
             Manager resources = getResources(key);
             
-            if (!resources.isLoadingComplete())
+            if (!resources.isComplete())
             {
                 //load the resources
                 resources.update(source);
@@ -309,10 +309,10 @@ public class Resources
         everyResource = null;
     }
     
-    public Graphics draw(final Graphics g, final Rectangle screen)
+    public Graphics draw(final Graphics graphics, final Rectangle screen)
     {
         if (!loading)
-            return g;
+            return graphics;
         
         Object[] keys = everyResource.keySet().toArray();
         
@@ -320,13 +320,17 @@ public class Resources
         {
             Manager resources = getResources(key);
             
-            if (!resources.isLoadingComplete())
+            //if the resources aren't complete yet
+            if (!resources.isComplete())
             {
-                Progress.draw(g, screen, resources.getProgress(), resources.getDesc());
-                return g;
+                //draw progress since this isn't done, but then do not draw any others
+                resources.render(graphics, screen);
+                
+                //return graphics object
+                return graphics;
             }
         }
         
-        return g;
+        return graphics;
     }
 }
