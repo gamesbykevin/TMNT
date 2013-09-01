@@ -244,7 +244,7 @@ public class LevelManager
         {
             //find the hero with the most width
             if (hero.getWidth() > playerWidth)
-                playerWidth = hero.getWidth() + 1;
+                playerWidth = (int)(hero.getWidth() + 1);
 
             //default the scroll speed to 0 before we check
             getLevel().setScrollSpeed(Player.VELOCITY_NONE);
@@ -263,7 +263,7 @@ public class LevelManager
             if (hero.isJumping())
             {
                 //tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2);
-                tmpAnchor.y = hero.getJumpPhase2().y + (hero.getHeight() / 2) - (int)(hero.getHeight() * Player.ANCHOR_HEIGHT_RATIO);
+                tmpAnchor.y = (int)(hero.getJumpPhase2().y + (hero.getHeight() / 2) - (hero.getHeight() * Player.ANCHOR_HEIGHT_RATIO));
             }
             else
             {
@@ -294,11 +294,11 @@ public class LevelManager
             //calculate future position and stop velocity if no longer in boundary
             if (hero.getVelocityX() != VELOCITY_NONE)
             {
-                tmpAnchor.translate(hero.getVelocityX(), VELOCITY_NONE);
+                tmpAnchor.translate((int)hero.getVelocityX(), VELOCITY_NONE);
 
                 if (!getLevel().getBoundary().contains(tmpAnchor) || !engine.getMain().getScreen().contains(tmpAnchor))
                 {
-                    tmpAnchor.translate(-hero.getVelocityX(), VELOCITY_NONE);
+                    tmpAnchor.translate(-(int)hero.getVelocityX(), VELOCITY_NONE);
                     hero.setVelocityX(VELOCITY_NONE);
                 }
             }
@@ -308,13 +308,13 @@ public class LevelManager
                 if (!hero.isJumping())
                 {
                     //move anchor according to y velocity set
-                    tmpAnchor.translate(VELOCITY_NONE, hero.getVelocityY());
+                    tmpAnchor.translate(VELOCITY_NONE, (int)hero.getVelocityY());
 
                     //if the anchor is no longer inside the level boundary
                     if (!getLevel().getBoundary().contains(tmpAnchor)) // || !screen.contains(tmpAnchor))
                     {
                         //move anchor back according to y velocity set
-                        tmpAnchor.translate(VELOCITY_NONE, -hero.getVelocityY());
+                        tmpAnchor.translate(VELOCITY_NONE, -(int)hero.getVelocityY());
                         
                         //since we can no longer move in the current direction set y velocity to none
                         hero.setVelocityY(VELOCITY_NONE);
@@ -328,11 +328,11 @@ public class LevelManager
                 boolean hasEnemies = engine.getPlayerManager().hasEnemies();
                 
                 //move temp anchor to check for collision before we scroll
-                tmpAnchor.translate(hero.getVelocityX(), Player.VELOCITY_NONE);
+                tmpAnchor.translate((int)hero.getVelocityX(), Player.VELOCITY_NONE);
 
                 //if there are no enemies on the screen and we are withing the boundary scroll accordingly
                 if (!hasEnemies && getLevel().getBoundary().contains(tmpAnchor))
-                    getLevel().setScrollSpeed(hero.getVelocityX());
+                    getLevel().setScrollSpeed((int)hero.getVelocityX());
 
                 //stop level scroll if at end of level or enemies exist
                 if (getLevel().getEastBoundsX() <= engine.getMain().getScreen().x + engine.getMain().getScreen().width || hasEnemies)
@@ -352,21 +352,21 @@ public class LevelManager
             //calculate future position and stop velocity if no longer in boundary
             if (grunt.getVelocityX() != VELOCITY_NONE)
             {
-                tmpAnchor.translate(grunt.getVelocityX(), VELOCITY_NONE);
+                tmpAnchor.translate((int)grunt.getVelocityX(), VELOCITY_NONE);
 
                 if (!getLevel().getBoundary().contains(tmpAnchor))
                 {
-                    tmpAnchor.translate(-grunt.getVelocityX(), VELOCITY_NONE);
+                    tmpAnchor.translate(-(int)grunt.getVelocityX(), VELOCITY_NONE);
                     grunt.setVelocityX(VELOCITY_NONE);
                 }
             }
             else
             {
-                tmpAnchor.translate(VELOCITY_NONE, grunt.getVelocityY());
+                tmpAnchor.translate(VELOCITY_NONE, (int)grunt.getVelocityY());
 
                 if (!getLevel().getBoundary().contains(tmpAnchor))
                 {
-                    tmpAnchor.translate(VELOCITY_NONE, -grunt.getVelocityY());
+                    tmpAnchor.translate(VELOCITY_NONE, -(int)grunt.getVelocityY());
                     grunt.setVelocityY(VELOCITY_NONE);
                 }
             }
@@ -512,7 +512,7 @@ public class LevelManager
                             hero.setHorizontalFlip(false);
                             
                             //set new start location
-                            engine.getPlayerManager().getHeroManager().setStartLocation(getLevel().getBoundary().getBounds(), hero.getWidth(), hero.getHeight());
+                            engine.getPlayerManager().getHeroManager().setStartLocation(getLevel().getBoundary().getBounds(), (int)hero.getWidth(), (int)hero.getHeight());
                             
                             //set hero to the start location
                             hero.setLocation(engine.getPlayerManager().getHeroManager().getStartLocation());

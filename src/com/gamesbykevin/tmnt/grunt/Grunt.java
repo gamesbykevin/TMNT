@@ -129,7 +129,7 @@ public class Grunt extends Player
 
                     //then, close/spread the gap
                     if (!step1 && !step2 && step3)
-                        closeGap(anchor, anchorHero, hero.getX());
+                        closeGap(anchor, anchorHero, (int)hero.getX());
 
                     //here we check for the opportunity to attack
                     final State attackState = getAttackOpportunity(anchor, anchorHero, hero.getCenter(), hero.isJumping());

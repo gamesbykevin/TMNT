@@ -206,7 +206,7 @@ public abstract class Player extends Sprite
      */
     protected final Rectangle getSpriteRectangle(final int col, final int row)
     {
-        return new Rectangle(col * getWidth(), row * getHeight(), getWidth(), getHeight());
+        return new Rectangle((int)(col * getWidth()), (int)(row * getHeight()), (int)getWidth(), (int)getHeight());
     }
     
     /**
@@ -492,7 +492,7 @@ public abstract class Player extends Sprite
                 if (getState() == State.JUMP_ATTACK)
                 {
                     //store y
-                    final int y = super.getY();
+                    final int y = (int)super.getY();
                     
                     //pretend we are at our landing spot
                     setY(getJumpPhase2().y);
@@ -764,13 +764,13 @@ public abstract class Player extends Sprite
      */
     public static Rectangle getAnchorLocation(final Sprite sprite)
     {
-        final int halfWidth  = (sprite.getWidth()  / 2);
-        final int halfHeight = (sprite.getHeight() / 2);
+        final int halfWidth  = (int)(sprite.getWidth()  / 2);
+        final int halfHeight = (int)(sprite.getHeight() / 2);
         
         sprite.setX(sprite.getX() - halfWidth);
         sprite.setY(sprite.getY() - halfHeight);
         
-        Rectangle tmp = new Rectangle(sprite.getX(), sprite.getY() + sprite.getHeight() - (int)(sprite.getHeight() * ANCHOR_HEIGHT_RATIO), sprite.getWidth(), (int)(sprite.getHeight() * ANCHOR_HEIGHT_RATIO));
+        Rectangle tmp = new Rectangle((int)sprite.getX(), (int)(sprite.getY() + sprite.getHeight() - (sprite.getHeight() * ANCHOR_HEIGHT_RATIO)), (int)sprite.getWidth(), (int)(sprite.getHeight() * ANCHOR_HEIGHT_RATIO));
         
         sprite.setX(sprite.getX() + halfWidth);
         sprite.setY(sprite.getY() + halfHeight);

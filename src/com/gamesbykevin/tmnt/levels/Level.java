@@ -222,7 +222,7 @@ public abstract class Level extends Sprite
     public Point getStart(final Rectangle screen, final Sprite sprite)
     {
         //the extra part we will check on each side
-        final int extraWidth = sprite.getWidth() * 2;
+        final int extraWidth = (int)(sprite.getWidth() * 2);
         
         //the edges on both sides
         Rectangle west = new Rectangle(screen.x - extraWidth, screen.y, extraWidth, screen.height);
@@ -382,12 +382,12 @@ public abstract class Level extends Sprite
             }
 
             final List<Integer> possibilities = new ArrayList<>();
-            final int startY = spawnArea.y + (powerUp.getHeight() / 2);
-            final int finishY = screen.y + screen.height - (powerUp.getHeight() / 2);
+            final int startY = (int)(spawnArea.y + (powerUp.getHeight() / 2));
+            final int finishY = (int)(screen.y + screen.height - (powerUp.getHeight() / 2));
             
             for (int y = startY; y < finishY; y++)
             {
-                if (getBoundary().contains(new Rectangle(randomX, y, powerUp.getWidth(), powerUp.getHeight())))
+                if (getBoundary().contains(new Rectangle(randomX, y, (int)powerUp.getWidth(), (int)powerUp.getHeight())))
                     possibilities.add(y);
             }
 
@@ -651,7 +651,7 @@ public abstract class Level extends Sprite
         if (bounds != null)
         {
             //update level position and bounds
-            bounds.translate(super.getVelocityX(), Player.VELOCITY_NONE);
+            bounds.translate((int)super.getVelocityX(), Player.VELOCITY_NONE);
             
             //keep updating the coordiantes
             eastBoundX += super.getVelocityX();

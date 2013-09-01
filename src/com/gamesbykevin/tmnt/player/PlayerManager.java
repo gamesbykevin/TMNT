@@ -250,8 +250,8 @@ public class PlayerManager
                 continue;
 
             //get half the dimensions so we can offset/reset the coordinates
-            int halfWidth  = (levelObject.getWidth()  / 2);
-            int halfHeight = (levelObject.getHeight() / 2);
+            int halfWidth  = (int)(levelObject.getWidth()  / 2);
+            int halfHeight = (int)(levelObject.getHeight() / 2);
 
             //we need to offset the object location before drawing
             levelObject.setX(levelObject.getX() - halfWidth);

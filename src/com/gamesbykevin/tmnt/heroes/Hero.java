@@ -106,8 +106,8 @@ public class Hero extends Player
                 
                 setVelocity(getVelocityX(), -getVelocityJump());
                 setNewState(State.JUMP);
-                setJumpPhase1(getX(), getY() - (getVelocityJump() * Player.NUM_FRAMES_JUMP));
-                setJumpPhase2(getX(), getY());
+                setJumpPhase1((int)getX(), (int)(getY() - (getVelocityJump() * Player.NUM_FRAMES_JUMP)));
+                setJumpPhase2((int)getX(), (int)getY());
             }
         }
 

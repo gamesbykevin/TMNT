@@ -164,7 +164,7 @@ public class HeroManager
                 hero.setDimensions();
                 
                 //set start location
-                setStartLocation(engine.getLevelManager().getLevel().getBoundary().getBounds(), hero.getWidth(), hero.getHeight());
+                setStartLocation(engine.getLevelManager().getLevel().getBoundary().getBounds(), (int)hero.getWidth(), (int)hero.getHeight());
                 
                 //place hero at start location
                 hero.setLocation(getStartLocation());
