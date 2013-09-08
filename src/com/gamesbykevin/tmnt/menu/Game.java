@@ -169,11 +169,9 @@ public class Game extends Menu
     }
     
     @Override
-    public Graphics render(Graphics g) throws Exception
+    public void render(Graphics graphics) throws Exception
     {
-        super.render(g);
-        
-        return g;
+        super.render(graphics);
     }
     
     @Override
